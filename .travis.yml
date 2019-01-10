@@ -1,0 +1,18 @@
+language: python
+
+python:
+  - "3.7"
+
+# env:
+#   - SECRET_KEY=TopSecretKey DEBUG=True ALLOWED_HOSTS=127.0.0.1 #Configuração das variáveis de ambiente
+
+install:
+  - pip install -r requirements.txt
+
+script:
+  - tox
+  - coverage run --source locadora-cin -m py.test
+  - coverage report -m
+
+after_success:
+  coveralls
