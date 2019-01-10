@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load bootstrap4 %}
+<<<<<<< HEAD
 
 
 {% block conteudo %}
@@ -126,6 +127,136 @@
         </div>
         <div class="card-footer small text-muted">Atualizado as 12:54 PM</div>
     </div>
+=======
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+
+{% block conteudo %}
+
+<!-- Breadcrumbs-->
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="{% url 'core:index'%}">Início</a>
+    </li>
+    <li class="breadcrumb-item active">Generos</li>
+</ol>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+            Generos
+    </div>   
+    <div class="card-body">
+        <div class="table-responsive">  
+            <a href="{% url 'core:genero-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+            <form method="GET" action="{%url 'core:genero-listar'%}">
+                <div class="input-group mb-3 float-left">
+                    <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Buscar</button>
+                    </div>
+                </div>
+            </form>
+                 
+            <table class="table table-striped table-bordered" cellspacing="0">
+                <thead class="text-center">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tfoot class="text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>Nome</th>
+                        <th>Opções</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    {% for genero in object_list %}
+                        <tr class="text-center">
+                            <th scope="row">{{ genero.id }}</th>
+                            <td>{{ genero.nome }}</td>
+                            <td>
+                                <!-- <button type="button" class="btn btn-warning" onclick="window.location = ''">
+                                    <i class="fa fa-pencil" title="Editar" aria-hidden="true"></i>
+                                    <span class="sr-only">Editar</span> Editar
+                                </button>
+                                <button type="button" class="btn btn-danger" id="id_excluir_genero" data-toggle="modal" data-target="#confirmDeleteGenero" data-id="{{ genero.id }}">
+                                    <i class="fa fa-trash-o" title="Deletar" aria-hidden="true"></i>
+                                    <span class="sr-only">Deletar</span>
+                                </button> -->
+                                <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:genero-edita' genero.id %}'">Editar</button>
+                                <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:genero-deletar' genero.id %}'">Excluir</button>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr colsp>
+                            <td colspan="3">Nenhum gênero encontrado.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>   
+            
+            {% if is_paginated %}
+                <hr>
+                <div class="row">
+                    <div class="col-sm">
+                        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.</span>
+                    </div>
+                    <div class="col-sm">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination">
+                                {% if page_obj.has_previous %}
+                                <!-- If it ain't a search result display, don't append the search query
+                                    to the URL. -->
+                                {% if not search %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% url 'core:genero-listar' %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Previous</a>
+                                </li>
+                                {% else %}
+                                <!-- Append the searched query to the URL, so that on a search results page,
+                                    the pagination don't revert to listing all the listview items. -->
+                                    <li class="page-item">
+                                    <a class="page-link" href="{% url 'core:genero-listar' %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Previous</a>
+                                </li>
+                                {% endif %}
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                                </li>
+                                {% endif %} 
+                                {% for object in page_obj.paginator.page_range %}
+                                    <li class="page-item"><a class="page-link" href="{% url 'core:genero-listar' %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
+                                {% endfor %} 
+                                {% if page_obj.has_next %}
+                                {% if not search %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% url 'core:genero-listar' %}?page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+                                {% else %}
+                                    <li class="page-item">
+                                    <a class="page-link" href="{% url 'core:genero-listar' %}?{{search}}&page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+                                {% endif %}
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            {% endif %}
+            
+        </div>
+    </div>
+    <div class="card-footer small text-muted">Atualizado as 12:54 PM</div>
+</div>
+>>>>>>> upstream/master
 
 
 {% endblock conteudo %}
