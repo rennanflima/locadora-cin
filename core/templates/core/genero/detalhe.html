@@ -1,3 +1,26 @@
-<h1>{{ object.headline }}</h1>
-<p>Id: {{ object.id }}</p>
-<p>Nome: {{object.nome }}</p>
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{% bootstrap_messages %}
+
+{% block conteudo %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'core:index'%}">Início</a>
+        </li>
+        <li class="breadcrumb-item ">
+            <a href="{%url 'core:genero-listar'%}">Gêneros</a>
+        </li>
+        <li class="breadcrumb-item active">Detalhar</li>
+    </ol>
+    <div class="container">
+        <h2>Detalhar Gênero</h2>
+        <hr>
+        <div class="form-group">
+            <label class="negrito">Nome: </label>    
+            {{object.nome }}
+        </div> 
+    </div>
+{% endblock conteudo %}
