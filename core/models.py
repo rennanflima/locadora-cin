@@ -9,7 +9,7 @@ class Genero(models.Model):
         return "%s" % self.nome 
 
     def get_absolute_url(self):
-        return reverse('core:genero-detalhe', kwargs={'id': self.pk})
+        return reverse('core:genero-detalhe', kwargs={'pk': self.pk})
 
     class Meta:
         verbose_name = 'Gênero'
