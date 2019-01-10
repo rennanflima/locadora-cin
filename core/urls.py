@@ -4,7 +4,7 @@ from . import views
 app_name = 'core'
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
-    
+
     # Início URL CRUD Gênero
     path('genero', views.GeneroListar.as_view(), name="genero-listar"),
     path('genero/novo', views.GeneroCriar.as_view(), name="genero-novo"),
