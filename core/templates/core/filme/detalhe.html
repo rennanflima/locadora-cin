@@ -1,0 +1,59 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{% bootstrap_messages %}
+
+{% block conteudo %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'core:index'%}">Início</a>
+        </li>
+        <li class="breadcrumb-item ">
+            <a href="{%url 'core:filme-listar'%}">Filme</a>
+        </li>
+        <li class="breadcrumb-item active">Detalhar</li>
+    </ol>
+    <div class="container">
+        <h2>Detalhar Filme</h2>
+        <hr>
+        <div class="form-group">
+            <label class="negrito">Título: </label>    
+            {{object.titulo }}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Título Original: </label>    
+            {{object.titulo }}
+        </div> 
+        <div class="form-group">
+            <label class="negrito">Gênero: </label>    
+            {% for g in object.genero.all %}
+                {{ g }}
+            {% endfor %}
+        </div> 
+        <div class="form-group">
+            <label class="negrito">Duração: </label>    
+            {{object.duracao }}
+        </div> 
+        <div class="form-group">
+            <label class="negrito">Data de Lançamento: </label>    
+            {{object.data_lancamento }} ({{object.pais}})
+        </div>
+        <div class="form-group">
+            <label class="negrito">Diretor: </label>    
+            {{object.diretor }}
+        </div>  
+        <div class="form-group">
+            <label class="negrito">Classificação Indicativa: </label>    
+            {{object.get_classificacao_display }}
+        </div> 
+        <div class="form-group">
+            <label class="negrito">Sinopse: </label><br/>   
+            {{object.sinopse }}
+        </div>  
+        <hr>
+        <a href="{% url 'core:filme-listar' %}" class="btn btn-info ml-2 float-right">Voltar para a Listagem</a>
+        <a href="{% url 'core:filme-novo' %}" class="btn btn-success ml-2 float-right">Adicionar outro Filme</a>
+    </div>
+{% endblock conteudo %}

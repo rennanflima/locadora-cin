@@ -37,7 +37,7 @@ class TestGeneroViews(TestCase):
     
     def test_genero_detalhe(self):
         path = reverse('core:genero-detalhe', kwargs={'pk': self.genero.pk})
-        request = RequestFactory().get(path)
+        request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
         response = GeneroDetalhe.as_view()(request, pk=self.genero.pk)
@@ -45,7 +45,7 @@ class TestGeneroViews(TestCase):
     
     def test_genero_editar(self):
         path = reverse('core:genero-edita', kwargs={'pk': self.genero.pk})
-        request = RequestFactory().get(path)
+        request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
         response = GeneroEditar.as_view()(request, pk=self.genero.pk)
@@ -53,9 +53,59 @@ class TestGeneroViews(TestCase):
     
     def test_genero_deletar(self):
         path = reverse('core:genero-deletar', kwargs={'pk': self.genero.pk})
-        request = RequestFactory().get(path)
+        request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
         response = GeneroDeletar.as_view()(request, pk=self.genero.pk)
         assert response.status_code == 200
 
+
+
+class TestFilmeViews(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestFilmeViews, cls).setUpClass()
+        cls.filme = mixer.blend('core.Filme')
+        cls.factory = RequestFactory()
+    
+    def test_filme_lista(self):
+        path = reverse('core:filme-listar')
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = FilmeListar.as_view()(request)
+        assert response.status_code == 200
+        
+    
+    def test_filme_novo(self):
+        path = reverse('core:filme-novo')
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = FilmeCriar.as_view()(request)
+        assert response.status_code == 200
+    
+    def test_filme_detalhe(self):
+        path = reverse('core:filme-detalhe', kwargs={'pk': self.filme.pk})
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = FilmeDetalhe.as_view()(request, pk=self.filme.pk)
+        assert response.status_code == 200
+    
+    def test_filme_editar(self):
+        path = reverse('core:filme-editar', kwargs={'pk': self.filme.pk})
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = FilmeEditar.as_view()(request, pk=self.filme.pk)
+        assert response.status_code == 200
+    
+    def test_filme_deletar(self):
+        path = reverse('core:filme-deletar', kwargs={'pk': self.filme.pk})
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = FilmeDeletar.as_view()(request, pk=self.filme.pk)
+        assert response.status_code == 200
