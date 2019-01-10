@@ -2,12 +2,16 @@ from django.shortcuts import render
 from django.views import generic
 from .models import Genero
 from .forms import *
+from django.urls import reverse_lazy
+from django.contrib import messages
+
 # Create your views here.
 
 
 class IndexView(generic.TemplateView):
     template_name = "core/index.html"
 
+# Início CRUD Gênero
 
 class GeneroCriar(generic.CreateView):
     model = Genero
@@ -27,10 +31,6 @@ class GeneroListar(generic.ListView):
     def get_queryset(self):
         nome = self.request.GET.get('nome', '')
         return self.model.objects.filter(nome__icontains = nome)
-    
-    # def get_context_data(self, **kwargs):
-    #     context = super(MinhaListView, self).get_context_data(**kwargs)
-    #     return context
 
 class GeneroDetalhe(generic.DetailView):
     model = Genero
@@ -40,3 +40,11 @@ class GeneroDetalhe(generic.DetailView):
 class GeneroDeletar(generic.DeleteView):
     model = Genero
     template_name = "core/genero/deletar.html"
+    success_url = reverse_lazy('core:genero-listar')
+    success_message = "Gênero excluído com sucesso."
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(GeneroDeletar, self).delete(request, *args, **kwargs)
+
+# Termino CRUD Gênero
