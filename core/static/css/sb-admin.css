@@ -44,6 +44,10 @@ body.fixed-nav.sidebar-toggled #content-wrapper {
   }
 }
 
+label {
+  font-weight: bold;
+}
+
 .scroll-to-top {
   position: fixed;
   right: 15px;

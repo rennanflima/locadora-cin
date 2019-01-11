@@ -1,26 +1,25 @@
 {% extends 'core/base.html' %}
 {% load bootstrap4 %}
 
-
 {% block conteudo %}
     <!-- Breadcrumbs-->
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
             <a href="{% url 'core:index'%}">Início</a>
         </li>
-        <li class="breadcrumb-item active">Gêneros</li>
+        <li class="breadcrumb-item active">Filme</li>
     </ol>
     {% bootstrap_messages %}
 
     <div class="card mb-3">
         <div class="card-header">
             <i class="fas fa-table"></i>
-                Gêneros
+                Filme
         </div>   
         <div class="card-body">
             <div class="table-responsive">  
-                <a href="{% url 'core:genero-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
-                <form method="GET" action="{%url 'core:genero-listar'%}">
+                <a href="{% url 'core:filme-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                <form method="GET" action="{%url 'core:filme-listar'%}">
                     <div class="input-group mb-3 float-left">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
                         <div class="input-group-append">
@@ -34,6 +33,9 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Nome</th>
+                            <th scope="col">Ano</th>
+                            <th scope="col">Gênero</th>
+                            <th scope="col">Duração</th>
                             <th scope="col">Ações</th>
                         </tr>
                     </thead>
@@ -41,22 +43,34 @@
                         <tr>
                             <th>#</th>
                             <th>Nome</th>
-                            <th>Opções</th>
+                            <th>Ano</th>
+                            <th>Gênero</th>
+                            <th>Duração</th>
+                            <th>Ações</th>
                         </tr>
                     </tfoot>
                     <tbody>
-                        {% for genero in object_list %}
+                        {% for filme in object_list %}
                             <tr class="text-center">
-                                <th scope="row">{{ genero.id }}</th>
-                                <td>{{ genero.nome }}</td>
+                                <th scope="row">{{ filme.id }}</th>
+                                <td>{{ filme }}</td>
+                                <td>{{ filme.data_lancamento|date:"Y" }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:genero-edita' genero.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:genero-deletar' genero.id %}'">Excluir</button>
+                                    <ul>
+                                        {% for g in filme.genero.all %}
+                                            <li>{{ g }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                                <td>{{ filme.duracao }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:filme-editar' filme.id %}'">Editar</button>
+                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:filme-deletar' filme.id %}'">Excluir</button>
                                 </td>
                             </tr>
                         {% empty %}
                             <tr class="text-center">
-                                <td colspan="3">Nenhum gênero encontrado.</td>
+                                <td colspan="6">Nenhum gênero encontrado.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
