@@ -9,8 +9,8 @@ class TestGenero(TestCase):
 
     def test_str(self):
         genero = mixer.blend('core.Genero', nome='Comédia')
-        self.assertEquals(str(genero), 'Comédia')
+        self.assertEqual(str(genero), 'Comédia')
 
     def test_get_absolute_url(self):
         genero = mixer.blend('core.Genero', nome='Drama')
-        self.assertEquals(genero.get_absolute_url(), '/core/genero/{}/detalhe'.format(genero.pk))
+        self.assertEqual(genero.get_absolute_url(), '/core/genero/{}/detalhe'.format(genero.pk))
