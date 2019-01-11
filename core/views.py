@@ -41,7 +41,7 @@ class GeneroDetalhe(generic.DetailView):
 class GeneroDeletar(generic.DeleteView):
     model = Genero
     template_name = "core/genero/deletar.html"
-    success_url = reverse_lazy('core:genero-listar')
+    success_url = reverse_lazy('admin:genero-listar')
     success_message = "Gênero excluído com sucesso."
 
     def delete(self, request, *args, **kwargs):
@@ -79,7 +79,7 @@ class FilmeDetalhe(generic.DetailView):
 class FilmeDeletar(generic.DeleteView):
     model = Filme
     template_name = "core/filme/deletar.html"
-    success_url = reverse_lazy('core:filme-listar')
+    success_url = reverse_lazy('admin:filme-listar')
     success_message = "Filme excluído com sucesso."
 
     def delete(self, request, *args, **kwargs):

@@ -7,10 +7,10 @@
 <!-- Breadcrumbs-->
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="{% url 'core:index'%}">Início</a>
+            <a href="{% url 'admin:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item ">
-            <a href="{%url 'core:filme-listar'%}">Filme</a>
+            <a href="{%url 'admin:filme-listar'%}">Filme</a>
         </li>
         <li class="breadcrumb-item active">Novo</li>
     </ol>
@@ -21,8 +21,8 @@
             {% csrf_token %}
             {% bootstrap_form form %}
             <hr>
-            <a href="{%url 'core:genero-novo'%}" class="btn btn-primary ml-2 mb-4 float-right">Adicionar Gênero</a>
-            <a href="{%url 'core:filme-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+            <a href="{%url 'admin:genero-novo'%}" class="btn btn-primary ml-2 mb-4 float-right">Adicionar Gênero</a>
+            <a href="{%url 'admin:filme-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
             <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Filme</button>
         </form>
     </div>
