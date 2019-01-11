@@ -1,6 +1,7 @@
 *.pyc
 *.sqlite3
 
+.tox
 .env
 __pycache__
 .vscode
