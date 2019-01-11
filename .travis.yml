@@ -12,8 +12,8 @@ install:
 
 script:
   - tox
-  - coverage run -m pytest
-  - coverage report -m --omit=*/virtualenv/*,*/env/*,*/tests/*,*/migrations/*
+  - coverage run -m --source=locadora-cin pytest
+  # - coverage report -m --omit=*/virtualenv/*,*/env/*,*/tests/*,*/migrations/*
 
 after_success:
   coveralls
