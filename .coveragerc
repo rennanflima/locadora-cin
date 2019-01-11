@@ -1,5 +1,9 @@
 [run]
 omit = */env/*
-       */vitualenv/*
+       */travis/virtualenv/*
+       */virtualenv/*
+       */python?.?/*
+       */site-packages/nose/*
+       *__init__*
        */tests/*
        */migrations/*

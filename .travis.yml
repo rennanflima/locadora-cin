@@ -12,7 +12,7 @@ install:
 
 script:
   - tox
-  - coverage run -m pytest --cov-config=.coveragerc
+  - coverage run -m pytest
   - coverage report -m
 
 after_success:
