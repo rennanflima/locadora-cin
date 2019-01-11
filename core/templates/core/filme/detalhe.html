@@ -8,10 +8,10 @@
 {% block conteudo %}
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="{% url 'core:index'%}">Início</a>
+            <a href="{% url 'admin:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item ">
-            <a href="{%url 'core:filme-listar'%}">Filme</a>
+            <a href="{%url 'admin:filme-listar'%}">Filme</a>
         </li>
         <li class="breadcrumb-item active">Detalhar</li>
     </ol>
@@ -53,7 +53,7 @@
             {{object.sinopse }}
         </div>  
         <hr>
-        <a href="{% url 'core:filme-listar' %}" class="btn btn-info ml-2 float-right">Voltar para a Listagem</a>
-        <a href="{% url 'core:filme-novo' %}" class="btn btn-success ml-2 float-right">Adicionar outro Filme</a>
+        <a href="{% url 'admin:filme-listar' %}" class="btn btn-info ml-2 float-right">Voltar para a Listagem</a>
+        <a href="{% url 'admin:filme-novo' %}" class="btn btn-success ml-2 float-right">Adicionar outro Filme</a>
     </div>
 {% endblock conteudo %}

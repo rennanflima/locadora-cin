@@ -4,45 +4,45 @@ class TestUrls:
     
     # Início CRUD Gênero
     def test_genero_listar(self):
-        path = reverse('core:genero-listar')
-        assert resolve(path).view_name == 'core:genero-listar'
+        path = reverse('admin:genero-listar')
+        assert resolve(path).view_name == 'admin:genero-listar'
 
     def test_genero_novo(self):
-        path = reverse('core:genero-novo')
-        assert resolve(path).view_name == 'core:genero-novo'
+        path = reverse('admin:genero-novo')
+        assert resolve(path).view_name == 'admin:genero-novo'
 
     def test_genero_editar(self):
-        path = reverse('core:genero-edita', kwargs={'pk' : 1})
-        assert resolve(path).view_name == 'core:genero-edita'
+        path = reverse('admin:genero-edita', kwargs={'pk' : 1})
+        assert resolve(path).view_name == 'admin:genero-edita'
 
     def test_genero_detalhe(self):
-        path = reverse('core:genero-detalhe', kwargs={'pk' : 1})
-        assert resolve(path).view_name == 'core:genero-detalhe'
+        path = reverse('admin:genero-detalhe', kwargs={'pk' : 1})
+        assert resolve(path).view_name == 'admin:genero-detalhe'
 
     def test_genero_deletar(self):
-        path = reverse('core:genero-deletar', kwargs={'pk' : 1})
-        assert resolve(path).view_name == 'core:genero-deletar'
+        path = reverse('admin:genero-deletar', kwargs={'pk' : 1})
+        assert resolve(path).view_name == 'admin:genero-deletar'
     # Termino CRUD Gênero
 
     # Início CRUD Filme
     def test_filme_listar(self):
-        path = reverse('core:filme-listar')
-        assert resolve(path).view_name == 'core:filme-listar'
+        path = reverse('admin:filme-listar')
+        assert resolve(path).view_name == 'admin:filme-listar'
 
     def test_filme_novo(self):
-        path = reverse('core:filme-novo')
-        assert resolve(path).view_name == 'core:filme-novo'
+        path = reverse('admin:filme-novo')
+        assert resolve(path).view_name == 'admin:filme-novo'
 
     def test_filme_editar(self):
-        path = reverse('core:filme-editar', kwargs={'pk' : 1})
-        assert resolve(path).view_name == 'core:filme-editar'
+        path = reverse('admin:filme-editar', kwargs={'pk' : 1})
+        assert resolve(path).view_name == 'admin:filme-editar'
 
     def test_filme_detalhe(self):
-        path = reverse('core:filme-detalhe', kwargs={'pk' : 1})
-        assert resolve(path).view_name == 'core:filme-detalhe'
+        path = reverse('admin:filme-detalhe', kwargs={'pk' : 1})
+        assert resolve(path).view_name == 'admin:filme-detalhe'
 
     def test_filme_deletar(self):
-        path = reverse('core:filme-deletar', kwargs={'pk' : 1})
-        assert resolve(path).view_name == 'core:filme-deletar'
+        path = reverse('admin:filme-deletar', kwargs={'pk' : 1})
+        assert resolve(path).view_name == 'admin:filme-deletar'
     
     # Termino CRUD Filme

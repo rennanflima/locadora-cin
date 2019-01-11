@@ -5,7 +5,7 @@
     <!-- Breadcrumbs-->
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="{% url 'core:index'%}">Início</a>
+            <a href="{% url 'admin:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item active">Filme</li>
     </ol>
@@ -18,8 +18,8 @@
         </div>   
         <div class="card-body">
             <div class="table-responsive">  
-                <a href="{% url 'core:filme-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
-                <form method="GET" action="{%url 'core:filme-listar'%}">
+                <a href="{% url 'admin:filme-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                <form method="GET" action="{%url 'admin:filme-listar'%}">
                     <div class="input-group mb-3 float-left">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
                         <div class="input-group-append">
@@ -64,8 +64,8 @@
                                 </td>
                                 <td>{{ filme.duracao }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:filme-editar' filme.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:filme-deletar' filme.id %}'">Excluir</button>
+                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'admin:filme-editar' filme.id %}'">Editar</button>
+                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'admin:filme-deletar' filme.id %}'">Excluir</button>
                                 </td>
                             </tr>
                         {% empty %}
@@ -90,13 +90,13 @@
                                         to the URL. -->
                                     {% if not search %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'core:genero-listar' %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Previous</a>
+                                        <a class="page-link" href="{% url 'admin:genero-listar' %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Previous</a>
                                     </li>
                                     {% else %}
                                     <!-- Append the searched query to the URL, so that on a search results page,
                                         the pagination don't revert to listing all the listview items. -->
                                         <li class="page-item">
-                                        <a class="page-link" href="{% url 'core:genero-listar' %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Previous</a>
+                                        <a class="page-link" href="{% url 'admin:genero-listar' %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Previous</a>
                                     </li>
                                     {% endif %}
                                     {% else %}
@@ -105,16 +105,16 @@
                                     </li>
                                     {% endif %} 
                                     {% for object in page_obj.paginator.page_range %}
-                                        <li class="page-item"><a class="page-link" href="{% url 'core:genero-listar' %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
+                                        <li class="page-item"><a class="page-link" href="{% url 'admin:genero-listar' %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
                                     {% endfor %} 
                                     {% if page_obj.has_next %}
                                     {% if not search %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'core:genero-listar' %}?page={{ page_obj.next_page_number }}">Next</a>
+                                        <a class="page-link" href="{% url 'admin:genero-listar' %}?page={{ page_obj.next_page_number }}">Next</a>
                                     </li>
                                     {% else %}
                                         <li class="page-item">
-                                        <a class="page-link" href="{% url 'core:genero-listar' %}?{{search}}&page={{ page_obj.next_page_number }}">Next</a>
+                                        <a class="page-link" href="{% url 'admin:genero-listar' %}?{{search}}&page={{ page_obj.next_page_number }}">Next</a>
                                     </li>
                                     {% endif %}
                                     {% else %}

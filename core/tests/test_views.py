@@ -16,7 +16,7 @@ class TestGeneroViews(TestCase):
         cls.factory = RequestFactory()
     
     def test_genero_lista(self):
-        path = reverse('core:genero-listar')
+        path = reverse('admin:genero-listar')
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
@@ -28,7 +28,7 @@ class TestGeneroViews(TestCase):
         
     
     def test_genero_novo(self):
-        path = reverse('core:genero-novo')
+        path = reverse('admin:genero-novo')
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
@@ -36,7 +36,7 @@ class TestGeneroViews(TestCase):
         assert response.status_code == 200
     
     def test_genero_detalhe(self):
-        path = reverse('core:genero-detalhe', kwargs={'pk': self.genero.pk})
+        path = reverse('admin:genero-detalhe', kwargs={'pk': self.genero.pk})
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
@@ -44,7 +44,7 @@ class TestGeneroViews(TestCase):
         assert response.status_code == 200
     
     def test_genero_editar(self):
-        path = reverse('core:genero-edita', kwargs={'pk': self.genero.pk})
+        path = reverse('admin:genero-edita', kwargs={'pk': self.genero.pk})
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
@@ -52,7 +52,7 @@ class TestGeneroViews(TestCase):
         assert response.status_code == 200
     
     def test_genero_deletar(self):
-        path = reverse('core:genero-deletar', kwargs={'pk': self.genero.pk})
+        path = reverse('admin:genero-deletar', kwargs={'pk': self.genero.pk})
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
@@ -70,7 +70,7 @@ class TestFilmeViews(TestCase):
         cls.factory = RequestFactory()
     
     def test_filme_lista(self):
-        path = reverse('core:filme-listar')
+        path = reverse('admin:filme-listar')
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
@@ -79,7 +79,7 @@ class TestFilmeViews(TestCase):
         
     
     def test_filme_novo(self):
-        path = reverse('core:filme-novo')
+        path = reverse('admin:filme-novo')
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
@@ -87,7 +87,7 @@ class TestFilmeViews(TestCase):
         assert response.status_code == 200
     
     def test_filme_detalhe(self):
-        path = reverse('core:filme-detalhe', kwargs={'pk': self.filme.pk})
+        path = reverse('admin:filme-detalhe', kwargs={'pk': self.filme.pk})
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
@@ -95,7 +95,7 @@ class TestFilmeViews(TestCase):
         assert response.status_code == 200
     
     def test_filme_editar(self):
-        path = reverse('core:filme-editar', kwargs={'pk': self.filme.pk})
+        path = reverse('admin:filme-editar', kwargs={'pk': self.filme.pk})
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
@@ -103,7 +103,7 @@ class TestFilmeViews(TestCase):
         assert response.status_code == 200
     
     def test_filme_deletar(self):
-        path = reverse('core:filme-deletar', kwargs={'pk': self.filme.pk})
+        path = reverse('admin:filme-deletar', kwargs={'pk': self.filme.pk})
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 

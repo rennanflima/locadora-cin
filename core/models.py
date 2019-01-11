@@ -10,7 +10,7 @@ class Genero(models.Model):
         return "%s" % self.nome 
 
     def get_absolute_url(self):
-        return reverse('core:genero-detalhe', kwargs={'pk': self.pk})
+        return reverse('admin:genero-detalhe', kwargs={'pk': self.pk})
 
     class Meta:
         ordering = ['nome',]
@@ -41,7 +41,7 @@ class Filme(models.Model):
         return "%s (%s)" % (self.titulo, self.titulo_original)
     
     def get_absolute_url(self):
-        return reverse('core:filme-detalhe', kwargs={'pk': self.pk})
+        return reverse('admin:filme-detalhe', kwargs={'pk': self.pk})
 
     class Meta:
         ordering = ['titulo',]

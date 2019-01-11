@@ -13,4 +13,4 @@ class TestGenero(TestCase):
 
     def test_get_absolute_url(self):
         genero = mixer.blend('core.Genero', nome='Drama')
-        self.assertEqual(genero.get_absolute_url(), '/core/genero/{}/detalhe'.format(genero.pk))
+        self.assertEqual(genero.get_absolute_url(), '/admin/genero/{}/detalhe'.format(genero.pk))
