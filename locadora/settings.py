@@ -119,9 +119,29 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'core/static'),
-    os.path.join(BASE_DIR, 'media'),
+    os.path.join(BASE_DIR, 'core/media'),
 ]
+
+BOOTSTRAP4 = {
+
+    # The URL to the jQuery JavaScript file
+    'jquery_url': os.path.join(STATIC_URL, 'vendor/jquery/jquery.min.js'),
+
+    # The Bootstrap base URL
+    'base_url': os.path.join(STATIC_URL, 'static/'),
+
+    # The complete URL to the Bootstrap CSS file (None means derive it from base_url)
+    'css_url': os.path.join(STATIC_URL, 'vendor/bootstrap/css/bootstrap.min.css'),
+
+    # The complete URL to the Bootstrap JavaScript file (None means derive it from base_url)
+    'javascript_url': os.path.join(STATIC_URL, 'vendor/bootstrap/js/bootstrap.min.js'),
+
+}
