@@ -13,6 +13,7 @@ class Genero(models.Model):
         return reverse('core:genero-detalhe', kwargs={'pk': self.pk})
 
     class Meta:
+        ordering = ['nome',]
         verbose_name = 'Gênero'
         verbose_name_plural = 'Gêneros'
 
@@ -43,5 +44,6 @@ class Filme(models.Model):
         return reverse('core:filme-detalhe', kwargs={'pk': self.pk})
 
     class Meta:
+        ordering = ['titulo',]
         verbose_name = 'Filme'
         verbose_name_plural = 'Filmes'

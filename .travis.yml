@@ -2,7 +2,7 @@ language: python
 
 python:
   - "3.6"
-  - "3.7"
+  # - "3.7"
 
 # env:
 #   - SECRET_KEY=TopSecretKey DEBUG=True ALLOWED_HOSTS=127.0.0.1 #Configuração das variáveis de ambiente
