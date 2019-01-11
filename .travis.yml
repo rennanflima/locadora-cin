@@ -13,7 +13,7 @@ install:
 script:
   - tox
   - coverage run -m pytest
-  - coverage report -m
+  - coverage report -m --omit=*/env/*,*/tests/*,*/migrations/*
 
 after_success:
   coveralls
