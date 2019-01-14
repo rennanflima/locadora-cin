@@ -27,8 +27,8 @@ class Filme(models.Model):
         ('16', 'Não recomendado para menores de 16 anos'),
         ('18', 'Não recomendado para maiores de 18 anos'),
     )
-    titulo = models.CharField('Título em Português', max_length=150) 
-    titulo_original = models.CharField('Título', max_length=150)
+    titulo = models.CharField('Título', max_length=150) 
+    titulo_original = models.CharField('Título Original', max_length=150)
     sinopse = models.TextField('Sinopse')
     classificacao = models.CharField('Classificação Indicativa', max_length=2, choices=tipo_classificacao)
     duracao = models.TimeField('Duração')
