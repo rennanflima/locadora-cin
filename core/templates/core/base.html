@@ -12,9 +12,12 @@
 
     <title>Painel de Administração</title>
     {% load static %}
+
     {% load bootstrap4 %}
+
     {% bootstrap_css %}
     {% bootstrap_javascript jquery='full' %}
+    
     <!-- Bootstrap core CSS-->
     <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
 
@@ -26,23 +29,6 @@
 
     <!-- Custom styles for this template-->
     <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet">
-
-    <!-- Core plugin JavaScript-->
-    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
-
-    <!-- Page level plugin JavaScript-->
-    <script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>
-    <script src="{% static 'vendor/datatables/jquery.dataTables.js' %}"></script>
-    <script src="{% static 'vendor/datatables/dataTables.bootstrap4.js' %}"></script>
-    <script src="{% static 'vendor/jquery-mask/jquery.mask.js' %}"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="{% static 'js/sb-admin.min.js' %}"></script>
-
-    <!-- Demo scripts for this page-->
-    <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
-    <script src="{% static 'js/demo/chart-area-demo.js' %}"></script>
-
   </head>
 
   <body id="page-top">
@@ -126,7 +112,7 @@
           <a class="dropdown-item" href="{% url 'admin:filme-novo' %}"><i class="fas fa-fw fa-film"></i> Filmes</a>
             <a class="dropdown-item" href="{% url 'admin:genero-novo' %}"><i class="fas fa-fw fa-venus-mars"></i> Gênero</a>
             <a class="dropdown-item" href="adicionar_usuario.html"><i class="fas fa-fw fa-user-plus"></i> Usuário</a>
-            <a class="dropdown-item" href="adicionar_midia.html"><i class="fas fa-compact-disc"></i> Mídia</a>
+            <a class="dropdown-item" href="{% url 'admin:midia-novo' %}"><i class="fas fa-compact-disc"></i> Mídia</a>
            
           </div>
         </li> 
@@ -141,7 +127,7 @@
             <span>Usuários</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="crudMidias.html">
+          <a class="nav-link" href="{% url 'admin:midia-listar' %}">
             <i class="fas fa-compact-disc"></i>
             <span>Mídias</span></a>
         </li>
@@ -201,6 +187,19 @@
         </div>
       </div>
     </div>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Page level plugin JavaScript-->
+    <script src="{% static 'vendor/datatables/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'vendor/datatables/dataTables.bootstrap4.js' %}"></script>
+    <script src="{% static 'vendor/jquery-mask/jquery.mask.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin.min.js' %}"></script>
+    
     <script type="application/javascript">
       $(document).ready(function () {
           //called when key is pressed in textbox  
@@ -216,6 +215,8 @@
       $('.time').mask('00:00:00');
 
       $('.cep').mask('00000-000');
+
+      $('.money2').mask("#.##0,00", {reverse: true});
 
       var SPMaskBehavior = function (val) {
         return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';

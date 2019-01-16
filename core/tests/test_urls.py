@@ -46,3 +46,26 @@ class TestUrls:
         assert resolve(path).view_name == 'admin:filme-deletar'
     
     # Termino CRUD Filme
+    
+    # Início CRUD Midia
+    def test_midia_listar(self):
+        path = reverse('admin:midia-listar')
+        assert resolve(path).view_name == 'admin:midia-listar'
+
+    def test_midia_novo(self):
+        path = reverse('admin:midia-novo')
+        assert resolve(path).view_name == 'admin:midia-novo'
+
+    def test_midia_editar(self):
+        path = reverse('admin:midia-editar', kwargs={'pk' : 1})
+        assert resolve(path).view_name == 'admin:midia-editar'
+
+    def test_midia_detalhe(self):
+        path = reverse('admin:midia-detalhe', kwargs={'pk' : 1})
+        assert resolve(path).view_name == 'admin:midia-detalhe'
+
+    def test_midia_deletar(self):
+        path = reverse('admin:midia-deletar', kwargs={'pk' : 1})
+        assert resolve(path).view_name == 'admin:midia-deletar'
+    
+    # Termino CRUD Midia

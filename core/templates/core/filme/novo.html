@@ -20,6 +20,37 @@
         <form method="POST" class="form">
             {% csrf_token %}
             {% bootstrap_form form %}
+            
+            <!--<div class="form-row ">
+                <div class="form-group col-md-6">
+                    <label>{{ form.titulo.label }}</label>
+                    {{ form.titulo }}
+                </div>
+                <div class="form-group col-md-6">
+                    <label>{{ form.titulo_original.label }}</label>
+                    {{ form.titulo_original }}
+                </div>
+            </div>
+            <div class="form-row ">
+                <div class="form-group col-md-2">
+                    <label>{{ form.ano.label }}</label>
+                    {{ form.ano }}
+                </div>
+                <div class="form-group col-md-2">
+                    <label>{{ form.duracao.label }}</label>
+                    {{ form.duracao }}
+                </div>
+                <div class="form-group col-md-4">
+                    <label>{{ form.diretor.label }}</label>
+                    {{ form.diretor }}
+                </div>
+                <div class="form-group col-md-3">
+                    <label>{{ form.genero.label }}</label>
+                    {{ form.genero }}
+                </div>
+            </div>-->
+
+
             <hr>
             <a href="{%url 'admin:genero-novo'%}" class="btn btn-primary ml-2 mb-4 float-right">Adicionar Gênero</a>
             <a href="{%url 'admin:filme-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>

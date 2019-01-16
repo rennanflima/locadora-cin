@@ -1,9 +1,5 @@
 {% extends 'core/base.html' %}
 {% load bootstrap4 %}
-{% bootstrap_css %}
-{% bootstrap_javascript jquery='full' %}
-
-{% bootstrap_messages %}
 
 {% block conteudo %}
     <ol class="breadcrumb">
@@ -15,6 +11,9 @@
         </li>
         <li class="breadcrumb-item active">Detalhar</li>
     </ol>
+
+    {% bootstrap_messages %}
+
     <div class="container">
         <h2>Detalhar Gênero</h2>
         <hr>
