@@ -121,14 +121,14 @@ class MidiaDetalhe(generic.DetailView):
     template_name = 'core/midia/detalhe.html'
 
 
-class MidiaDeletar(SuccessMessageMixin, generic.DeleteView):
+class MidiaDeletar(generic.DeleteView):
     model = Midia
     template_name = "core/midia/deletar.html"
     success_url = reverse_lazy('admin:midia-listar')
     success_message = "Mídia excluída com sucesso."
 
-    #def delete(self, request, *args, **kwargs):
-    #    messages.success(self.request, self.success_message)
-    #    return super(MidiaDeletar, self).delete(request, *args, **kwargs)
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(MidiaDeletar, self).delete(request, *args, **kwargs)
 
 # Termino CRUD Midia

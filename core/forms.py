@@ -26,7 +26,7 @@ class FilmeForm(ModelForm):
         super(FilmeForm, self).__init__(*args, **kwargs)
 
 class MidiaForm(ModelForm):
-    valor = forms.DecimalField(max_digits=8, decimal_places=2, localize=True)
+    valor = forms.DecimalField(label='Valor da Locação', max_digits=8, decimal_places=2, localize=True)
     class Meta:
         model = Midia
         fields = ('nome','valor',)
