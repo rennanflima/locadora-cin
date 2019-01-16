@@ -92,3 +92,43 @@ class FilmeDeletar(generic.DeleteView):
         return super(FilmeDeletar, self).delete(request, *args, **kwargs)
 
 # Termino CRUD Filme
+
+# Início CRUD Midia
+
+class MidiaCriar(SuccessMessageMixin, generic.CreateView):
+    model = Midia
+    form_class = MidiaForm
+    template_name = 'core/midia/novo.html'
+    success_message = "Mídia adicionada com sucesso."
+
+class MidiaEditar(SuccessMessageMixin, generic.UpdateView):
+    model = Midia
+    form_class = MidiaForm
+    template_name = 'core/midia/editar.html'
+    success_message = "Mídia editada com sucesso."
+
+class MidiaListar(generic.ListView):
+    model = Midia
+    paginate_by = 10
+    template_name = 'core/midia/lista.html'    
+
+    def get_queryset(self):
+        nome = self.request.GET.get('nome', '')
+        return self.model.objects.filter(nome__icontains = nome)
+
+class MidiaDetalhe(generic.DetailView):
+    model = Midia
+    template_name = 'core/midia/detalhe.html'
+
+
+class MidiaDeletar(SuccessMessageMixin, generic.DeleteView):
+    model = Midia
+    template_name = "core/midia/deletar.html"
+    success_url = reverse_lazy('admin:midia-listar')
+    success_message = "Mídia excluída com sucesso."
+
+    #def delete(self, request, *args, **kwargs):
+    #    messages.success(self.request, self.success_message)
+    #    return super(MidiaDeletar, self).delete(request, *args, **kwargs)
+
+# Termino CRUD Midia

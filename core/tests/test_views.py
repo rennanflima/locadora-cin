@@ -60,7 +60,7 @@ class TestGeneroViews(TestCase):
         assert response.status_code == 200
 
 
-
+@pytest.mark.django_db
 class TestFilmeViews(TestCase):
 
     @classmethod
@@ -108,4 +108,54 @@ class TestFilmeViews(TestCase):
         # request.user = mixer.blend(User)
 
         response = FilmeDeletar.as_view()(request, pk=self.filme.pk)
+        assert response.status_code == 200
+
+@pytest.mark.django_db
+class TestMidiaViews(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestMidiaViews, cls).setUpClass()
+        cls.midia = mixer.blend('core.Midia')
+        cls.factory = RequestFactory()
+    
+    def test_midia_lista(self):
+        path = reverse('admin:midia-listar')
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = MidiaListar.as_view()(request)
+        assert response.status_code == 200
+        
+    
+    def test_midia_novo(self):
+        path = reverse('admin:midia-novo')
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = MidiaCriar.as_view()(request)
+        assert response.status_code == 200
+    
+    def test_midia_detalhe(self):
+        path = reverse('admin:midia-detalhe', kwargs={'pk': self.midia.pk})
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = MidiaDetalhe.as_view()(request, pk=self.midia.pk)
+        assert response.status_code == 200
+    
+    def test_midia_editar(self):
+        path = reverse('admin:midia-editar', kwargs={'pk': self.midia.pk})
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = MidiaEditar.as_view()(request, pk=self.midia.pk)
+        assert response.status_code == 200
+    
+    def test_midia_deletar(self):
+        path = reverse('admin:midia-deletar', kwargs={'pk': self.midia.pk})
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = MidiaDeletar.as_view()(request, pk=self.midia.pk)
         assert response.status_code == 200

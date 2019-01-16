@@ -24,3 +24,13 @@ class TestFilme(TestCase):
     def test_get_absolute_url(self):
         filme = mixer.blend('core.Filme', titulo='A Rocha', titulo_original='The Rock')
         self.assertEqual(filme.get_absolute_url(), '/admin/filme/{}/detalhe'.format(filme.pk))
+
+class TestMidia(TestCase):
+
+    def test_str(self):
+        midia = mixer.blend('core.Midia', nome='DVD')
+        self.assertEqual(str(midia), 'DVD')
+
+    def test_get_absolute_url(self):
+        midia = mixer.blend('core.Midia', nome='VHS')
+        self.assertEqual(midia.get_absolute_url(), '/admin/midia/{}/detalhe'.format(midia.pk))

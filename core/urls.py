@@ -21,4 +21,11 @@ urlpatterns = [
     path('filme/<int:pk>/detalhe', views.FilmeDetalhe.as_view(), name="filme-detalhe"),
     # Termino URL CRUD Filme
     
+    # Início URL CRUD Midia
+    path('midia', views.MidiaListar.as_view(), name="midia-listar"),
+    path('midia/novo', views.MidiaCriar.as_view(), name="midia-novo"),
+    path('midia/<int:pk>/editar', views.MidiaEditar.as_view(), name="midia-editar"),
+    path('midia/<int:pk>/deletar', views.MidiaDeletar.as_view(), name="midia-deletar"),
+    path('midia/<int:pk>/detalhe', views.MidiaDetalhe.as_view(), name="midia-detalhe"),
+    # Termino URL CRUD Midia
 ]

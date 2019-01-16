@@ -47,3 +47,18 @@ class Filme(models.Model):
         ordering = ['titulo',]
         verbose_name = 'Filme'
         verbose_name_plural = 'Filmes'
+
+class Midia(models.Model):
+    nome = models.CharField('Nome', max_length=100)
+    valor = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+
+    def __str__(self):
+        return "%s" % self.nome
+
+    def get_absolute_url(self):
+        return reverse('admin:midia-detalhe', kwargs={'pk': self.pk})
+
+    class Meta:
+        ordering = ['nome',]
+        verbose_name = 'Mídia'
+        verbose_name_plural = 'Mídias'

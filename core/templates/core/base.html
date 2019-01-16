@@ -112,7 +112,7 @@
           <a class="dropdown-item" href="{% url 'admin:filme-novo' %}"><i class="fas fa-fw fa-film"></i> Filmes</a>
             <a class="dropdown-item" href="{% url 'admin:genero-novo' %}"><i class="fas fa-fw fa-venus-mars"></i> Gênero</a>
             <a class="dropdown-item" href="adicionar_usuario.html"><i class="fas fa-fw fa-user-plus"></i> Usuário</a>
-            <a class="dropdown-item" href="adicionar_midia.html"><i class="fas fa-compact-disc"></i> Mídia</a>
+            <a class="dropdown-item" href="{% url 'admin:midia-novo' %}"><i class="fas fa-compact-disc"></i> Mídia</a>
            
           </div>
         </li> 
@@ -127,7 +127,7 @@
             <span>Usuários</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="crudMidias.html">
+          <a class="nav-link" href="{% url 'admin:midia-listar' %}">
             <i class="fas fa-compact-disc"></i>
             <span>Mídias</span></a>
         </li>
@@ -215,6 +215,8 @@
       $('.time').mask('00:00:00');
 
       $('.cep').mask('00000-000');
+
+      $('.money2').mask("#.##0,00", {reverse: true});
 
       var SPMaskBehavior = function (val) {
         return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
