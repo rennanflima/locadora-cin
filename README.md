@@ -1,6 +1,6 @@
 # locadora-cin
 
-[![Build Status](https://travis-ci.com/rennanflima/locadora-cin.svg?branch=branch-rennan)](https://travis-ci.com/rennanflima/locadora-cin) [![Coverage Status](https://coveralls.io/repos/github/rennanflima/locadora-cin/badge.svg?branch=branch-rennan)](https://coveralls.io/github/rennanflima/locadora-cin?branch=branch-rennan)
+[![Build Status](https://travis-ci.org/mprof2018/locadora-cin.svg?branch=master)](https://travis-ci.org/mprof2018/locadora-cin) [![Coverage Status](https://coveralls.io/repos/github/mprof2018/locadora-cin/badge.svg?branch=master)](https://coveralls.io/github/mprof2018/locadora-cin?branch=master)
 
 
 teste
