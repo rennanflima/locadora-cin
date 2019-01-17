@@ -109,10 +109,10 @@
             <span>Cadastro</span>
           </a>
            <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-          <a class="dropdown-item" href="{% url 'admin:filme-novo' %}"><i class="fas fa-fw fa-film"></i> Filmes</a>
-            <a class="dropdown-item" href="{% url 'admin:genero-novo' %}"><i class="fas fa-fw fa-venus-mars"></i> Gênero</a>
+          <a class="dropdown-item" href="{% url 'admin:filme-listar' %}"><i class="fas fa-fw fa-film"></i> Filmes</a>
+            <a class="dropdown-item" href="{% url 'admin:genero-listar' %}"><i class="fas fa-fw fa-venus-mars"></i> Gênero</a>
             <a class="dropdown-item" href="adicionar_usuario.html"><i class="fas fa-fw fa-user-plus"></i> Usuário</a>
-            <a class="dropdown-item" href="{% url 'admin:midia-novo' %}"><i class="fas fa-compact-disc"></i> Mídia</a>
+            <a class="dropdown-item" href="{% url 'admin:midia-listar' %}"><i class="fas fa-compact-disc"></i> Mídia</a>
            
           </div>
         </li> 
@@ -120,21 +120,6 @@
           <a class="nav-link" href="{%url 'admin:filme-listar'%}">
             <i class="fas fa-fw fa-film"></i>
             <span>Filmes</span></a>
-        </li>
-		    <li class="nav-item">
-          <a class="nav-link" href="crudUsuarios.html">
-            <i class="fas fa-fw fa-users"></i>
-            <span>Usuários</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'admin:midia-listar' %}">
-            <i class="fas fa-compact-disc"></i>
-            <span>Mídias</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{%url 'admin:genero-listar'%}">
-            <i class="fas fa-fw fa-venus-mars"></i>
-            <span>Gênero</span></a>
         </li>
       </ul>
 
