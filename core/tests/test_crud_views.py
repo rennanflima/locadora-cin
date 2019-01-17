@@ -1,7 +1,7 @@
 from django.urls import reverse
 from django.test import RequestFactory
 from django.contrib.auth.models import User
-from core.views import *
+from core.views.cruds_views import *
 from mixer.backend.django import mixer
 import pytest
 from django.test import TestCase

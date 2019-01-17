@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views import generic
-from .models import Genero
-from .forms import *
+from core.models import Genero
+from core.forms import *
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Q
@@ -10,8 +10,7 @@ from django.db.models import Q
 # Create your views here.
 
 
-class IndexView(generic.TemplateView):
-    template_name = "core/index.html"
+
 
 # Início CRUD Gênero
 
@@ -51,8 +50,6 @@ class GeneroDeletar(SuccessMessageMixin, generic.DeleteView):
         messages.success(self.request, self.success_message)
         return super(GeneroDeletar, self).delete(request, *args, **kwargs)
 
-# Termino CRUD Gênero
-
 # Início CRUD Filme
 
 class FilmeCriar(SuccessMessageMixin, generic.CreateView):
@@ -90,8 +87,6 @@ class FilmeDeletar(generic.DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super(FilmeDeletar, self).delete(request, *args, **kwargs)
-
-# Termino CRUD Filme
 
 # Início CRUD Midia
 
@@ -131,4 +126,3 @@ class MidiaDeletar(generic.DeleteView):
         messages.success(self.request, self.success_message)
         return super(MidiaDeletar, self).delete(request, *args, **kwargs)
 
-# Termino CRUD Midia

@@ -34,7 +34,6 @@
                 <table class="table table-striped table-bordered" cellspacing="0">
                     <thead class="text-center">
                         <tr>
-                            <th scope="col">#</th>
                             <th scope="col">Nome</th>
                             <th scope="col">Valor da Locação</th>
                             <th scope="col">Ações</th>
@@ -42,7 +41,6 @@
                     </thead>
                     <tfoot class="text-center">
                         <tr>
-                            <th>#</th>
                             <th>Nome</th>
                             <th>Valor da Locação</th>
                             <th>Opções</th>
@@ -51,8 +49,7 @@
                     <tbody>
                         {% for midia in object_list %}
                             <tr class="text-center">
-                                <th scope="row">{{ midia.id }}</th>
-                                <td>{{ midia.nome }}</td>
+                                <th scope="row"><a href="{% url 'admin:midia-detalhe' midia.id %}">{{ midia.nome }}</a></th>
                                 <td>{{ midia.valor|currency }}</td>
                                 <td>
                                     <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'admin:midia-editar' midia.id %}'">Editar</button>
@@ -61,7 +58,7 @@
                             </tr>
                         {% empty %}
                             <tr class="text-center">
-                                <td colspan="4">Nenhum tipo de mídia encontrado.</td>
+                                <td colspan="3">Nenhum tipo de mídia encontrado.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
