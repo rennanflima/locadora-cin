@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+
+{% block conteudo %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'admin:index'%}">Início</a>
+        </li>
+        <li class="breadcrumb-item ">
+            <a href="{%url 'admin:genero-listar'%}">Gêneros</a>
+        </li>
+        <li class="breadcrumb-item active">Detalhar</li>
+    </ol>
+
+    {% bootstrap_messages %}
+
+    <div class="container">
+        <h2>Detalhar Gênero</h2>
+        <hr>
+        <div class="form-group">
+            <label class="negrito">Nome: </label>    
+            {{object.nome }}
+        </div> 
+        <hr>
+        <a href="{% url 'admin:genero-listar' %}" class="btn btn-info ml-2 float-right">Voltar para a Listagem</a>
+        <a href="{% url 'admin:genero-novo' %}" class="btn btn-success ml-2 float-right">Adicionar outro Gênero</a>
+    </div>
+{% endblock conteudo %}
