@@ -103,10 +103,19 @@ class ElencoForm(forms.ModelForm):
 
 
 
+ElencoFormSet = forms.modelformset_factory(Elenco, form=ElencoForm, extra=1)
 
-ElencoFormSet = forms.inlineformset_factory(
+ElencoInlineFormSet = forms.inlineformset_factory(
     Filme, 
     Elenco, 
-    form=ElencoForm,
-    extra=1
+    extra=1,
+    formset=ElencoFormSet,
+    fields = ('ator', 'personagem', 'principal'),
+    widgets={'personagem': forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Informe o personagem aqui'
+        }),
+    },
+    min_num=1,
+
 )
