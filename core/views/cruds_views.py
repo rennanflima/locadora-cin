@@ -50,6 +50,43 @@ class GeneroDeletar(SuccessMessageMixin, generic.DeleteView):
         messages.success(self.request, self.success_message)
         return super(GeneroDeletar, self).delete(request, *args, **kwargs)
 
+# Incício CRUD Pessoas do Filme
+
+class PessoaFilmeCriar(SuccessMessageMixin, generic.CreateView):
+    model = PessoaFilme
+    form_class = PessoaFilmeForm
+    template_name = 'core/pessoa_filme/novo.html'
+    success_message = "Filme adicionado com sucesso."
+
+class PessoaFilmeEditar(SuccessMessageMixin, generic.UpdateView):
+    model = PessoaFilme
+    form_class = PessoaFilmeForm
+    template_name = 'core/pessoa_filme/editar.html'
+    success_message = "Filme editado com sucesso."
+
+class PessoaFilmeListar(generic.ListView):
+    model = PessoaFilme
+    paginate_by = 10
+    template_name = 'core/pessoa_filme/lista.html'    
+
+    def get_queryset(self):
+        nome = self.request.GET.get('nome', '')
+        return self.model.objects.filter(nome__icontains = nome)
+
+class PessoaFilmeDetalhe(generic.DetailView):
+    model = PessoaFilme
+    template_name = 'core/pessoa_filme/detalhe.html'
+
+class PessoaFilmeDeletar(generic.DeleteView):
+    model = PessoaFilme
+    template_name = "core/pessoa_filme/deletar.html"
+    success_url = reverse_lazy('admin:pessoafilme-listar')
+    success_message = "Filme excluído com sucesso."
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(PessoaFilmeDeletar, self).delete(request, *args, **kwargs)
+
 # Início CRUD Filme
 
 class FilmeCriar(SuccessMessageMixin, generic.CreateView):

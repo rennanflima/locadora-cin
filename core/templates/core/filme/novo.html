@@ -1,7 +1,7 @@
 {% extends 'core/base.html' %}
 {% load bootstrap4 %}
-
-{% bootstrap_messages %}
+{% load static %}
+{% load crispy_forms_tags %}
 
 {% block conteudo %}
 <!-- Breadcrumbs-->
@@ -14,47 +14,27 @@
         </li>
         <li class="breadcrumb-item active">Novo</li>
     </ol>
+
+    {% bootstrap_messages %}
+
     <div class="container">
         <h2>Adicionar Filme</h2>
         <hr>
         <form method="POST" class="form">
             {% csrf_token %}
-            {% bootstrap_form form %}
-            
-            <!--<div class="form-row ">
-                <div class="form-group col-md-6">
-                    <label>{{ form.titulo.label }}</label>
-                    {{ form.titulo }}
-                </div>
-                <div class="form-group col-md-6">
-                    <label>{{ form.titulo_original.label }}</label>
-                    {{ form.titulo_original }}
-                </div>
-            </div>
-            <div class="form-row ">
-                <div class="form-group col-md-2">
-                    <label>{{ form.ano.label }}</label>
-                    {{ form.ano }}
-                </div>
-                <div class="form-group col-md-2">
-                    <label>{{ form.duracao.label }}</label>
-                    {{ form.duracao }}
-                </div>
-                <div class="form-group col-md-4">
-                    <label>{{ form.diretor.label }}</label>
-                    {{ form.diretor }}
-                </div>
-                <div class="form-group col-md-3">
-                    <label>{{ form.genero.label }}</label>
-                    {{ form.genero }}
-                </div>
-            </div>-->
-
-
+            {% crispy form %}
             <hr>
             <a href="{%url 'admin:genero-novo'%}" class="btn btn-primary ml-2 mb-4 float-right">Adicionar Gênero</a>
             <a href="{%url 'admin:filme-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
             <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Filme</button>
         </form>
     </div>
+
+    <script>
+        $("label[for='id_diretor']").append(
+            //"<a id='add_id_recipe__dot__recipe__braceleft__profile__braceright__' href='{% url "admin:pessoafilme-novo" %}' class='font-weight-bold ml-2 add-another' style='font-size:20px;'>+</a>"
+            '<a href="{% url "admin:pessoafilme-novo" %}" class="add-another" id="add_id_{{field.html_name}}" onclick="return showAddAnotherPopup(this);"> <img src="{% static '/img/icon_addlink.svg' %}" width="12" height="12" alt="Add Another"/></a>'
+            );
+    
+    </script>
 {% endblock conteudo %}

@@ -11,6 +11,12 @@ urlpatterns = [
     path('genero/<int:pk>/detalhe', cruds_views.GeneroDetalhe.as_view(), name="genero-detalhe"),
     # Termino URL CRUD Gênero
 
+    path('pessoa/filme', cruds_views.PessoaFilmeListar.as_view(), name="pessoafilme-listar"),
+    path('pessoa/filme/novo', cruds_views.PessoaFilmeCriar.as_view(), name="pessoafilme-novo"),
+    path('pessoa/filme/<int:pk>/editar', cruds_views.PessoaFilmeEditar.as_view(), name="pessoafilme-editar"),
+    path('pessoa/filme/<int:pk>/deletar', cruds_views.PessoaFilmeDeletar.as_view(), name="pessoafilme-deletar"),
+    path('pessoa/filme/<int:pk>/detalhe', cruds_views.PessoaFilmeDetalhe.as_view(), name="pessoafilme-detalhe"),
+
     # Início URL CRUD Filme
     path('filme', cruds_views.FilmeListar.as_view(), name="filme-listar"),
     path('filme/novo', cruds_views.FilmeCriar.as_view(), name="filme-novo"),
