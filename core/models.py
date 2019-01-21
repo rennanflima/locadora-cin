@@ -62,6 +62,17 @@ class Elenco(models.Model):
     personagem = models.CharField('Personagem', max_length=150)
     principal = models.BooleanField('Principal ?', default=False)
 
+    def __str__(self):
+        return "%s (%s)" % (self.ator, self.personagem)
+
+    def get_absolute_url(self):
+        return reverse('admin:elenco-detalhe', kwargs={'pk': self.pk})
+
+    class Meta:
+        ordering = ['ator', 'principal', ]
+        verbose_name = 'Elenco'
+        verbose_name_plural = 'Elencos'
+
 class Midia(models.Model):
     nome = models.CharField('Nome', max_length=100)
     valor = models.DecimalField('Valor da Locação', max_digits=8, decimal_places=2, default=0)

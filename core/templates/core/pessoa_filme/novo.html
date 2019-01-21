@@ -1,7 +1,6 @@
 {% extends 'core/base.html' %}
 {% load bootstrap4 %}
 
-{% bootstrap_messages %}
 
 {% block conteudo %}
 <!-- Breadcrumbs-->
@@ -14,6 +13,9 @@
         </li>
         <li class="breadcrumb-item active">Novo</li>
     </ol>
+
+    {% bootstrap_messages %}
+
     <div class="container">
         <h2>Adicionar Pessoa do Filme</h2>
         <hr>

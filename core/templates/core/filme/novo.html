@@ -23,18 +23,131 @@
         <form method="POST" class="form">
             {% csrf_token %}
             {% crispy form %}
-            <hr>
-            <a href="{%url 'admin:genero-novo'%}" class="btn btn-primary ml-2 mb-4 float-right">Adicionar Gênero</a>
-            <a href="{%url 'admin:filme-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
-            <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Filme</button>
+            <h3>Elenco</h3>
+            {{ formset.management_form }}
+            <table class="table">
+                <thead>
+                    <th scope="col">Ator</th>
+                    <th scope="col">Personagem</th>
+                    <th scope="col">Principal?</th>
+                    <th scope="col"></th>
+                </thead>
+                <tbody>
+                    {% for form in formset %}
+                        <tr class="elenco-form {% if form.instance.pk %}item{% else %}new{% endif %}">
+                            <td>{{ form.id }} {{ form.ator }}</td>
+                            <td>{{ form.personagem }}</td>
+                            <td>{{ form.principal }}</td>
+                            {% if form.istance.pk %}
+                                <td class="text-center">{{ form.DELETE }}</td>
+                            {% else %}
+                                <td class="text-center"></td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="form-actions">
+                <hr>
+                <a href='{% url 'admin:genero-novo' %}' class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Gênero</a>
+                <a href='{% url 'admin:midia-listar' %}' class='btn btn-danger ml-2 float-right'>Cancelar</a>
+                <input type="submit" name="save_changes" value="Adicionar Filme" class="btn btn-primary btn-success ml-2 mb-4 float-right" id="submit-id-save_changes">
+            </div>
         </form>
     </div>
 
+    <!-- ModalForm Diretor -->
+    <div class="modal fade" id="genericModal" tabindex="-1" role="dialog" aria-labelledby="genericModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+
+
     <script>
         $("label[for='id_diretor']").append(
-            //"<a id='add_id_recipe__dot__recipe__braceleft__profile__braceright__' href='{% url "admin:pessoafilme-novo" %}' class='font-weight-bold ml-2 add-another' style='font-size:20px;'>+</a>"
-            '<a href="{% url "admin:pessoafilme-novo" %}" class="add-another" id="add_id_{{field.html_name}}" onclick="return showAddAnotherPopup(this);"> <img src="{% static '/img/icon_addlink.svg' %}" width="12" height="12" alt="Add Another"/></a>'
-            );
+            '<a href="#" class="add-another" id="add_id_diretor"> <img src="{% static '/img/icon_addlink.svg' %}" width="13" height="13" alt="Add Another"/></a>'
+        );
+
+        $("label[for='id_genero']").append(
+            '<a href="#" class="add-another" id="add_id_genero"> <img src="{% static '/img/icon_addlink.svg' %}" width="13" height="13" alt="Add Another"/></a>'
+        );
+
+        $("#add_id_diretor").click(function(){
+           $.ajax({
+               url: "{%url 'admin:ajax-diretor-novo' %}",
+               type: 'get',
+               dataType: 'json',
+               beforeSend: function () {
+                    $("#genericModal").modal("show");
+               },
+               success: function (data) {
+                   $("#genericModal .modal-content").html(data.html_form);
+               }
+           }); 
+        });
+
+        $("#genericModal").on("submit", ".js-diretor-novo-form", function(){
+            var form = $(this);
+            $.ajax({
+                url: form.attr("action"),
+                data: form.serialize(),
+                type: form.attr("method"),
+                dataType: 'json',
+                success: function(data){
+                    if (data.form_is_valid) {
+                        runNotify({
+                            message: 'Diretor adicionado com sucesso!',
+                            levelMessage: 'success'
+                        });
+                        $("#id_diretor").append(data.html_diretor_list);
+                        $("#genericModal").modal("hide");
+                    } else {
+                        $("#genericModal .modal-content").html(data.html_form);
+                    }
+                }
+            });
+            return false;
+        });
+
+
+        $("#add_id_genero").click(function(){
+           $.ajax({
+               url: "{%url 'admin:ajax-genero-novo' %}",
+               type: 'get',
+               dataType: 'json',
+               beforeSend: function () {
+                    $("#genericModal").modal("show");
+               },
+               success: function (data) {
+                   $("#genericModal .modal-content").html(data.html_form);
+               }
+           }); 
+        });
+
+        $("#genericModal").on("submit", ".js-genero-novo-form", function(){
+            var form = $(this);
+            $.ajax({
+                url: form.attr("action"),
+                data: form.serialize(),
+                type: form.attr("method"),
+                dataType: 'json',
+                success: function(data){
+                    if (data.form_is_valid) {
+                        runNotify({
+                            message: 'Gênero adicionado com sucesso!',
+                            levelMessage: 'success'
+                        });
+                        $("#id_genero").append(data.html_genero_list);
+                        $("#genericModal").modal("hide");
+                    } else {
+                        $("#genericModal .modal-content").html(data.html_form);
+                    }
+                }
+            });
+            return false;
+        });
     
     </script>
 {% endblock conteudo %}
