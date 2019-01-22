@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import BaseInlineFormSet
 from core.models import *
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column, HTML
@@ -28,6 +29,15 @@ class DiretorForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super(DiretorForm, self).__init__(*args, **kwargs)
+
+
+class AtorForm(forms.ModelForm):
+    class Meta:
+        model = PessoaFilme
+        fields = ('nome',)
+    
+    def __init__(self, *args, **kwargs):
+        super(AtorForm, self).__init__(*args, **kwargs)
 
 
 class FilmeForm(forms.ModelForm):
@@ -92,7 +102,8 @@ class MidiaForm(forms.ModelForm):
         )
 
 class ElencoForm(forms.ModelForm):
-    ator = forms.ModelMultipleChoiceField(queryset = PessoaFilme.objects.filter(tipo__icontains='Ator'))
+    ator = forms.ModelChoiceField(queryset = PessoaFilme.objects.filter(tipo__icontains='Ator'), empty_label='Selecione um ator ...')
+    # DELETE = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'hidden'}), required=False)
     class Meta:
         model = Elenco
         fields = ('ator', 'personagem', 'principal', )
@@ -100,22 +111,62 @@ class ElencoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ElencoForm, self).__init__(*args, **kwargs)
 
+class BaseElencoFormSet(BaseInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        super(BaseElencoFormSet, self).__init__(*args, **kwargs)
+
+        for form in self.forms:
+            form.fields['ator'].queryset = PessoaFilme.objects.filter(tipo__icontains='Ator')
+            form.fields['ator'].widget.attrs['class'] = 'form-control js-ator'
+
+    def clean(self):
+        for form in self.forms:
+            if form.cleaned_data:
+                if 'ator' in form.cleaned_data:
+                    ator = form.cleaned_data['ator']
+                else:
+                    ator = None
+                
+                if 'personagem' in form.cleaned_data:
+                    personagem = form.cleaned_data['personagem']
+                else:
+                    personagem = None
+
+                if 'principal' in form.cleaned_data:
+                    principal = form.cleaned_data['principal']
+                else:
+                    principal = None
+
+                if not ator and not personagem:
+                    form.cleaned_data['ator'] = None
+                    form.cleaned_data['personagem'] = None
+                    form.cleaned_data['principal'] = None
+                    form.cleaned_data['DELETE'] = True   
+
+                # print(form.prefix+' '+str(form.cleaned_data['DELETE']))
+
+                if ator and not personagem:
+                    raise forms.ValidationError('É obrigatório informar o personagem', code='missing_personagem')
+
+        if any(self.errors):
+            return
 
 
 
-ElencoFormSet = forms.modelformset_factory(Elenco, form=ElencoForm, extra=1)
+
+    
 
 ElencoInlineFormSet = forms.inlineformset_factory(
     Filme, 
     Elenco, 
+    form=ElencoForm,
     extra=1,
-    formset=ElencoFormSet,
-    fields = ('ator', 'personagem', 'principal'),
+    formset=BaseElencoFormSet,
     widgets={'personagem': forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Informe o personagem aqui'
-        }),
+                'class': 'form-control',
+                'placeholder': 'Informe o personagem aqui'
+            }),
     },
     min_num=1,
-
+    can_delete=True,
 )

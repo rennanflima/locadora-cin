@@ -6,6 +6,7 @@ urlpatterns = [
     #Ajax
     path('ajax/diretor/novo', cruds_views.diretor_novo_ajax, name="ajax-diretor-novo"),
     path('ajax/genero/novo', cruds_views.genero_novo_ajax, name="ajax-genero-novo"),
+    path('ajax/ator/novo', cruds_views.ator_novo_ajax, name="ajax-ator-novo"), 
 
 
     # Início URL CRUD Gênero
@@ -24,16 +25,15 @@ urlpatterns = [
 
     # Início URL CRUD Filme
     path('filme', cruds_views.FilmeListar.as_view(), name="filme-listar"),
-    # path('filme/novo', cruds_views.FilmeCriar.as_view(), name="filme-novo"),
     path('filme/novo', cruds_views.criar_filme, name="filme-novo"),
-    path('filme/<int:pk>/editar', cruds_views.FilmeEditar.as_view(), name="filme-editar"),
+    path('filme/<int:pk>/editar', cruds_views.editar_filme, name="filme-editar"),
     path('filme/<int:pk>/deletar', cruds_views.FilmeDeletar.as_view(), name="filme-deletar"),
-    path('filme/<int:pk>/detalhe', cruds_views.FilmeDetalhe.as_view(), name="filme-detalhe"),
+    path('filme/<int:pk>/detalhe', cruds_views.filme_detalhe, name="filme-detalhe"),
     # Termino URL CRUD Filme
 
     #CRUD Elenco
     path('filme/<int:idFilme>/elenco/novo', cruds_views.FilmeListar.as_view(), name="elenco-listar"),
-    path('filme/<int:idFilme>/elenco/<int:pk>/detalhe', cruds_views.FilmeDetalhe.as_view(), name="elenco-detalhe"),
+    # path('filme/<int:idFilme>/elenco/<int:pk>/detalhe', cruds_views.filme_detalhe, name="elenco-detalhe"),
 
 
     # Início URL CRUD Midia

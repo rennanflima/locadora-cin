@@ -1,13 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views import generic
-from core.models import Genero
+from core.models import *
 from core.forms import *
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Q
 from django.template.loader import render_to_string
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.db import transaction
 
 # Create your views here.
@@ -92,42 +93,11 @@ class PessoaFilmeDeletar(generic.DeleteView):
 
 # Início CRUD Filme
 
-class FilmeCriar(SuccessMessageMixin, generic.CreateView):
-    model = Filme
-    form_class = FilmeForm
-    template_name = 'core/filme/novo.html'
-    success_message = "Filme adicionado com sucesso."
-
-
-class FilmeElencoCriar(generic.CreateView):
-    model = Filme
-    form_class = FilmeForm
-
-    def get_context_data(self, **kwargs):
-        data = super(FilmeElencoCriar, self).get_context_data(**kwargs)
-        if self.request.POST:
-            data['elencos'] = ElencoFormSet(self.request.POST)
-        else:
-            data['elencos'] = ElencoFormSet()
-        return data
-    
-    def form_valid(self, form):
-        context = self.get_context_data()
-        elencos = context['elencos']
-        with transaction.atomic():
-            self.object = form.save()
-
-            if elencos.is_valid():
-                elencos.instace = self.object
-                elencos.save()
-        return super(FilmeElencoCriar, self).form_valid(form)
-
+# View Criar filme com Form e Formset
 def criar_filme(request):
     
     form = FilmeForm()
-    elenco_forms = ElencoInlineFormSet(
-        queryset=Elenco.objects.none()
-    )
+    elenco_forms = ElencoInlineFormSet(queryset=Elenco.objects.none())
 
     if request.method == 'POST':
         form = FilmeForm(request.POST)
@@ -141,15 +111,48 @@ def criar_filme(request):
             for elenco in elencos:
                 elenco.filme = filme
                 elenco.save()
+            messages.success(request, 'Filme adicionado com sucesso.')
+            return HttpResponseRedirect(reverse('admin:filme-detalhe', kwargs={'pk': filme.pk}))
     
     return render(request, 'core/filme/novo.html', {'form': form, 'formset':elenco_forms})
              
 
-class FilmeEditar(SuccessMessageMixin, generic.UpdateView):
-    model = Filme
-    form_class = FilmeForm
-    template_name = 'core/filme/editar.html'
-    success_message = "Filme editado com sucesso."
+def editar_filme(request, pk):
+    filme = get_object_or_404(Filme, pk=pk)
+    form = FilmeForm(instance=filme)
+    elenco_filme = Elenco.objects.filter(filme=filme.id)
+    elenco_forms = ElencoInlineFormSet(instance=filme)
+
+    if request.method == 'POST':
+        form = FilmeForm(request.POST, instance=filme)
+        elenco_forms = ElencoInlineFormSet(request.POST, instance=filme)
+        print('elenco_forms.is_valid(): '+ str(elenco_forms.is_valid()))
+        if form.is_valid() and elenco_forms.is_valid():
+            filme = form.save()
+            # if not elenco_forms.empty_permitted:
+            elencos = elenco_forms.save(commit=False)
+            
+            for obj in elencos:
+                obj.filme = filme
+                obj.save()
+
+            for obj in elenco_forms.deleted_forms:
+                obj.delete()
+
+            messages.success(request, 'Filme editado com sucesso.')
+            return HttpResponseRedirect(filme.get_absolute_url())
+        else:
+            # messages.error(request, form.errors)
+            messages.error(request, elenco_forms.errors)
+    
+    return render(request, 'core/filme/editar.html', {'form': form, 'formset':elenco_forms})
+
+
+# class FilmeEditar(SuccessMessageMixin, generic.UpdateView):
+#     model = Filme
+#     form_class = FilmeForm
+#     template_name = 'core/filme/editar.html'
+#     success_message = "Filme editado com sucesso."
 
 class FilmeListar(generic.ListView):
     model = Filme
@@ -160,9 +163,13 @@ class FilmeListar(generic.ListView):
         nome = self.request.GET.get('nome', '')
         return self.model.objects.filter(Q(titulo__icontains = nome) | Q(titulo_original__icontains=nome))
 
-class FilmeDetalhe(generic.DetailView):
-    model = Filme
-    template_name = 'core/filme/detalhe.html'
+
+def filme_detalhe(request, pk):
+    filme = get_object_or_404(Filme, pk=pk)
+    elencos = Elenco.objects.filter(filme=filme)
+    return render(request, 'core/filme/detalhe.html', {'filme': filme, 'elencos': elencos})
+
+
 
 #Formulario de diretor no modal
 def diretor_novo_ajax(request):
@@ -179,7 +186,18 @@ def diretor_novo_ajax(request):
             diretores = PessoaFilme.objects.filter(tipo__icontains='Diretor')
             data['html_diretor_list'] = render_to_string('core/filme/ajax/partial_select_diretor.html', {'diretores': diretores})
         else:
-            data['form_is_valid'] = False
+            try:
+                diretor = PessoaFilme.objects.get(nome=form.instance.nome)
+                
+                if 'Ator' in ator.tipo:
+                    ator.tipo = 'Diretor', 'Ator'
+                
+                diretor.save()
+                data['form_is_valid'] = True
+                diretores = PessoaFilme.objects.filter(tipo__icontains='Diretor')
+                data['html_diretor_list'] = render_to_string('core/filme/ajax/partial_select_diretor.html', {'diretores': diretores})           
+            except:
+                data['form_is_valid'] = False
     
     context = {'form': form}
     data['html_form'] = render_to_string('core/filme/ajax/partial_diretor_novo.html', context, request=request,)
@@ -202,6 +220,39 @@ def genero_novo_ajax(request):
     
     context = {'form': form}
     data['html_form'] = render_to_string('core/filme/ajax/partial_genero_novo.html', context, request=request,)
+
+    return JsonResponse(data)
+
+
+def ator_novo_ajax(request):
+    data = dict()
+    form = AtorForm
+
+    if request.method == 'POST':
+        form = AtorForm(request.POST)
+        if form.is_valid():
+            f = form.save(commit=False)
+            f.tipo = 'Ator'
+            f.save()
+            data['form_is_valid'] = True
+            atores = PessoaFilme.objects.filter(tipo__icontains='Ator')
+            data['html_ator_list'] = render_to_string('core/filme/ajax/partial_select_ator.html', {'atores': atores})
+        else:
+            try:
+                ator = PessoaFilme.objects.get(nome=form.instance.nome)
+                
+                if 'Diretor' in ator.tipo:
+                    ator.tipo = 'Diretor', 'Ator'
+                
+                ator.save()
+                data['form_is_valid'] = True
+                atores = PessoaFilme.objects.filter(tipo__icontains='Ator')
+                data['html_ator_list'] = render_to_string('core/filme/ajax/partial_select_ator.html', {'atores': atores})           
+            except:
+                data['form_is_valid'] = False
+    
+    context = {'form': form}
+    data['html_form'] = render_to_string('core/filme/ajax/partial_ator_novo.html', context, request=request,)
 
     return JsonResponse(data)
 

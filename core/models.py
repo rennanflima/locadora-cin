@@ -6,7 +6,7 @@ from core.choices import *
 
 # Create your models here.
 class Genero(models.Model):
-    nome = models.CharField('Nome', max_length=100)
+    nome = models.CharField('Nome', max_length=100, unique=True)
 
     def __str__(self):
         return "%s" % self.nome 
@@ -20,7 +20,7 @@ class Genero(models.Model):
         verbose_name_plural = 'Gêneros'
 
 class PessoaFilme(models.Model):
-    nome = models.CharField('Nome', max_length=150)
+    nome = models.CharField('Nome', max_length=150, unique=True)
     tipo = MultiSelectField('Atividade', choices=tipo_pessoa_filme)
 
     def __str__(self):
@@ -59,7 +59,7 @@ class Filme(models.Model):
 class Elenco(models.Model):
     filme = models.ForeignKey(Filme, on_delete=models.CASCADE)
     ator =  models.ForeignKey(PessoaFilme, on_delete=models.CASCADE)
-    personagem = models.CharField('Personagem', max_length=150)
+    personagem = models.CharField('Personagem', max_length=150, null=True, blank=True)
     principal = models.BooleanField('Principal ?', default=False)
 
     def __str__(self):
@@ -69,12 +69,13 @@ class Elenco(models.Model):
         return reverse('admin:elenco-detalhe', kwargs={'pk': self.pk})
 
     class Meta:
+        unique_together = ('filme', 'ator')
         ordering = ['ator', 'principal', ]
         verbose_name = 'Elenco'
         verbose_name_plural = 'Elencos'
 
 class Midia(models.Model):
-    nome = models.CharField('Nome', max_length=100)
+    nome = models.CharField('Nome', max_length=100, unique=True)
     valor = models.DecimalField('Valor da Locação', max_digits=8, decimal_places=2, default=0)
 
     def __str__(self):

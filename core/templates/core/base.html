@@ -29,6 +29,7 @@
 
     <!-- Custom styles for this template-->
     <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/bootstrap-toggle/css/bootstrap-toggle.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'vendor/notifyMessage/css/notifyMessage.css' %}">
   </head>
 
@@ -194,6 +195,7 @@
     <script src="{% static 'vendor/popper/popper.min.js' %}"></script>
     <script src="{% static 'vendor/notifyMessage/js/notifyMessage.js' %}"></script>
     <script src="{% static 'js/jquery.formset.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap-toggle/js/bootstrap-toggle.min.js' %}"></script>
 
     <!-- Custom scripts for all pages-->
     <script src="{% static 'js/sb-admin.min.js' %}"></script>
@@ -227,6 +229,14 @@
       
       $('.sp_celphones').mask(SPMaskBehavior, spOptions);
 
+      $('.formset').formset({
+        addText: 'Adicionar outro',
+        deleteText: 'Remover'
+      });
+
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+      });
     </script>
   </body>
 
