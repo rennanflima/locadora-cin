@@ -59,19 +59,19 @@ class GeneroDeletar(SuccessMessageMixin, generic.DeleteView):
 class ArtistaCriar(SuccessMessageMixin, generic.CreateView):
     model = Artista
     form_class = ArtistaForm
-    template_name = 'core/pessoa_filme/novo.html'
-    success_message = "Filme adicionado com sucesso."
+    template_name = 'core/artista/novo.html'
+    success_message = "Artista adicionado com sucesso."
 
 class ArtistaEditar(SuccessMessageMixin, generic.UpdateView):
     model = Artista
     form_class = ArtistaForm
-    template_name = 'core/pessoa_filme/editar.html'
-    success_message = "Filme editado com sucesso."
+    template_name = 'core/artista/editar.html'
+    success_message = "Artista editado com sucesso."
 
 class ArtistaListar(generic.ListView):
     model = Artista
     paginate_by = 10
-    template_name = 'core/pessoa_filme/lista.html'    
+    template_name = 'core/artista/lista.html'    
 
     def get_queryset(self):
         nome = self.request.GET.get('nome', '')
@@ -79,13 +79,13 @@ class ArtistaListar(generic.ListView):
 
 class ArtistaDetalhe(generic.DetailView):
     model = Artista
-    template_name = 'core/pessoa_filme/detalhe.html'
+    template_name = 'core/artista/detalhe.html'
 
 class ArtistaDeletar(generic.DeleteView):
     model = Artista
-    template_name = "core/pessoa_filme/deletar.html"
-    success_url = reverse_lazy('admin:pessoafilme-listar')
-    success_message = "Filme excluído com sucesso."
+    template_name = "core/artista/deletar.html"
+    success_url = reverse_lazy('admin:artista-listar')
+    success_message = "Artista excluído com sucesso."
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
@@ -105,14 +105,19 @@ def criar_filme(request):
             request.POST,
             queryset=Elenco.objects.none()
         )
-        if form.is_valid() and elenco_forms.is_valid():
-            filme = form.save()
-            elencos = elenco_forms.save(commit=False)
-            for elenco in elencos:
-                elenco.filme = filme
-                elenco.save()
-            messages.success(request, 'Filme adicionado com sucesso.')
-            return HttpResponseRedirect(reverse('admin:filme-detalhe', kwargs={'pk': filme.pk}))
+        if form.is_valid():
+            if elenco_forms.is_valid():
+                filme = form.save()
+                elencos = elenco_forms.save(commit=False)
+                for elenco in elencos:
+                    elenco.filme = filme
+                    elenco.save()
+                messages.success(request, 'Filme adicionado com sucesso.')
+                return HttpResponseRedirect(reverse('admin:filme-detalhe', kwargs={'pk': filme.pk}))
+            else:
+                messages.error(request, elenco_forms.errors)
+        else:
+            messages.error(request, form.errors)
     
     return render(request, 'core/filme/novo.html', {'form': form, 'formset':elenco_forms})
              
@@ -126,23 +131,28 @@ def editar_filme(request, pk):
     if request.method == 'POST':
         form = FilmeForm(request.POST, instance=filme)
         elenco_forms = ElencoInlineFormSet(request.POST, instance=filme)
-        if form.is_valid():
-            if elenco_forms.is_valid():
-                filme = form.save()
-                elencos = elenco_forms.save()
-                for obj in elencos:
-                    if obj.filme != filme:
-                        obj.filme = filme
-                        obj.save()
+        if form.is_valid() and elenco_forms.is_valid():
+            filme = form.save()
+            elencos = elenco_forms.save()
+            for obj in elencos:
+                if obj.filme != filme:
+                    obj.filme = filme
+                    obj.save()
 
-                messages.success(request, 'Filme editado com sucesso.')
-                return HttpResponseRedirect(filme.get_absolute_url())
-            else:
-                messages.error(request, elenco_forms.errors)
+            messages.success(request, 'Filme editado com sucesso.')
+            return HttpResponseRedirect(filme.get_absolute_url())
         else:
-            messages.error(request, form.errors)
+            errors = []
+            errors.append(form.errors)
+            errors.append(elenco_forms.errors)
+            # for key, value in elenco_forms.errors:
+            for x in range(len(elenco_forms.errors)):
+                if elenco_forms.errors[x]:
+                    print(elenco_forms.errors[x])
+                    messages.error(request, elenco_forms.errors[x])
             
-    
+            
+            
     return render(request, 'core/filme/editar.html', {'form': form, 'formset':elenco_forms})
 
 

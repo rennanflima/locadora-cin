@@ -4,6 +4,7 @@ from core.models import *
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column, HTML
 from crispy_forms.bootstrap import AppendedText, PrependedText, FormActions
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 
 class GeneroForm(forms.ModelForm):
     class Meta:
@@ -107,9 +108,20 @@ class ElencoForm(forms.ModelForm):
     class Meta:
         model = Elenco
         fields = ('ator', 'personagem', 'principal', )
+        error_messages = {
+            NON_FIELD_ERRORS: {
+                'unique_together': "%(model_name)s's %(field_labels)s are not unique.",
+            }
+        }
     
     def __init__(self, *args, **kwargs):
         super(ElencoForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super(ElencoForm, self).clean()
+
+
+
 
 class BaseElencoFormSet(BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
@@ -119,7 +131,13 @@ class BaseElencoFormSet(BaseInlineFormSet):
             form.fields['ator'].queryset = Artista.objects.filter(tipo__icontains='Ator')
             form.fields['ator'].widget.attrs['class'] = 'form-control js-ator'
 
+
     def clean(self):
+        atores = []
+        personagens = []
+        duplicates = False
+        print('BaseElencoFormSet: clean')
+
         for form in self.forms:
             if form.cleaned_data:
                 if 'ator' in form.cleaned_data:
@@ -137,19 +155,31 @@ class BaseElencoFormSet(BaseInlineFormSet):
                 else:
                     principal = None
 
-                if not ator and not personagem:
-                    form.cleaned_data['ator'] = None
-                    form.cleaned_data['personagem'] = None
-                    form.cleaned_data['principal'] = None
-                    form.cleaned_data['DELETE'] = True   
+                try:
+                    print('try BaseElencoFormSet')
+                    artistas_filme = Elenco.objects.get(filme=form.cleaned_data['filme'], ator=ator)
+                    if artistas_filme:
+                        form.add_error('ator', '%s já está listado no elenco deste filme' % ator)
+                except:
+                    pass
+                    
 
-                # print(form.prefix+' '+str(form.cleaned_data['DELETE']))
+                if ator and personagem:
+                    if ator in atores:
+                        duplicates = True    
+                    atores.append(ator)
 
-                if ator and not personagem:
-                    raise forms.ValidationError('É obrigatório informar o personagem', code='missing_personagem')
-
+                    if personagem in personagens:
+                        duplicates = True
+                    personagens.append(personagem)
+                
+                if duplicates:
+                    raise forms.ValidationError('O Elenco deve ter atores e personagem exclusivo.', code='duplicates_ator')
+        
         if any(self.errors):
             return
+
+        
 
 
 

@@ -2,6 +2,8 @@ from django.db import models
 from django.urls import reverse
 from multiselectfield import MultiSelectField
 from core.choices import *
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 
 # Create your models here.
@@ -67,6 +69,11 @@ class Elenco(models.Model):
 
     def get_absolute_url(self):
         return reverse('admin:elenco-detalhe', kwargs={'pk': self.pk})
+
+    def clean(self):
+        if self.ator and not self.personagem:
+            raise ValidationError({'personagem': _('É obrigatório informar o nome do personagem caso tenha selecionado um ator.')})
+
 
     class Meta:
         unique_together = ('filme', 'ator')
