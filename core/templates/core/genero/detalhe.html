@@ -14,7 +14,7 @@
 
     {% bootstrap_messages %}
 
-    <div class="container">
+    <div class="container-fluid">
         <h2>Detalhar Gênero</h2>
         <hr>
         <div class="form-group">
@@ -22,7 +22,7 @@
             {{object.nome }}
         </div> 
         <hr>
-        <a href="{% url 'admin:genero-listar' %}" class="btn btn-info ml-2 float-right">Voltar para a Listagem</a>
-        <a href="{% url 'admin:genero-novo' %}" class="btn btn-success ml-2 float-right">Adicionar outro Gênero</a>
+        <a href="{% url 'admin:genero-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
+        <a href="{% url 'admin:genero-novo' %}" class="btn btn-success ml-2 float-right">Adicionar Gênero</a>
     </div>
 {% endblock conteudo %}

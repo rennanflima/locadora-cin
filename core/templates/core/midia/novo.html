@@ -1,7 +1,7 @@
 {% extends 'core/base.html' %}
 {% load bootstrap4 %}
+{% load crispy_forms_tags %}
 
-{% bootstrap_messages %}
 
 {% block conteudo %}
 <!-- Breadcrumbs-->
@@ -14,18 +14,15 @@
         </li>
         <li class="breadcrumb-item active">Novo</li>
     </ol>
-    <div class="container">
+
+    {% bootstrap_messages %}
+
+    <div class="container-fluid">
         <h2>Adicionar Tipo de Mídia</h2>
         <hr>
         <form method="POST" class="form">
             {% csrf_token %}
-            {% bootstrap_form form %}
-            
-            <hr>
-            <a href="#" class="btn btn-primary ml-2 mb-4 float-right">Adicionar Item</a>
-            <a href="{%url 'admin:midia-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
-            <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Gênero</button>
-            
+            {% crispy form %}            
         </form>
     </div>
 {% endblock conteudo %}

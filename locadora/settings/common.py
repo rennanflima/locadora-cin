@@ -11,10 +11,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'j^0rgdltpux@fbe+iq--6sng#mm^^m%xi*f-igq6hiohk*@u%)'
-
-DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
@@ -30,6 +26,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'bootstrap4',
+    'multiselectfield',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -61,15 +59,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'locadora.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
-default_dburl = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
-
-DATABASES = { 'default': config('DATABASE_URL', default=default_dburl, cast=dburl), }
-
 
 
 # Password validation
@@ -137,3 +126,7 @@ BOOTSTRAP4 = {
 # DATABASE_URL="postgres://mwlsmycgybaqap:521876ffb44ac01bd33b94a0036017efb82eb62b78fa1a4484b8ff0ada8ddf1e@ec2-54-225-227-125.compute-1.amazonaws.com:5432/dfkp1nm6mi0iov"
 # logging
 # django_heroku.settings(locals())
+
+#Crispy Form
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
