@@ -56,20 +56,20 @@ class GeneroDeletar(SuccessMessageMixin, generic.DeleteView):
 
 # Incício CRUD Pessoas do Filme
 
-class PessoaFilmeCriar(SuccessMessageMixin, generic.CreateView):
-    model = PessoaFilme
-    form_class = PessoaFilmeForm
+class ArtistaCriar(SuccessMessageMixin, generic.CreateView):
+    model = Artista
+    form_class = ArtistaForm
     template_name = 'core/pessoa_filme/novo.html'
     success_message = "Filme adicionado com sucesso."
 
-class PessoaFilmeEditar(SuccessMessageMixin, generic.UpdateView):
-    model = PessoaFilme
-    form_class = PessoaFilmeForm
+class ArtistaEditar(SuccessMessageMixin, generic.UpdateView):
+    model = Artista
+    form_class = ArtistaForm
     template_name = 'core/pessoa_filme/editar.html'
     success_message = "Filme editado com sucesso."
 
-class PessoaFilmeListar(generic.ListView):
-    model = PessoaFilme
+class ArtistaListar(generic.ListView):
+    model = Artista
     paginate_by = 10
     template_name = 'core/pessoa_filme/lista.html'    
 
@@ -77,19 +77,19 @@ class PessoaFilmeListar(generic.ListView):
         nome = self.request.GET.get('nome', '')
         return self.model.objects.filter(nome__icontains = nome)
 
-class PessoaFilmeDetalhe(generic.DetailView):
-    model = PessoaFilme
+class ArtistaDetalhe(generic.DetailView):
+    model = Artista
     template_name = 'core/pessoa_filme/detalhe.html'
 
-class PessoaFilmeDeletar(generic.DeleteView):
-    model = PessoaFilme
+class ArtistaDeletar(generic.DeleteView):
+    model = Artista
     template_name = "core/pessoa_filme/deletar.html"
     success_url = reverse_lazy('admin:pessoafilme-listar')
     success_message = "Filme excluído com sucesso."
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
-        return super(PessoaFilmeDeletar, self).delete(request, *args, **kwargs)
+        return super(ArtistaDeletar, self).delete(request, *args, **kwargs)
 
 # Início CRUD Filme
 
@@ -126,24 +126,22 @@ def editar_filme(request, pk):
     if request.method == 'POST':
         form = FilmeForm(request.POST, instance=filme)
         elenco_forms = ElencoInlineFormSet(request.POST, instance=filme)
-        print('elenco_forms.is_valid(): '+ str(elenco_forms.is_valid()))
-        if form.is_valid() and elenco_forms.is_valid():
-            filme = form.save()
-            # if not elenco_forms.empty_permitted:
-            elencos = elenco_forms.save(commit=False)
-            
-            for obj in elencos:
-                obj.filme = filme
-                obj.save()
+        if form.is_valid():
+            if elenco_forms.is_valid():
+                filme = form.save()
+                elencos = elenco_forms.save()
+                for obj in elencos:
+                    if obj.filme != filme:
+                        obj.filme = filme
+                        obj.save()
 
-            for obj in elenco_forms.deleted_forms:
-                obj.delete()
-
-            messages.success(request, 'Filme editado com sucesso.')
-            return HttpResponseRedirect(filme.get_absolute_url())
+                messages.success(request, 'Filme editado com sucesso.')
+                return HttpResponseRedirect(filme.get_absolute_url())
+            else:
+                messages.error(request, elenco_forms.errors)
         else:
-            # messages.error(request, form.errors)
-            messages.error(request, elenco_forms.errors)
+            messages.error(request, form.errors)
+            
     
     return render(request, 'core/filme/editar.html', {'form': form, 'formset':elenco_forms})
 
@@ -163,13 +161,15 @@ class FilmeListar(generic.ListView):
         nome = self.request.GET.get('nome', '')
         return self.model.objects.filter(Q(titulo__icontains = nome) | Q(titulo_original__icontains=nome))
 
+class FilmeDetalhe(generic.DetailView):
+    model = Filme
+    context_object_name = 'filme'
+    template_name = 'core/filme/detalhe.html'
 
-def filme_detalhe(request, pk):
-    filme = get_object_or_404(Filme, pk=pk)
-    elencos = Elenco.objects.filter(filme=filme)
-    return render(request, 'core/filme/detalhe.html', {'filme': filme, 'elencos': elencos})
-
-
+    def get_context_data(self, **kwargs):
+        context = super(FilmeDetalhe, self).get_context_data(**kwargs)
+        context['elencos'] = Elenco.objects.filter(filme=self.object)
+        return context
 
 #Formulario de diretor no modal
 def diretor_novo_ajax(request):
@@ -182,25 +182,25 @@ def diretor_novo_ajax(request):
             f = form.save(commit=False)
             f.tipo = 'Diretor'
             f.save()
-            data['form_is_valid'] = True
-            diretores = PessoaFilme.objects.filter(tipo__icontains='Diretor')
+            data['form_diretor_is_valid'] = True
+            diretores = Artista.objects.filter(tipo__icontains='Diretor')
             data['html_diretor_list'] = render_to_string('core/filme/ajax/partial_select_diretor.html', {'diretores': diretores})
         else:
             try:
-                diretor = PessoaFilme.objects.get(nome=form.instance.nome)
+                diretor = Artista.objects.get(nome=form.instance.nome)
                 
                 if 'Ator' in ator.tipo:
                     ator.tipo = 'Diretor', 'Ator'
                 
                 diretor.save()
-                data['form_is_valid'] = True
-                diretores = PessoaFilme.objects.filter(tipo__icontains='Diretor')
+                data['form_diretor_is_valid'] = True
+                diretores = Artista.objects.filter(tipo__icontains='Diretor')
                 data['html_diretor_list'] = render_to_string('core/filme/ajax/partial_select_diretor.html', {'diretores': diretores})           
             except:
-                data['form_is_valid'] = False
+                data['form_diretor_is_valid'] = False
     
     context = {'form': form}
-    data['html_form'] = render_to_string('core/filme/ajax/partial_diretor_novo.html', context, request=request,)
+    data['html_form_diretor'] = render_to_string('core/filme/ajax/partial_diretor_novo.html', context, request=request,)
 
     return JsonResponse(data)
 
@@ -212,14 +212,14 @@ def genero_novo_ajax(request):
         form = GeneroForm(request.POST)
         if form.is_valid():
             form.save()
-            data['form_is_valid'] = True
+            data['form_genero_is_valid'] = True
             generos = Genero.objects.all()
             data['html_genero_list'] = render_to_string('core/filme/ajax/partial_select_genero.html', {'generos': generos})
         else:
-            data['form_is_valid'] = False
+            data['form_genero_is_valid'] = False
     
     context = {'form': form}
-    data['html_form'] = render_to_string('core/filme/ajax/partial_genero_novo.html', context, request=request,)
+    data['html_form_genero'] = render_to_string('core/filme/ajax/partial_genero_novo.html', context, request=request,)
 
     return JsonResponse(data)
 
@@ -234,25 +234,25 @@ def ator_novo_ajax(request):
             f = form.save(commit=False)
             f.tipo = 'Ator'
             f.save()
-            data['form_is_valid'] = True
-            atores = PessoaFilme.objects.filter(tipo__icontains='Ator')
+            data['form_ator_is_valid'] = True
+            atores = Artista.objects.filter(tipo__icontains='Ator')
             data['html_ator_list'] = render_to_string('core/filme/ajax/partial_select_ator.html', {'atores': atores})
         else:
             try:
-                ator = PessoaFilme.objects.get(nome=form.instance.nome)
+                ator = Artista.objects.get(nome=form.instance.nome)
                 
                 if 'Diretor' in ator.tipo:
                     ator.tipo = 'Diretor', 'Ator'
                 
                 ator.save()
-                data['form_is_valid'] = True
-                atores = PessoaFilme.objects.filter(tipo__icontains='Ator')
+                data['form_ator_is_valid'] = True
+                atores = Artista.objects.filter(tipo__icontains='Ator')
                 data['html_ator_list'] = render_to_string('core/filme/ajax/partial_select_ator.html', {'atores': atores})           
             except:
-                data['form_is_valid'] = False
+                data['form_ator_is_valid'] = False
     
     context = {'form': form}
-    data['html_form'] = render_to_string('core/filme/ajax/partial_ator_novo.html', context, request=request,)
+    data['html_form_ator'] = render_to_string('core/filme/ajax/partial_ator_novo.html', context, request=request,)
 
     return JsonResponse(data)
 

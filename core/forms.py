@@ -13,18 +13,18 @@ class GeneroForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(GeneroForm, self).__init__(*args, **kwargs)
 
-class PessoaFilmeForm(forms.ModelForm):
+class ArtistaForm(forms.ModelForm):
     class Meta:
-        model = PessoaFilme
+        model = Artista
         fields = ('nome', 'tipo',)
     
     def __init__(self, *args, **kwargs):
-        super(PessoaFilmeForm, self).__init__(*args, **kwargs)
+        super(ArtistaForm, self).__init__(*args, **kwargs)
 
 
 class DiretorForm(forms.ModelForm):
     class Meta:
-        model = PessoaFilme
+        model = Artista
         fields = ('nome',)
     
     def __init__(self, *args, **kwargs):
@@ -33,7 +33,7 @@ class DiretorForm(forms.ModelForm):
 
 class AtorForm(forms.ModelForm):
     class Meta:
-        model = PessoaFilme
+        model = Artista
         fields = ('nome',)
     
     def __init__(self, *args, **kwargs):
@@ -41,7 +41,7 @@ class AtorForm(forms.ModelForm):
 
 
 class FilmeForm(forms.ModelForm):
-    diretor = forms.ModelMultipleChoiceField(queryset = PessoaFilme.objects.filter(tipo__icontains='Diretor'))
+    diretor = forms.ModelMultipleChoiceField(queryset = Artista.objects.filter(tipo__icontains='Diretor'))
     class Meta:
         model = Filme
         fields = ('titulo', 'titulo_original', 'duracao', 'diretor', 'ano', 'pais', 'classificacao', 'genero', 'sinopse',)
@@ -102,7 +102,7 @@ class MidiaForm(forms.ModelForm):
         )
 
 class ElencoForm(forms.ModelForm):
-    ator = forms.ModelChoiceField(queryset = PessoaFilme.objects.filter(tipo__icontains='Ator'), empty_label='Selecione um ator ...')
+    ator = forms.ModelChoiceField(queryset = Artista.objects.filter(tipo__icontains='Ator'), empty_label='Selecione um ator ...')
     # DELETE = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'hidden'}), required=False)
     class Meta:
         model = Elenco
@@ -116,7 +116,7 @@ class BaseElencoFormSet(BaseInlineFormSet):
         super(BaseElencoFormSet, self).__init__(*args, **kwargs)
 
         for form in self.forms:
-            form.fields['ator'].queryset = PessoaFilme.objects.filter(tipo__icontains='Ator')
+            form.fields['ator'].queryset = Artista.objects.filter(tipo__icontains='Ator')
             form.fields['ator'].widget.attrs['class'] = 'form-control js-ator'
 
     def clean(self):

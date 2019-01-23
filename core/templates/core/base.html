@@ -124,7 +124,7 @@
             <span>Filmes</span></a>
         </li>
       </ul>
-
+      
       <div id="content-wrapper">
 
         <div class="container-fluid">
@@ -177,10 +177,10 @@
 
     <!-- Modal Genérico -->
     <div class="modal fade" id="genericModal" tabindex="-1" role="dialog" aria-labelledby="genericModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            </div>
-        </div>
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+          </div>
+      </div>
     </div>
 
 
@@ -238,6 +238,10 @@
         $('[data-toggle="tooltip"]').tooltip();
       });
     </script>
+
+    {% block javascript %}
+    
+    {% endblock javascript%}
   </body>
 
 </html>

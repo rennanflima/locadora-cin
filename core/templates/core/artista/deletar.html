@@ -2,11 +2,11 @@
 
 {% block conteudo %}
     <div class="container-fluid">
-        <h2>Deletar Pessoa do Filme</h2>
+        <h2>Deletar Artista</h2>
         <hr>
         <form method="post">
             {% csrf_token %}
-            <p>Você tem certeza que quer apagar o Pessoa do Filme "{{ object }}"?</p>
+            <p>Você tem certeza que quer apagar o Artista "{{ object }}"?</p>
             <input type="submit" class="btn btn-danger" value="Sim, tenho certeza">
             <a href="#" class="btn btn-secondary" onclick="window.history.back(); return false;" class="button cancel-link">Não, me leve de volta</a>
         </form>

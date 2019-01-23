@@ -27,25 +27,11 @@
             <h3>Elenco</h3>
             <hr>
             {{ formset.management_form }}
-            <!-- {% for form in formset %}
-                <div class="formset row mb-3">
-                    <div class="col-md-4">
-                        {{ form.id }} {{ form.ator }}
-                    </div>
-                    <div class="col-md-5">
-                        {{ form.personagem }}
-                    </div>
-                    <div class="col-md-2 mr-0">
-                        {{ form.principal.label }}
-                        {{ form.principal }}
-                    </div>
-                </div>
-            {% endfor %} -->
             <div class="table-responsive">
                 <table class="table">
                     <thead class="text-center">
                         <th scope="col">
-                            Ator <a href="#" class="add-another" id="add_id_ator" data-toggle="tooltip" data-placement="bottom" title="Adicionar um ator"> <img src="{% static '/img/icon_addlink.svg' %}" width="13" height="13" alt="Add outro ator"/></a>
+                            Ator <a href="" class="add-another" id="add_id_ator" data-toggle="tooltip" data-placement="bottom" title="Adicionar um ator"> <img src="{% static '/img/icon_addlink.svg' %}" width="13" height="13" alt="Add outro ator"/></a>
                         </th>
                         <th scope="col">Personagem</th>
                         <th scope="col">Principal?</th>
@@ -69,34 +55,38 @@
             </div>
             <div class="form-actions">
                 <hr>
-                <a href="{% url 'admin:genero-novo' %}" class="btn btn-primary ml-2 mb-4 float-right">Adicionar Gênero</a>
                 <a href="{% url 'admin:midia-listar' %}" class="btn btn-danger ml-2 float-right">Cancelar</a>
                 <input type="submit" name="save_changes" value="Adicionar Filme" class="btn btn-primary btn-success ml-2 mb-4 float-right" id="submit-id-save_changes">
             </div>
         </form>
     </div>
 
+{% endblock conteudo %}
+
+{% block javascript %}
     <script>
         $("label[for='id_diretor']").append(
-            '<a href="#" class="add-another" id="add_id_diretor" data-toggle="tooltip" data-placement="bottom" title="Adicionar um diretor"> <img src="{% static '/img/icon_addlink.svg' %}" width="13" height="13" alt="Add Another"/></a>'
+            '<a href="" class="add-another" id="add_id_diretor" data-toggle="tooltip" data-placement="bottom" title="Adicionar um diretor"> <img src="{% static '/img/icon_addlink.svg' %}" width="13" height="13" alt="Adicionar outro diretor"/></a>'
         );
 
         $("label[for='id_genero']").append(
-            '<a href="#" class="add-another" id="add_id_genero" data-toggle="tooltip" data-placement="bottom" title="Adicionar um gênero"> <img src="{% static '/img/icon_addlink.svg' %}" width="13" height="13" alt="Add Another"/></a>'
+            '<a href="" class="add-another" id="add_id_genero" data-toggle="tooltip" data-placement="bottom" title="Adicionar um gênero"> <img src="{% static '/img/icon_addlink.svg' %}" width="13" height="13" alt="Adicionar outro gênero"/></a>'
         );
 
         $("#add_id_diretor").click(function(){
            $.ajax({
-               url: "{%url 'admin:ajax-diretor-novo' %}",
-               type: 'get',
-               dataType: 'json',
-               beforeSend: function () {
-                    $("#genericModal").modal("show");
-               },
-               success: function (data) {
-                   $("#genericModal .modal-content").html(data.html_form);
-               }
+                url: "{% url 'admin:ajax-diretor-novo' %}",
+                type: 'get',
+                dataType: 'json',
+                beforeSend: function () {
+                        $("#genericModal").modal("show");
+                },
+                success: function (data) {
+                    $("#genericModal .modal-content").empty();
+                    $("#genericModal .modal-content").append(data.html_form_diretor);
+                }
            }); 
+           return false;
         });
 
         $("#genericModal").on("submit", ".js-diretor-novo-form", function(){
@@ -107,7 +97,7 @@
                 type: form.attr("method"),
                 dataType: 'json',
                 success: function(data){
-                    if (data.form_is_valid) {
+                    if (data.form_diretor_is_valid) {
                         runNotify({
                             message: 'Diretor adicionado com sucesso!',
                             levelMessage: 'success'
@@ -116,7 +106,7 @@
                         $("#id_diretor").append(data.html_diretor_list);
                         $("#genericModal").modal("hide");
                     } else {
-                        $("#genericModal .modal-content").html(data.html_form);
+                        $("#genericModal .modal-content").append(data.html_form_diretor);
                     }
                 }
             });
@@ -126,16 +116,18 @@
 
         $("#add_id_genero").click(function(){
            $.ajax({
-               url: "{%url 'admin:ajax-genero-novo' %}",
-               type: 'get',
-               dataType: 'json',
-               beforeSend: function () {
-                    $("#genericModal").modal("show");
-               },
-               success: function (data) {
-                   $("#genericModal .modal-content").html(data.html_form);
-               }
+                url: "{%url 'admin:ajax-genero-novo' %}",
+                type: 'get',
+                dataType: 'json',
+                beforeSend: function () {
+                        $("#genericModal").modal("show");
+                },
+                success: function (data) {
+                    $("#genericModal .modal-content").empty();
+                    $("#genericModal .modal-content").append(data.html_form_genero);
+                }
            }); 
+           return false;
         });
 
         $("#genericModal").on("submit", ".js-genero-novo-form", function(){
@@ -146,16 +138,16 @@
                 type: form.attr("method"),
                 dataType: 'json',
                 success: function(data){
-                    if (data.form_is_valid) {
+                    if (data.form_genero_is_valid) {
+                        $("#id_genero").empty();
+                        $("#id_genero").append(data.html_genero_list);
+                        $("#genericModal").modal("hide");
                         runNotify({
                             message: 'Gênero adicionado com sucesso!',
                             levelMessage: 'success'
                         });
-                        $("#id_genero").empty();
-                        $("#id_genero").append(data.html_genero_list);
-                        $("#genericModal").modal("hide");
                     } else {
-                        $("#genericModal .modal-content").html(data.html_form);
+                        $("#genericModal .modal-content").append(data.html_form_genero);
                     }
                 }
             });
@@ -164,16 +156,18 @@
     
         $("#add_id_ator").click(function(){
            $.ajax({
-               url: "{%url 'admin:ajax-ator-novo' %}",
-               type: 'get',
-               dataType: 'json',
-               beforeSend: function () {
+                url: "{%url 'admin:ajax-ator-novo' %}",
+                type: 'get',
+                dataType: 'json',
+                beforeSend: function () {
                     $("#genericModal").modal("show");
-               },
-               success: function (data) {
-                   $("#genericModal .modal-content").html(data.html_form);
-               }
+                },
+                success: function (data) {
+                    $("#genericModal .modal-content").empty();
+                    $("#genericModal .modal-content").append(data.html_form_ator);
+                }
            }); 
+           return false;
         });
 
         $("#genericModal").on("submit", ".js-ator-novo-form", function(){
@@ -184,16 +178,16 @@
                 type: form.attr("method"),
                 dataType: 'json',
                 success: function(data){
-                    if (data.form_is_valid) {
+                    if (data.form_ator_is_valid) {
+                        $(".js-ator").empty();
+                        $(".js-ator").append(data.html_ator_list);
+                        $("#genericModal").modal("hide");
                         runNotify({
                             message: 'Ator adicionado com sucesso!',
                             levelMessage: 'success'
                         });
-                        $(".js-ator").empty();
-                        $(".js-ator").append(data.html_ator_list);
-                        $("#genericModal").modal("hide");
                     } else {
-                        $("#genericModal .modal-content").html(data.html_form);
+                        $("#genericModal .modal-content").append(data.html_form_ator);
                     }
                 }
             });
@@ -201,4 +195,4 @@
         });
 
     </script>
-{% endblock conteudo %}
+{% endblock javascript %}

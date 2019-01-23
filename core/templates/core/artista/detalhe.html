@@ -7,7 +7,7 @@
             <a href="{% url 'admin:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item ">
-            <a href="{%url 'admin:pessoafilme-listar'%}">Pessoas dos Filmes</a>
+            <a href="{%url 'admin:artista-listar'%}">Artistas</a>
         </li>
         <li class="breadcrumb-item active">Detalhar</li>
     </ol>
@@ -15,7 +15,7 @@
     {% bootstrap_messages %}
 
     <div class="container-fluid">
-        <h2>Detalhar Pessoa do Filme</h2>
+        <h2>Detalhar Artista</h2>
         <hr>
         <div class="form-group">
             <label class="negrito">Nome: </label>    
@@ -26,7 +26,7 @@
             {{object.tipo }}
         </div> 
         <hr>
-        <a href="{% url 'admin:pessoafilme-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
-        <a href="{% url 'admin:pessoafilme-novo' %}" class="btn btn-success ml-2 float-right">Adicionar Pessoa do Filme</a>
+        <a href="{% url 'admin:artista-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
+        <a href="{% url 'admin:artista-novo' %}" class="btn btn-success ml-2 float-right">Adicionar Artista</a>
     </div>
 {% endblock conteudo %}

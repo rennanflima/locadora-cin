@@ -19,7 +19,7 @@ class Genero(models.Model):
         verbose_name = 'Gênero'
         verbose_name_plural = 'Gêneros'
 
-class PessoaFilme(models.Model):
+class Artista(models.Model):
     nome = models.CharField('Nome', max_length=150, unique=True)
     tipo = MultiSelectField('Atividade', choices=tipo_pessoa_filme)
 
@@ -27,12 +27,12 @@ class PessoaFilme(models.Model):
         return "%s" % self.nome 
 
     def get_absolute_url(self):
-        return reverse('admin:pessoafilme-detalhe', kwargs={'pk': self.pk})
+        return reverse('admin:artista-detalhe', kwargs={'pk': self.pk})
 
     class Meta:
         ordering = ['nome',]
-        verbose_name = 'Pessoa do Filme'
-        verbose_name_plural = 'Pessoas dos Filmes'
+        verbose_name = 'Artista'
+        verbose_name_plural = 'Artistas'
 
 class Filme(models.Model):
     titulo = models.CharField('Título em Português', max_length=150) 
@@ -40,7 +40,7 @@ class Filme(models.Model):
     sinopse = models.TextField('Sinopse')
     classificacao = models.CharField('Classificação Indicativa', max_length=2, choices=tipo_classificacao)
     duracao = models.TimeField('Duração')
-    diretor = models.ManyToManyField(PessoaFilme)
+    diretor = models.ManyToManyField(Artista)
     ano = models.PositiveSmallIntegerField('Ano de Lançamento')
     pais = models.CharField('País', max_length=150)
     genero = models.ManyToManyField(Genero)
@@ -58,7 +58,7 @@ class Filme(models.Model):
 
 class Elenco(models.Model):
     filme = models.ForeignKey(Filme, on_delete=models.CASCADE)
-    ator =  models.ForeignKey(PessoaFilme, on_delete=models.CASCADE)
+    ator =  models.ForeignKey(Artista, on_delete=models.CASCADE)
     personagem = models.CharField('Personagem', max_length=150, null=True, blank=True)
     principal = models.BooleanField('Principal ?', default=False)
 
