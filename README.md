@@ -1,4 +1,6 @@
 # Locadora Imperial - (locadora-cin)
+[![Build Status](https://travis-ci.org/mprof2018/locadora-cin.svg?branch=master)](https://travis-ci.org/mprof2018/locadora-cin) [![Coverage Status](https://coveralls.io/repos/github/mprof2018/locadora-cin/badge.svg?branch=master)](https://coveralls.io/github/mprof2018/locadora-cin?branch=master)
+
 
 ## Justificativa
 Atualmente a informatização das atividades de uma empresa não é mais considerada um diferencial e sim uma necessidade que rege a sobrevivência do negócio, independentemente do ramo de atividades.
@@ -20,4 +22,3 @@ Para o desenvolvimento desse projeto, formamos uma equipe de 5 pessoas com as se
 | Analista de Testes | Constrói os testes de comportamento                                                                            | Clayton Ricardo                  | crf       |
 | Programador        | Responsável técnico pela codificação do sistema                                                                | Rennan Francisco                 | rfml      |
 | Web Designer       | Construção dos templates                                                                                       | Jeferson Anunciação & Iago Viana | jja & ivm |
-[![Build Status](https://travis-ci.org/mprof2018/locadora-cin.svg?branch=master)](https://travis-ci.org/mprof2018/locadora-cin) [![Coverage Status](https://coveralls.io/repos/github/mprof2018/locadora-cin/badge.svg?branch=master)](https://coveralls.io/github/mprof2018/locadora-cin?branch=master)
