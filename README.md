@@ -1,4 +1,4 @@
-# Locadora Imperial - (locadora-cin)
+# Projeto de Engenharia de Software
 [![Build Status](https://travis-ci.org/mprof2018/locadora-cin.svg?branch=master)](https://travis-ci.org/mprof2018/locadora-cin) [![Coverage Status](https://coveralls.io/repos/github/mprof2018/locadora-cin/badge.svg?branch=master)](https://coveralls.io/github/mprof2018/locadora-cin?branch=master)
 
 
@@ -13,6 +13,10 @@ A videolocadora imperial necessita de um sistema de informação que irá automa
   4. - Consulta Online de Acervo
   5. - Notificação de Reservas
   6. - Bloqueio de Locação
+ 
+## Descrição do Produto
+
+O __locadora_cin__ é um sistema gerencial feito sob demanda cuja finalidade é gerenciar as atividades de locação, reserva e consulta de acervo para videolocadoras, em especial a locadora imperial, contratante deste objeto.
 
 ## Equipe
 
