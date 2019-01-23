@@ -16,9 +16,10 @@ A videolocadora imperial necessita de um sistema de informação que irá automa
 ## Equipe
 
 Para o desenvolvimento desse projeto, formamos uma equipe de 5 pessoas com as seguintes atribuições:
-| Função             | Responsabildade                                                                                                | Responsável                      | Login     |
-|--------------------|----------------------------------------------------------------------------------------------------------------|----------------------------------|-----------|
-| Arquiteto          | Analisa as necessidades do projeto e define os elementos  técnicos a serem utilizados na concepção do software | Woshington Valdeci               | wvs2      |
-| Analista de Testes | Constrói os testes de comportamento                                                                            | Clayton Ricardo                  | crf       |
-| Programador        | Responsável técnico pela codificação do sistema                                                                | Rennan Francisco                 | rfml      |
-| Web Designer       | Construção dos templates                                                                                       | Jeferson Anunciação & Iago Viana | jja & ivm |
+
+Função| Responsabildade| Responsável                      | Login     
+---------|-----------|----------------------------------|-----------
+Arquiteto| Analisa as necessidades do projeto e define a abordagem a ser utilizada  | Woshington Valdeci| wvs2
+Analista de Testes| Constrói os testes de comportamento| Clayton Ricardo| crf 
+Programador| Responsável técnico pela codificação do sistema| Rennan Francisco| rfml
+Web Designer| Construção dos templates| Jeferson Anunciação & Iago Viana | jja & ivm
