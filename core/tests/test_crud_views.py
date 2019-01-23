@@ -1,7 +1,7 @@
 from django.urls import reverse
 from django.test import RequestFactory
 from django.contrib.auth.models import User
-from core.views import *
+from core.views.cruds_views import *
 from mixer.backend.django import mixer
 import pytest
 from django.test import TestCase
@@ -83,7 +83,7 @@ class TestFilmeViews(TestCase):
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
-        response = FilmeCriar.as_view()(request)
+        response = criar_filme(request)
         assert response.status_code == 200
     
     def test_filme_detalhe(self):
@@ -99,7 +99,7 @@ class TestFilmeViews(TestCase):
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
-        response = FilmeEditar.as_view()(request, pk=self.filme.pk)
+        response = editar_filme(request, pk=self.filme.pk)
         assert response.status_code == 200
     
     def test_filme_deletar(self):

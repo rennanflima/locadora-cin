@@ -15,7 +15,7 @@
 
     {% bootstrap_messages %}
 
-    <div class="container">
+    <div class="container-fluid">
         <h2>Detalhar Tipos de Mídia</h2>
         <hr>
         <div class="form-group">
@@ -27,7 +27,7 @@
             {{ object.valor|currency }}
         </div> 
         <hr>
-        <a href="{% url 'admin:midia-listar' %}" class="btn btn-info ml-2 float-right">Voltar para a Listagem</a>
-        <a href="{% url 'admin:midia-novo' %}" class="btn btn-success ml-2 float-right">Adicionar outro Tipo de Mídia</a>
+        <a href="{% url 'admin:midia-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
+        <a href="{% url 'admin:midia-novo' %}" class="btn btn-success ml-2 float-right">Adicionar Tipo de Mídia</a>
     </div>
 {% endblock conteudo %}

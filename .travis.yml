@@ -6,11 +6,10 @@ python:
 
 # env:
 #   - SECRET_KEY=TopSecretKey DEBUG=True ALLOWED_HOSTS=127.0.0.1 #Configuração das variáveis de ambiente
-
 install:
   - pip install -r requirements.txt
-before_script:
-  - echo "DEBUG=False" >> .env
+# before_script:
+#   - echo "DEBUG=False" >> .env
 script:
   - tox
   - coverage run -m pytest

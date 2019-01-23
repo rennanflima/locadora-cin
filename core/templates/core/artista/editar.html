@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+
+{% block conteudo %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'admin:index'%}">Início</a>
+        </li>
+        <li class="breadcrumb-item ">
+            <a href="{%url 'admin:artista-listar'%}">Artistas</a>
+        </li>
+        <li class="breadcrumb-item active">Editar</li>
+    </ol>
+
+    <div class="container-fluid">
+        <h2>Editar Artistas</h2>
+        <hr>
+        <form method="POST" class="form">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <hr>
+            
+            <a href="{%url 'admin:filme-novo'%}" class="btn btn-primary ml-2 mb-4 float-right">Adicionar Filme</a>
+            <a href="{%url 'admin:artista-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+            <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Artistas</button>
+                       
+        </form>
+    </div>
+{% endblock conteudo %}

@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load bootstrap4 %}
+{% load static %} 
 
 {% block conteudo %}
     <ol class="breadcrumb">
@@ -14,45 +15,80 @@
     
     {% bootstrap_messages %}
 
-    <div class="container">
+    <div class="container-fluid">
         <h2>Detalhar Filme</h2>
         <hr>
         <div class="form-group">
             <label class="negrito">Título: </label>    
-            {{object.titulo }}
+            {{filme.titulo }}
         </div>
         <div class="form-group">
             <label class="negrito">Título Original: </label>    
-            {{object.titulo }}
+            {{filme.titulo_original }}
         </div> 
         <div class="form-group">
             <label class="negrito">Gênero: </label>    
-            {% for g in object.genero.all %}
+            {% for g in filme.genero.all %}
                 {{ g }}
             {% endfor %}
         </div> 
         <div class="form-group">
             <label class="negrito">Duração: </label>    
-            {{object.duracao }}
+            {{filme.duracao }}
         </div> 
         <div class="form-group">
-            <label class="negrito">Data de Lançamento: </label>    
-            {{object.data_lancamento }} ({{object.pais}})
+            <label class="negrito">Ano de Lançamento: </label>    
+            {{filme.ano }}
+        </div>
+        <div class="form-group">
+            <label class="negrito">País: </label>    
+            {{filme.pais}}
         </div>
         <div class="form-group">
             <label class="negrito">Diretor: </label>    
-            {{object.diretor }}
+            {% for d in filme.diretor.all %}
+                {{ d }}
+            {% endfor %}
         </div>  
         <div class="form-group">
             <label class="negrito">Classificação Indicativa: </label>    
-            {{object.get_classificacao_display }}
+            {{filme.get_classificacao_display }}
         </div> 
         <div class="form-group">
             <label class="negrito">Sinopse: </label><br/>   
-            {{object.sinopse }}
-        </div>  
+            {{filme.sinopse }}
+        </div>
+
+        <fieldset class="mt-3">
+            <legend>Elenco</legend>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead class="text-center">
+                        <th scope="col">Ator</th>
+                        <th scope="col">Personagem</th>
+                        <th scope="col">Principal?</th>
+                    </thead>
+                    <tbody>
+                        {% for elenco in elencos %}
+                            <tr class="text-center">
+                                <td>{{ elenco.ator }}</td>
+                                <td>{{ elenco.personagem }}</td>
+                                <td>
+                                    {% if elenco.principal %}
+                                        <img src="{% static '/img/icon_yes.svg' %}" width="17" height="17" alt="Sim"/>
+                                    {% else %}
+                                        <img src="{% static '/img/icon_no.svg' %}" width="17" height="17" alt="Não"/>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </fieldset>
         <hr>
-        <a href="{% url 'admin:filme-listar' %}" class="btn btn-info ml-2 float-right">Voltar para a Listagem</a>
-        <a href="{% url 'admin:filme-novo' %}" class="btn btn-success ml-2 float-right">Adicionar outro Filme</a>
+        <a href="{% url 'admin:filme-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
+        <a href="{% url 'admin:filme-novo' %}" class="btn btn-primary ml-2 float-right">Adicionar Filme</a>
+        <a href="{% url 'admin:filme-editar' filme.pk %}" class="btn btn-success ml-2 mb-4 float-right">Editar Filme</a>
     </div>
 {% endblock conteudo %}
