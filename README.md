@@ -22,9 +22,9 @@ O __locadora_cin__ é um sistema gerencial feito sob demanda cuja finalidade é 
 
 Para o desenvolvimento desse projeto, formamos uma equipe de 5 pessoas com as seguintes atribuições:
 
-Função| Responsabildade| Responsável                      | Login     
+Função| Responsabildade| Responsável                      | E-mail     
 ---------|-----------|----------------------------------|-----------
-Arquiteto| Analisa as necessidades do projeto e define a abordagem a ser utilizada  | Woshington Valdeci| wvs2
-Analista de Testes| Constrói os testes de comportamento| Clayton Ricardo| crf 
-Programador| Responsável técnico pela codificação do sistema| Rennan Francisco| rfml
-Web Designer| Construção dos templates| Jeferson Anunciação & Iago Viana | jja & ivm
+Arquiteto| Analisa as necessidades do projeto e define a abordagem a ser utilizada  | Woshington Valdeci| wvs2@ci.ufpe.br
+Analista de Testes| Constrói os testes de comportamento| Clayton Ricardo| crf@ci.ufpe.br 
+Programador| Responsável técnico pela codificação do sistema| Rennan Francisco| rfml@ci.ufpe.br
+Web Designer| Construção dos templates| Jeferson Anunciação & Iago Viana | jja@ci.ufpe.br & ivm@ci.ufpe.br
