@@ -14,12 +14,10 @@ A videolocadora imperial necessita de um sistema de informação que irá automa
 ## Equipe
 
 Para o desenvolvimento desse projeto, formamos uma equipe de 5 pessoas com as seguintes atribuições:
-Função      | Descrição                 | Profissional        |login      |
-------------|---------------------------|---------------------|-----------|
-Web Designer|Responsável pela construção dos templates utilizados no sistema| Jeferson e Iago| jja & imv|
-|Arquiteto  |Analisa as necessidades do projeto e define os elementos técnicos a serem utilizados na concepção do software| Woshington| wvs2|
-|Programador|Responsável técnico pela codificação do sistema| Rennan| rnm|
-|Tester |Faz a validação submissões do sistema, se as funcionalidades incrementadas estão de acordo com o especificado| Clayton| email|
-|Gerente |Coordena a distribuição de tarefas e o cronograma do projeto| Woshington | wvs2|
-
+| Função             | Responsabildade                                                                                                | Responsável                      | Login     |
+|--------------------|----------------------------------------------------------------------------------------------------------------|----------------------------------|-----------|
+| Arquiteto          | Analisa as necessidades do projeto e define os elementos  técnicos a serem utilizados na concepção do software | Woshington Valdeci               | wvs2      |
+| Analista de Testes | Constrói os testes de comportamento                                                                            | Clayton Ricardo                  | crf       |
+| Programador        | Responsável técnico pela codificação do sistema                                                                | Rennan Francisco                 | rfml      |
+| Web Designer       | Construção dos templates                                                                                       | Jeferson Anunciação & Iago Viana | jja & ivm |
 [![Build Status](https://travis-ci.org/mprof2018/locadora-cin.svg?branch=master)](https://travis-ci.org/mprof2018/locadora-cin) [![Coverage Status](https://coveralls.io/repos/github/mprof2018/locadora-cin/badge.svg?branch=master)](https://coveralls.io/github/mprof2018/locadora-cin?branch=master)
