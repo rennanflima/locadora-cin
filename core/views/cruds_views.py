@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.template.loader import render_to_string
 from django.http import JsonResponse, HttpResponseRedirect
 from django.db import transaction
+from django.utils.html import strip_tags
 
 # Create your views here.
 
@@ -115,7 +116,9 @@ def criar_filme(request):
                 messages.success(request, 'Filme adicionado com sucesso.')
                 return HttpResponseRedirect(reverse('admin:filme-detalhe', kwargs={'pk': filme.pk}))
             else:
-                messages.error(request, elenco_forms.errors)
+                for eform in elenco_forms:
+                    if eform.errors:
+                        messages.error(request, eform.errors)
         else:
             messages.error(request, form.errors)
     
@@ -131,25 +134,23 @@ def editar_filme(request, pk):
     if request.method == 'POST':
         form = FilmeForm(request.POST, instance=filme)
         elenco_forms = ElencoInlineFormSet(request.POST, instance=filme)
-        if form.is_valid() and elenco_forms.is_valid():
-            filme = form.save()
-            elencos = elenco_forms.save()
-            for obj in elencos:
-                if obj.filme != filme:
-                    obj.filme = filme
-                    obj.save()
+        if form.is_valid():
+            if elenco_forms.is_valid():
+                filme = form.save()
+                elencos = elenco_forms.save()
+                for obj in elencos:
+                    if obj.filme != filme:
+                        obj.filme = filme
+                        obj.save()
 
-            messages.success(request, 'Filme editado com sucesso.')
-            return HttpResponseRedirect(filme.get_absolute_url())
+                messages.success(request, 'Filme editado com sucesso.')
+                return HttpResponseRedirect(filme.get_absolute_url())
+            else:
+                for eform in elenco_forms:
+                    if eform.errors:
+                        messages.error(request, eform.errors)
         else:
-            errors = []
-            errors.append(form.errors)
-            errors.append(elenco_forms.errors)
-            # for key, value in elenco_forms.errors:
-            for x in range(len(elenco_forms.errors)):
-                if elenco_forms.errors[x]:
-                    print(elenco_forms.errors[x])
-                    messages.error(request, elenco_forms.errors[x])
+            messages.error(request, form.errors)
             
             
             

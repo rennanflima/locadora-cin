@@ -72,7 +72,7 @@ class Elenco(models.Model):
 
     def clean(self):
         if self.ator and not self.personagem:
-            raise ValidationError({'personagem': _('É obrigatório informar o nome do personagem caso tenha selecionado um ator.')})
+            raise ValidationError({'personagem': _("É obrigatório informar o nome do personagem para o ator: '%s'." % self.ator)})
 
 
     class Meta:
