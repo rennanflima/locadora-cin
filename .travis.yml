@@ -6,6 +6,8 @@ python:
 
 # env:
 #   - SECRET_KEY=TopSecretKey DEBUG=True ALLOWED_HOSTS=127.0.0.1 #Configuração das variáveis de ambiente
+addons:
+  - firefox: "64.0"
 install:
   - pip install --upgrade pip
   - pip install -r requirements.txt
