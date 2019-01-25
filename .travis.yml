@@ -8,11 +8,11 @@ python:
 #   - SECRET_KEY=TopSecretKey DEBUG=True ALLOWED_HOSTS=127.0.0.1 #Configuração das variáveis de ambiente
 addons:
   - firefox: "latest"
-# before_install:
-#   - wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz
-#   - mkdir geckodriver
-#   - tar -xzf geckodriver-v0.23.0-linux64.tar.gz -C geckodriver
-#   - export PATH=$PATH:$PWD/geckodriver
+before_install:
+  - wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz
+  - mkdir geckodriver
+  - tar -xzf geckodriver-v0.23.0-linux64.tar.gz -C geckodriver
+  - export PATH=$PATH:$PWD/geckodriver
 install:
   - pip install --upgrade pip
   - pip install -r requirements.txt
