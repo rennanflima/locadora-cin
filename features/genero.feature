@@ -1,4 +1,3 @@
-@tags @tag
 Feature: Manipulacao de Genero
   description
   Comportamento para insercao e edicao de genero
