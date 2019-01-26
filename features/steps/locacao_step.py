@@ -1,6 +1,6 @@
 from nose.tools import assert_equal, assert_true
 from behave import Given, When, Then
-# from locacao.models import Cliente, Item, Locacao
+from locacao.models import Cliente, Item, Locacao
 
 @given(u'Eu navego até a página de edição da locação')
 def step_impl(context):
@@ -27,7 +27,7 @@ def step_impl(context):
 def step_impl(context):
     context.browser.find_element_by_id("id_adicionar_item").click()
 
-@when(u'informo o código de barras do item')
+@when(u'informo o codigo de barras')
 def step_impl(context):
     item = Item.objects.first()
     context.browser.find_element_by_id("id_item").send_keys(item.codigo_barras)
@@ -43,29 +43,32 @@ def step_impl(context):
 # Excluir Item
 @when(u'Eu clico no botão excluir ao lado do item que quero excluir')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: When Eu clico no botão excluir ao lado do item que quero excluir')
+    context.browser.find_element_by_class_name("btn-danger").click()
 
 
-@then(u'Eu sou questionado "Tem certeza que deseja remover este item?"')
+@then(u'Eu sou questionado "Tem certeza que deseja remover este Item?"')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Then Eu sou questionado "Tem certeza que deseja remover este item?"')
+    conteudo = context.browser.find_element_by_id("pergunta_delete").text
+    if "Você tem certeza que deseja remover este Item?" in conteudo:
+        assert True is not False
+    else:
+        assert True is not True
 
 
-@when(u'Clico em "Sim"')
+@when(u'Clico em "Sim, tenho certeza"')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: When Clico em "Sim"')
-
+    context.browser.find_element_by_id("btn_confirm_delete").click()
 
 @then(u'Eu recebo a msg "Item Excluido com Sucesso."')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Then Eu recebo a msg "Item Excluido com Sucesso."')
+    assert_true(context.browser.find_element_by_class_name("alert-success"), "Gênero excluído com sucesso.")
 
 
 @when(u'Eu clico no botão Salvar')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: When Eu clico no botão Salvar')
+    context.browser.find_element_by_id("id_salvar_locacao").click()
 
 
 @then(u'Eu recebo a msg "Locação Salva com Sucesso!"')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Then Eu recebo a msg "Locação Salva com Sucesso!"')
+    assert_true(context.browser.find_element_by_class_name("alert-success"), "Locação Salva com Sucesso!")

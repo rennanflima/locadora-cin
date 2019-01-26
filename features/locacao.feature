@@ -12,15 +12,14 @@ Feature: Realizando locação
   Scenario: Adicionar Item a Locação
     Given Eu navego até a página de edição da locação
     When Eu clico em adicionar item
-      And informo o código de barras do item
+      And informo o codigo de barras
       And clico em salvar item
     Then Eu recebo a msg "Item adicionado com sucesso"
-
 
   Scenario: Excluir Item da Locação
     Given Eu navego até a página de edição da locação
     When Eu clico no botão excluir ao lado do item que quero excluir
-    Then Eu sou questionado "Tem certeza que deseja remover este item?"
+    Then Eu sou questionado "Tem certeza que deseja remover este Item?"
     When Clico em "Sim"
     Then Eu recebo a msg "Item Excluido com Sucesso."
 
