@@ -5,7 +5,7 @@ behave==1.2.6
 certifi==2018.11.29
 chardet==3.0.4
 colorama==0.4.1
-coverage==4.0.3
+coverage==4.5.2
 coveralls==1.5.1
 dj-database-url==0.5.0
 dj-static==0.0.6
@@ -37,6 +37,7 @@ pycodestyle==2.4.0
 pyflakes==2.0.0
 pylint==2.2.2
 pytest==4.1.0
+pytest-cov==2.6.1
 pytest-django==3.4.5
 python-coveralls==2.9.1
 python-dateutil==2.7.5
