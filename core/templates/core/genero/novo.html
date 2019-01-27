@@ -1,7 +1,7 @@
 {% extends 'core/base.html' %}
 {% load bootstrap4 %}
+{% load crispy_forms_tags %}
 
-{% bootstrap_messages %}
 
 {% block conteudo %}
 <!-- Breadcrumbs-->
@@ -14,7 +14,10 @@
         </li>
         <li class="breadcrumb-item active">Novo</li>
     </ol>
-    <div class="container">
+
+    {% bootstrap_messages %}
+
+    <div class="container-fluid">
         <h2>Adicionar Gênero</h2>
         <hr>
         <form method="POST" class="form">
