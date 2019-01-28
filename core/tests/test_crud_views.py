@@ -159,3 +159,54 @@ class TestMidiaViews(TestCase):
 
         response = MidiaDeletar.as_view()(request, pk=self.midia.pk)
         assert response.status_code == 200
+
+
+@pytest.mark.django_db
+class TestArtistaViews(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestArtistaViews, cls).setUpClass()
+        cls.artista = mixer.blend('core.Artista')
+        cls.factory = RequestFactory()
+    
+    def test_artista_lista(self):
+        path = reverse('admin:artista-listar')
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = ArtistaListar.as_view()(request)
+        assert response.status_code == 200
+        
+    
+    def test_artista_novo(self):
+        path = reverse('admin:artista-novo')
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = ArtistaCriar.as_view()(request)
+        assert response.status_code == 200
+    
+    def test_artista_detalhe(self):
+        path = reverse('admin:artista-detalhe', kwargs={'pk': self.artista.pk})
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = ArtistaDetalhe.as_view()(request, pk=self.artista.pk)
+        assert response.status_code == 200
+    
+    def test_artista_editar(self):
+        path = reverse('admin:artista-editar', kwargs={'pk': self.artista.pk})
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = ArtistaEditar.as_view()(request, pk=self.artista.pk)
+        assert response.status_code == 200
+    
+    def test_artista_deletar(self):
+        path = reverse('admin:artista-deletar', kwargs={'pk': self.artista.pk})
+        request = self.factory.get(path)
+        # request.user = mixer.blend(User)
+
+        response = ArtistaDeletar.as_view()(request, pk=self.artista.pk)
+        assert response.status_code == 200

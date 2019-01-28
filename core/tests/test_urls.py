@@ -68,4 +68,36 @@ class TestUrls:
         path = reverse('admin:midia-deletar', kwargs={'pk' : 1})
         assert resolve(path).view_name == 'admin:midia-deletar'
     
-    # Termino CRUD Midia
+    # Início CRUD Artista
+    def test_artista_listar(self):
+        path = reverse('admin:artista-listar')
+        assert resolve(path).view_name == 'admin:artista-listar'
+
+    def test_artista_novo(self):
+        path = reverse('admin:artista-novo')
+        assert resolve(path).view_name == 'admin:artista-novo'
+
+    def test_artista_editar(self):
+        path = reverse('admin:artista-editar', kwargs={'pk' : 1})
+        assert resolve(path).view_name == 'admin:artista-editar'
+
+    def test_artista_detalhe(self):
+        path = reverse('admin:artista-detalhe', kwargs={'pk' : 1})
+        assert resolve(path).view_name == 'admin:artista-detalhe'
+
+    def test_artista_deletar(self):
+        path = reverse('admin:artista-deletar', kwargs={'pk' : 1})
+        assert resolve(path).view_name == 'admin:artista-deletar'
+
+    #Ajax
+    def test_diretor_ajax_novo(self):
+        path = reverse('admin:ajax-diretor-novo')
+        assert resolve(path).view_name == 'admin:ajax-diretor-novo'
+    
+    def test_ator_ajax_novo(self):
+        path = reverse('admin:ajax-ator-novo')
+        assert resolve(path).view_name == 'admin:ajax-ator-novo'
+
+    def test_genero_ajax_novo(self):
+        path = reverse('admin:ajax-genero-novo')
+        assert resolve(path).view_name == 'admin:ajax-genero-novo'

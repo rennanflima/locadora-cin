@@ -14,11 +14,7 @@ from django.utils.html import strip_tags
 
 # Create your views here.
 
-
-
-
 # Início CRUD Gênero
-
 class GeneroCriar(SuccessMessageMixin, generic.CreateView):
     model = Genero
     form_class = GeneroForm
@@ -56,7 +52,6 @@ class GeneroDeletar(SuccessMessageMixin, generic.DeleteView):
         return super(GeneroDeletar, self).delete(request, *args, **kwargs)
 
 # Incício CRUD Pessoas do Filme
-
 class ArtistaCriar(SuccessMessageMixin, generic.CreateView):
     model = Artista
     form_class = ArtistaForm
@@ -156,13 +151,6 @@ def editar_filme(request, pk):
             
     return render(request, 'core/filme/editar.html', {'form': form, 'formset':elenco_forms})
 
-
-# class FilmeEditar(SuccessMessageMixin, generic.UpdateView):
-#     model = Filme
-#     form_class = FilmeForm
-#     template_name = 'core/filme/editar.html'
-#     success_message = "Filme editado com sucesso."
-
 class FilmeListar(generic.ListView):
     model = Filme
     paginate_by = 10
@@ -215,6 +203,7 @@ def diretor_novo_ajax(request):
 
     return JsonResponse(data)
 
+#Formulario de genero no modal
 def genero_novo_ajax(request):
     data = dict()
     form = GeneroForm
@@ -234,7 +223,7 @@ def genero_novo_ajax(request):
 
     return JsonResponse(data)
 
-
+#Formulario de ator no modal
 def ator_novo_ajax(request):
     data = dict()
     form = AtorForm
@@ -278,7 +267,6 @@ class FilmeDeletar(generic.DeleteView):
         return super(FilmeDeletar, self).delete(request, *args, **kwargs)
 
 # Início CRUD Midia
-
 class MidiaCriar(SuccessMessageMixin, generic.CreateView):
     model = Midia
     form_class = MidiaForm
@@ -303,7 +291,6 @@ class MidiaListar(generic.ListView):
 class MidiaDetalhe(generic.DetailView):
     model = Midia
     template_name = 'core/midia/detalhe.html'
-
 
 class MidiaDeletar(generic.DeleteView):
     model = Midia
