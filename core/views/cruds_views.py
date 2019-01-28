@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse, HttpResponseRedirect
 from django.db import transaction
 from django.utils.html import strip_tags
+from django.forms import inlineformset_factory
 
 # Create your views here.
 
@@ -48,7 +49,7 @@ class GeneroDetalhe(generic.DetailView):
 class GeneroDeletar(SuccessMessageMixin, generic.DeleteView):
     model = Genero
     template_name = "core/genero/deletar.html"
-    success_url = reverse_lazy('admin:genero-listar')
+    success_url = reverse_lazy('core:genero-listar')
     success_message = "Gênero excluído com sucesso."
 
     def delete(self, request, *args, **kwargs):
@@ -85,7 +86,7 @@ class ArtistaDetalhe(generic.DetailView):
 class ArtistaDeletar(generic.DeleteView):
     model = Artista
     template_name = "core/artista/deletar.html"
-    success_url = reverse_lazy('admin:artista-listar')
+    success_url = reverse_lazy('core:artista-listar')
     success_message = "Artista excluído com sucesso."
 
     def delete(self, request, *args, **kwargs):
@@ -114,7 +115,7 @@ def criar_filme(request):
                     elenco.filme = filme
                     elenco.save()
                 messages.success(request, 'Filme adicionado com sucesso.')
-                return HttpResponseRedirect(reverse('admin:filme-detalhe', kwargs={'pk': filme.pk}))
+                return HttpResponseRedirect(reverse('core:filme-detalhe', kwargs={'pk': filme.pk}))
             else:
                 for eform in elenco_forms:
                     if eform.errors:
@@ -195,7 +196,7 @@ def diretor_novo_ajax(request):
             f.save()
             data['form_diretor_is_valid'] = True
             diretores = Artista.objects.filter(tipo__icontains='Diretor')
-            data['html_diretor_list'] = render_to_string('core/filme/ajax/partial_select_diretor.html', {'diretores': diretores})
+            data['html_diretor_list'] = render_to_string('core/ajax/partial_select_diretor.html', {'diretores': diretores})
         else:
             try:
                 diretor = Artista.objects.get(nome=form.instance.nome)
@@ -206,12 +207,12 @@ def diretor_novo_ajax(request):
                 diretor.save()
                 data['form_diretor_is_valid'] = True
                 diretores = Artista.objects.filter(tipo__icontains='Diretor')
-                data['html_diretor_list'] = render_to_string('core/filme/ajax/partial_select_diretor.html', {'diretores': diretores})           
+                data['html_diretor_list'] = render_to_string('core/ajax/partial_select_diretor.html', {'diretores': diretores})           
             except:
                 data['form_diretor_is_valid'] = False
     
     context = {'form': form}
-    data['html_form_diretor'] = render_to_string('core/filme/ajax/partial_diretor_novo.html', context, request=request,)
+    data['html_form_diretor'] = render_to_string('core/ajax/partial_diretor_novo.html', context, request=request,)
 
     return JsonResponse(data)
 
@@ -225,12 +226,12 @@ def genero_novo_ajax(request):
             form.save()
             data['form_genero_is_valid'] = True
             generos = Genero.objects.all()
-            data['html_genero_list'] = render_to_string('core/filme/ajax/partial_select_genero.html', {'generos': generos})
+            data['html_genero_list'] = render_to_string('core/ajax/partial_select_genero.html', {'generos': generos})
         else:
             data['form_genero_is_valid'] = False
     
     context = {'form': form}
-    data['html_form_genero'] = render_to_string('core/filme/ajax/partial_genero_novo.html', context, request=request,)
+    data['html_form_genero'] = render_to_string('core/ajax/partial_genero_novo.html', context, request=request,)
 
     return JsonResponse(data)
 
@@ -247,7 +248,7 @@ def ator_novo_ajax(request):
             f.save()
             data['form_ator_is_valid'] = True
             atores = Artista.objects.filter(tipo__icontains='Ator')
-            data['html_ator_list'] = render_to_string('core/filme/ajax/partial_select_ator.html', {'atores': atores})
+            data['html_ator_list'] = render_to_string('core/ajax/partial_select_ator.html', {'atores': atores})
         else:
             try:
                 ator = Artista.objects.get(nome=form.instance.nome)
@@ -258,19 +259,19 @@ def ator_novo_ajax(request):
                 ator.save()
                 data['form_ator_is_valid'] = True
                 atores = Artista.objects.filter(tipo__icontains='Ator')
-                data['html_ator_list'] = render_to_string('core/filme/ajax/partial_select_ator.html', {'atores': atores})           
+                data['html_ator_list'] = render_to_string('core/ajax/partial_select_ator.html', {'atores': atores})           
             except:
                 data['form_ator_is_valid'] = False
     
     context = {'form': form}
-    data['html_form_ator'] = render_to_string('core/filme/ajax/partial_ator_novo.html', context, request=request,)
+    data['html_form_ator'] = render_to_string('core/ajax/partial_ator_novo.html', context, request=request,)
 
     return JsonResponse(data)
 
 class FilmeDeletar(generic.DeleteView):
     model = Filme
     template_name = "core/filme/deletar.html"
-    success_url = reverse_lazy('admin:filme-listar')
+    success_url = reverse_lazy('core:filme-listar')
     success_message = "Filme excluído com sucesso."
 
     def delete(self, request, *args, **kwargs):
@@ -298,7 +299,7 @@ class MidiaListar(generic.ListView):
 
     def get_queryset(self):
         nome = self.request.GET.get('nome', '')
-        return self.model.objects.filter(nome__icontains = nome)
+        return self.model.objects.filter(Q(nome__icontains = nome)| Q(sigla=nome))
 
 class MidiaDetalhe(generic.DetailView):
     model = Midia
@@ -308,10 +309,78 @@ class MidiaDetalhe(generic.DetailView):
 class MidiaDeletar(generic.DeleteView):
     model = Midia
     template_name = "core/midia/deletar.html"
-    success_url = reverse_lazy('admin:midia-listar')
+    success_url = reverse_lazy('core:midia-listar')
     success_message = "Mídia excluída com sucesso."
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super(MidiaDeletar, self).delete(request, *args, **kwargs)
 
+
+# Início CRUD Distribuidora
+
+# class DistribuidoraCriar(SuccessMessageMixin, generic.CreateView):
+#     model = Distribuidora
+#     form_class = DistribuidoraForm
+#     template_name = 'core/distribuidora/novo.html'
+#     success_message = "Distribuidora adicionada com sucesso."
+        
+def criar_distribuidora(request):
+    
+    form = DistribuidoraForm()
+    end_form = EnderecoForm()
+
+    if request.method == 'POST':
+        form = DistribuidoraForm(request.POST)
+        end_form = EnderecoForm(request.POST)
+        if form.is_valid():
+            if elenco_forms.is_valid():
+                distribuidora = form.save(commit=False)
+                endereco = end_form.save()
+                distribuidora.endereco = endereco
+                distribuidora.save()
+                messages.success(request, 'Distribuidora adicionada com sucesso.')
+                return HttpResponseRedirect(reverse('core:distribuidora-detalhe', kwargs={'pk': distribuidora.pk}))
+            else:
+                messages.error(request, end_form.errors)
+        else:
+            messages.error(request, form.errors)
+    
+    return render(request, 'core/distribuidora/novo.html', {'form': form, 'end_form':end_form})
+
+
+class DistribuidoraEditar(SuccessMessageMixin, generic.UpdateView):
+    model = Distribuidora
+    form_class = DistribuidoraForm
+    template_name = 'core/distribuidora/editar.html'
+    success_message = "Distribuidora editada com sucesso."
+
+class DistribuidoraListar(generic.ListView):
+    model = Distribuidora
+    paginate_by = 10
+    template_name = 'core/distribuidora/lista.html'    
+
+    def get_queryset(self):
+        nome = self.request.GET.get('nome', '')
+        return self.model.objects.filter(razao_social__icontains = nome)
+
+class DistribuidoraDetalhe(generic.DetailView):
+    model = Distribuidora
+    template_name = 'core/distribuidora/detalhe.html'
+
+
+class DistribuidoraDeletar(SuccessMessageMixin, generic.DeleteView):
+    model = Distribuidora
+    template_name = "core/distribuidora/deletar.html"
+    success_url = reverse_lazy('core:distribuidora-listar')
+    success_message = "Distribuidora excluída com sucesso."
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(DistribuidoraDeletar, self).delete(request, *args, **kwargs)
+
+
+def carregar_cidades(request):
+    estado_id = request.GET.get('estado')
+    cidades = Cidade.objects.filter(estado_id=estado_id)
+    return render(request, 'core/ajax/partial_select_cidade.html', {'cidades': cidades})

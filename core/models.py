@@ -14,7 +14,7 @@ class Genero(models.Model):
         return "%s" % self.nome 
 
     def get_absolute_url(self):
-        return reverse('admin:genero-detalhe', kwargs={'pk': self.pk})
+        return reverse('core:genero-detalhe', kwargs={'pk': self.pk})
 
     class Meta:
         ordering = ['nome',]
@@ -29,7 +29,7 @@ class Artista(models.Model):
         return "%s" % self.nome 
 
     def get_absolute_url(self):
-        return reverse('admin:artista-detalhe', kwargs={'pk': self.pk})
+        return reverse('core:artista-detalhe', kwargs={'pk': self.pk})
 
     class Meta:
         ordering = ['nome',]
@@ -51,7 +51,7 @@ class Filme(models.Model):
         return "%s (%s)" % (self.titulo, self.titulo_original)
     
     def get_absolute_url(self):
-        return reverse('admin:filme-detalhe', kwargs={'pk': self.pk})
+        return reverse('core:filme-detalhe', kwargs={'pk': self.pk})
 
     class Meta:
         ordering = ['titulo',]
@@ -68,7 +68,7 @@ class Elenco(models.Model):
         return "%s (%s)" % (self.ator, self.personagem)
 
     def get_absolute_url(self):
-        return reverse('admin:elenco-detalhe', kwargs={'pk': self.pk})
+        return reverse('core:elenco-detalhe', kwargs={'pk': self.pk})
 
     def clean(self):
         if self.ator and not self.personagem:
@@ -77,7 +77,7 @@ class Elenco(models.Model):
 
     class Meta:
         unique_together = ('filme', 'ator')
-        ordering = ['ator', 'principal', ]
+        ordering = ['ator', 'principal',]
         verbose_name = 'Elenco'
         verbose_name_plural = 'Elencos'
 
@@ -89,9 +89,102 @@ class Midia(models.Model):
         return "%s" % self.nome
 
     def get_absolute_url(self):
-        return reverse('admin:midia-detalhe', kwargs={'pk': self.pk})
+        return reverse('core:midia-detalhe', kwargs={'pk': self.pk})
 
     class Meta:
         ordering = ['nome',]
         verbose_name = 'Tipo de Mídia'
         verbose_name_plural = 'Tipos de Mídias'
+
+class Estado(models.Model):
+    nome = models.CharField('Nome', max_length=60, unique=True)
+    sigla = models.CharField('Sigla', max_length=30, unique=True)
+
+    def __str__(self):
+        return "%s" % self.nome
+
+    def get_absolute_url(self):
+        return reverse('core:estado-detalhe', kwargs={'pk': self.pk})
+
+    class Meta:
+        ordering = ['nome',]
+        verbose_name = 'Estado'
+        verbose_name_plural = 'Estados'
+
+class Cidade(models.Model):
+    nome = models.CharField('Nome', max_length=60)
+    capital = models.BooleanField('Capital ?', default=False)
+    estado = models.ForeignKey(Estado, on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return "%s/%s" % (self.nome, self.estado.sigla)
+
+    def get_absolute_url(self):
+        return reverse('core:cidade-detalhe', kwargs={'pk': self.pk})
+
+    class Meta:
+        ordering = ['nome', 'estado',]
+        verbose_name = 'Cidade'
+        verbose_name_plural = 'Cidades'
+
+class Endereco(models.Model):
+    logradouro = models.CharField('Logradouro', max_length=100)
+    numero = models.PositiveIntegerField('Número')
+    complemento = models.CharField('Complemento', max_length=60, null=True, blank=True)
+    bairro = models.CharField('Bairro', max_length=30)
+    cep = models.CharField('CEP', max_length=10)
+    cidade = models.ForeignKey(Cidade, on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return "%s, nº %d - %s - %s - CEP %s" % (self.logradouro, self.numero, self.bairro, self.cidade, self.cep)
+
+    def get_absolute_url(self):
+        return reverse('core:endereco-detalhe', kwargs={'pk': self.pk})
+
+    class Meta:
+        ordering = ['logradouro', 'numero', 'cidade',]
+        verbose_name = 'Endereço'
+        verbose_name_plural = 'Endereços'
+
+
+class Telefone(models.Model):
+    prefixo = models.CharField('Prefixo', max_length=10)
+    numero = models.CharField('Número', max_length=20)
+    tipo = models.CharField('Tipo de Telefone', max_length=15, choices=tipo_classificacao)
+
+    def __str__(self):
+        return "(%s) %s - %s" % (self.prefixo, self.numero, self.tipo)
+
+    def get_absolute_url(self):
+        return reverse('core:cidade-detalhe', kwargs={'pk': self.pk})
+
+    class Meta:
+        ordering = ['prefixo', 'tipo',]
+        verbose_name = 'Telefone'
+        verbose_name_plural = 'Telefones'
+
+class Distribuidora(models.Model):
+    razao_social = models.CharField('Razão Social', max_length=150)
+    cnpj = models.CharField('CNPJ', max_length=20)
+    contato = models.CharField('Pessoa de Contato', max_length=150)
+    telefone = models.CharField('Telefone', max_length=30)
+    endereco = models.OneToOneField(Endereco, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "%s" % self.razao_social
+
+    def get_absolute_url(self):
+        return reverse('core:distribuidora-detalhe', kwargs={'pk': self.pk})
+
+    class Meta:
+        ordering = ['razao_social',]
+        verbose_name = 'Distribuidora'
+        verbose_name_plural = 'Distribuidoras'
+    
+
+
+
+
+
+
+

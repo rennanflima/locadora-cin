@@ -74,8 +74,8 @@ class FilmeForm(forms.ModelForm):
             ),
             'sinopse',
             # HTML('<hr>'),
-            # HTML("<a href='{% url 'admin:genero-novo' %}' class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Gênero</a>"),
-            # HTML("<a href='{% url 'admin:filme-listar' %}' class='btn btn-danger ml-2 float-right'>Cancelar</a>"),
+            # HTML("<a href='{% url 'core:genero-novo' %}' class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Gênero</a>"),
+            # HTML("<a href='{% url 'core:filme-listar' %}' class='btn btn-danger ml-2 float-right'>Cancelar</a>"),
             # Submit('save_changes', 'Adicionar Filme', css_class="btn-success ml-2 mb-4 float-right"),
         )
 
@@ -96,8 +96,8 @@ class MidiaForm(forms.ModelForm):
             'nome',
             PrependedText('valor','R$'),
             HTML('<hr>'),
-            HTML("<a href='{% url 'admin:filme-novo' %}' class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Filme</a>"),
-            HTML("<a href='{% url 'admin:midia-listar' %}' class='btn btn-danger ml-2 float-right'>Cancelar</a>"),
+            HTML("<a href='{% url 'core:filme-novo' %}' class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Filme</a>"),
+            HTML("<a href='{% url 'core:midia-listar' %}' class='btn btn-danger ml-2 float-right'>Cancelar</a>"),
             Submit('save_changes', 'Adicionar Tipo de Mídia', css_class="btn-success ml-2 mb-4 float-right"),
 
         )
@@ -179,13 +179,6 @@ class BaseElencoFormSet(BaseInlineFormSet):
         if any(self.errors):
             return
 
-        
-
-
-
-
-    
-
 ElencoInlineFormSet = forms.inlineformset_factory(
     Filme, 
     Elenco, 
@@ -200,3 +193,30 @@ ElencoInlineFormSet = forms.inlineformset_factory(
     min_num=1,
     can_delete=True,
 )
+
+class EnderecoForm(forms.ModelForm):
+    estado = forms.ModelChoiceField(queryset = Estado.objects.all(), empty_label='Selecione um estado ...')
+
+    class Meta:
+        model = Endereco
+        fields = ('logradouro','numero','complemento', 'bairro', 'cep', 'cidade')
+    
+    def __init__(self, *args, **kwargs):
+        super(EnderecoForm, self).__init__(*args, **kwargs)
+        self.base_fields['cep'].widget.attrs['class'] = 'form-control cep'
+        self.base_fields['cidade'].queryset = Cidade.objects.none()
+
+
+class DistribuidoraForm(forms.ModelForm):
+    class Meta:
+        model = Distribuidora
+        fields = ('razao_social','cnpj','contato', 'telefone')
+    
+    def __init__(self, *args, **kwargs):
+        super(DistribuidoraForm, self).__init__(*args, **kwargs)
+        self.base_fields['cnpj'].widget.attrs['class'] = 'form-control cnpj'
+        self.base_fields['telefone'].widget.attrs['class'] = 'form-control sp_celphones'
+
+
+
+# Endereco

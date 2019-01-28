@@ -7,22 +7,20 @@
             <a href="{% url 'core:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item ">
-            <a href="{%url 'core:midia-listar'%}">Mídia</a>
+            <a href="{%url 'core:distribuidora-listar'%}">Distribuidoras</a>
         </li>
         <li class="breadcrumb-item active">Editar</li>
     </ol>
 
     <div class="container-fluid">
-        <h2>Editar Tipo de Mídia</h2>
+        <h2>Editar Distribuidora</h2>
         <hr>
         <form method="POST" class="form">
             {% csrf_token %}
             {% bootstrap_form form %}
             <hr>
-            
-            <a href="#" class="btn btn-primary ml-2 mb-4 float-right">Adicionar Item</a>
-            <a href="{%url 'core:midia-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
-            <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Mídia</button>
+            <a href="{%url 'core:distribuidora-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+            <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Distribuidora</button>
                        
         </form>
     </div>

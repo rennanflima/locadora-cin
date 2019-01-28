@@ -6,10 +6,10 @@
 {% block conteudo %}
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="{% url 'admin:index'%}">Início</a>
+            <a href="{% url 'core:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item ">
-            <a href="{%url 'admin:filme-listar'%}">Filme</a>
+            <a href="{%url 'core:filme-listar'%}">Filme</a>
         </li>
         <li class="breadcrumb-item active">Editar</li>
     </ol>
@@ -49,7 +49,7 @@
             </div>
             <hr>
             <div class="form-actions">
-                <a href="{%url 'admin:filme-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+                <a href="{%url 'core:filme-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
                 <input type="submit" name="save_changes" value="Salvar alterações" class="btn btn-primary btn-success ml-2 mb-4 float-right" id="submit-id-save_changes">                       
             </div>
         </form>
@@ -68,7 +68,7 @@
 
         $("#add_id_diretor").click(function(){
            $.ajax({
-                url: "{% url 'admin:ajax-diretor-novo' %}",
+                url: "{% url 'core:ajax-diretor-novo' %}",
                 type: 'get',
                 dataType: 'json',
                 beforeSend: function () {
@@ -109,7 +109,7 @@
 
         $("#add_id_genero").click(function(){
            $.ajax({
-                url: "{%url 'admin:ajax-genero-novo' %}",
+                url: "{%url 'core:ajax-genero-novo' %}",
                 type: 'get',
                 dataType: 'json',
                 beforeSend: function () {
@@ -149,7 +149,7 @@
     
         $("#add_id_ator").click(function(){
            $.ajax({
-                url: "{%url 'admin:ajax-ator-novo' %}",
+                url: "{%url 'core:ajax-ator-novo' %}",
                 type: 'get',
                 dataType: 'json',
                 beforeSend: function () {

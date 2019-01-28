@@ -11,3 +11,10 @@ tipo_pessoa_filme = (
     ('Diretor', 'Diretor'),
     ('Ator', 'Ator'),
 )
+
+tipo_telefone = (
+    ('Residencial', 'Residencial'),
+    ('Trabalho', 'Trabalho'),
+    ('Celular', 'Celular'),
+    ('Outro', 'Outro'),
+)

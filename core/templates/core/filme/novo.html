@@ -7,10 +7,10 @@
 <!-- Breadcrumbs-->
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="{% url 'admin:index'%}">Início</a>
+            <a href="{% url 'core:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item ">
-            <a href="{%url 'admin:filme-listar'%}">Filme</a>
+            <a href="{%url 'core:filme-listar'%}">Filme</a>
         </li>
         <li class="breadcrumb-item active">Novo</li>
     </ol>
@@ -55,8 +55,8 @@
             </div>
             <div class="form-actions">
                 <hr>
-                <a href="{% url 'admin:midia-listar' %}" class="btn btn-danger ml-2 float-right">Cancelar</a>
-                <input type="submit" name="save_changes" value="Adicionar Filme" class="btn btn-primary btn-success ml-2 mb-4 float-right" id="submit-id-save_changes">
+                <a href="{% url 'core:midia-listar' %}" class="btn btn-danger ml-2 mb-4 float-right">Cancelar</a>
+                <input type="submit" name="save_changes" value="Adicionar Filme" class="btn btn-success ml-2 mb-4 float-right" id="submit-id-save_changes">
             </div>
         </form>
     </div>
@@ -75,7 +75,7 @@
 
         $("#add_id_diretor").click(function(){
            $.ajax({
-                url: "{% url 'admin:ajax-diretor-novo' %}",
+                url: "{% url 'core:ajax-diretor-novo' %}",
                 type: 'get',
                 dataType: 'json',
                 beforeSend: function () {
@@ -116,7 +116,7 @@
 
         $("#add_id_genero").click(function(){
            $.ajax({
-                url: "{%url 'admin:ajax-genero-novo' %}",
+                url: "{%url 'core:ajax-genero-novo' %}",
                 type: 'get',
                 dataType: 'json',
                 beforeSend: function () {
@@ -156,7 +156,7 @@
     
         $("#add_id_ator").click(function(){
            $.ajax({
-                url: "{%url 'admin:ajax-ator-novo' %}",
+                url: "{%url 'core:ajax-ator-novo' %}",
                 type: 'get',
                 dataType: 'json',
                 beforeSend: function () {

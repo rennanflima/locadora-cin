@@ -1,0 +1,83 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+
+
+{% block conteudo %}
+<!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'core:index'%}">Início</a>
+        </li>
+        <li class="breadcrumb-item ">
+            <a href="{%url 'core:distribuidora-listar'%}">Distribuidoras</a>
+        </li>
+        <li class="breadcrumb-item active">Novo</li>
+    </ol>
+
+    {% bootstrap_messages %}
+
+    <div class="container-fluid">
+        <h2>Adicionar Distribuidora</h2>
+        <hr>
+        <form method="POST" class="form">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <fieldset class="mt-4">
+                <legend><b>Endereço<hr></b></legend>
+                <!-- {% crispy end_form %} -->
+                <div class="form-row">
+                    <div class="col">
+                        {{ end_form.cep|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-10">
+                        {{ end_form.logradouro|as_crispy_field }}
+                    </div>
+                    <div class="col-md-2">
+                        {{ end_form.numero|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-6">
+                        {{ end_form.complemento|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ end_form.bairro|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-6">
+                        {{ end_form.estado|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ end_form.cidade|as_crispy_field }}
+                    </div>
+                </div>
+            </fieldset>
+            <div class="form-actions">
+                <hr>
+                <a href="{%url 'core:distribuidora-listar'%}" class="btn btn-danger ml-2 mb-4 float-right">Cancelar</a>
+                <input type="submit" name="save_changes" value="Adicionar Distribuidora" class="btn btn-primary btn-success ml-2 mb-4 float-right" id="submit-id-save_changes">
+            </div>
+        </form>
+    </div>
+{% endblock conteudo %}
+
+{% block javascript %}
+    <script>
+        $('#id_estado').change(function(){
+            var url =  "{% url 'core:ajax-cidades-carregar' %}";
+            var estadoId = $(this).val();
+
+            $.ajax({
+                url: url,
+                data:{'estado': estadoId},
+                success: function(data){
+                    $('#id_cidade').html(data);
+                }
+            });
+        });
+    </script>
+{% endblock javascript %}

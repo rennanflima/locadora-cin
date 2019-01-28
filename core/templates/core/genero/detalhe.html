@@ -4,10 +4,10 @@
 {% block conteudo %}
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="{% url 'admin:index'%}">Início</a>
+            <a href="{% url 'core:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item ">
-            <a href="{%url 'admin:genero-listar'%}">Gêneros</a>
+            <a href="{%url 'core:genero-listar'%}">Gêneros</a>
         </li>
         <li class="breadcrumb-item active">Detalhar</li>
     </ol>
@@ -22,7 +22,7 @@
             {{object.nome }}
         </div> 
         <hr>
-        <a href="{% url 'admin:genero-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
-        <a href="{% url 'admin:genero-novo' %}" class="btn btn-success ml-2 float-right">Adicionar Gênero</a>
+        <a href="{% url 'core:genero-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
+        <a href="{% url 'core:genero-novo' %}" class="btn btn-success ml-2 float-right">Adicionar Gênero</a>
     </div>
 {% endblock conteudo %}
