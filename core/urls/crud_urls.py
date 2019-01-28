@@ -16,6 +16,7 @@ urlpatterns = [
     path('genero/<int:pk>/deletar/', cruds_views.GeneroDeletar.as_view(), name="genero-deletar"),
     path('genero/<int:pk>/detalhe/', cruds_views.GeneroDetalhe.as_view(), name="genero-detalhe"),
 
+    # Início URL CRUD Artista
     path('artista/', cruds_views.ArtistaListar.as_view(), name="artista-listar"),
     path('artista/novo/', cruds_views.ArtistaCriar.as_view(), name="artista-novo"),
     path('artista/<int:pk>/editar/', cruds_views.ArtistaEditar.as_view(), name="artista-editar"),
@@ -28,11 +29,6 @@ urlpatterns = [
     path('filme/<int:pk>/editar/', cruds_views.editar_filme, name="filme-editar"),
     path('filme/<int:pk>/deletar/', cruds_views.FilmeDeletar.as_view(), name="filme-deletar"),
     path('filme/<int:pk>/detalhe/', cruds_views.FilmeDetalhe.as_view(), name="filme-detalhe"),
-
-    #CRUD Elenco
-    path('filme/<int:idFilme>/elenco/novo/', cruds_views.FilmeListar.as_view(), name="elenco-listar"),
-    # path('filme/<int:idFilme>/elenco/<int:pk>/detalhe', cruds_views.filme_detalhe, name="elenco-detalhe"),
-
 
     # Início URL CRUD Midia
     path('midia/', cruds_views.MidiaListar.as_view(), name="midia-listar"),
