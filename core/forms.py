@@ -5,6 +5,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column, HTML
 from crispy_forms.bootstrap import AppendedText, PrependedText, FormActions
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from localflavor.br.forms import BRCPFField, BRCNPJField, BRZipCodeField
 
 class GeneroForm(forms.ModelForm):
     class Meta:
@@ -206,6 +207,15 @@ class EnderecoForm(forms.ModelForm):
         self.base_fields['cep'].widget.attrs['class'] = 'form-control cep'
         self.base_fields['cidade'].queryset = Cidade.objects.none()
 
+    def clean(self):
+        self.cleaned_data['cidade'] = self.clean_cidade()
+        return self.cleaned_data
+
+    def clean_cidade(self):
+        if self['cidade'].value() != '':
+            del self._errors['cidade']
+        return self['cidade']
+
 
 class DistribuidoraForm(forms.ModelForm):
     class Meta:
@@ -219,4 +229,3 @@ class DistribuidoraForm(forms.ModelForm):
 
 
 
-# Endereco

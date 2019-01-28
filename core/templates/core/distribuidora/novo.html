@@ -67,15 +67,42 @@
 
 {% block javascript %}
     <script>
-        $('#id_estado').change(function(){
+
+        function carregar_cidades(estado_id){
             var url =  "{% url 'core:ajax-cidades-carregar' %}";
-            var estadoId = $(this).val();
+            var estadoId = estado_id;
 
             $.ajax({
                 url: url,
                 data:{'estado': estadoId},
                 success: function(data){
                     $('#id_cidade').html(data);
+                }
+            });
+        }
+
+        $('#id_estado').change(function(){
+            var estadoId = $(this).val();
+            carregar_cidades(estadoId);
+        });
+
+        
+        $('#id_cep').blur(function(){
+            var url =  "{% url 'core:ajax-buscar-cep' %}";
+            cep = $(this).val();
+
+            $.ajax({
+                url: url,
+                data: {'cep': cep},
+                success: function(data){
+                    $('#id_logradouro').val(data.end);
+                    $('#id_bairro').val(data.bairro);
+                    $('#id_estado').val(data.uf).change();
+                    $('#id_complemento').val(data.complemento2);
+                    setTimeout(function(){
+                        $('#id_cidade').val(data.cidade).change();
+                    }, 50);
+                    
                 }
             });
         });

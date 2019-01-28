@@ -8,6 +8,7 @@ urlpatterns = [
     path('ajax/genero/novo/', cruds_views.genero_novo_ajax, name="ajax-genero-novo"),
     path('ajax/ator/novo/', cruds_views.ator_novo_ajax, name="ajax-ator-novo"),
     path('ajax/carregar/cidades/', cruds_views.carregar_cidades, name="ajax-cidades-carregar"), 
+    path('ajax/buscar/cep/', cruds_views.buscar_cep, name="ajax-buscar-cep"),
 
     # Início URL CRUD Gênero
     path('genero/', cruds_views.GeneroListar.as_view(), name="genero-listar"),

@@ -11,7 +11,8 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse, HttpResponseRedirect
 from django.db import transaction
 from django.utils.html import strip_tags
-from django.forms import inlineformset_factory
+from pycep_correios import consultar_cep
+from pycep_correios.excecoes import ExcecaoPyCEPCorreios
 
 # Create your views here.
 
@@ -321,7 +322,7 @@ def criar_distribuidora(request):
         form = DistribuidoraForm(request.POST)
         end_form = EnderecoForm(request.POST)
         if form.is_valid():
-            if elenco_forms.is_valid():
+            if end_form.is_valid():
                 distribuidora = form.save(commit=False)
                 endereco = end_form.save()
                 distribuidora.endereco = endereco
@@ -371,3 +372,20 @@ def carregar_cidades(request):
     estado_id = request.GET.get('estado')
     cidades = Cidade.objects.filter(estado_id=estado_id)
     return render(request, 'core/ajax/partial_select_cidade.html', {'cidades': cidades})
+
+def buscar_cep(request):
+    data = dict()
+    cep = request.GET.get('cep')
+    try:
+        data = consultar_cep(cep)
+        print(data)
+        estado = Estado.objects.get(sigla=data['uf'])
+        cidade = Cidade.objects.get(nome=data['cidade'], estado=estado)
+
+        data['uf'] = estado.id
+        data['cidade'] = cidade.id
+    except ExcecaoPyCEPCorreios as exc:
+        print(exc)
+        data['error'] = exc.message       
+
+    return JsonResponse(data)

@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'multiselectfield',
     'crispy_forms',
+    'localflavor',
 ]
 
 MIDDLEWARE = [
