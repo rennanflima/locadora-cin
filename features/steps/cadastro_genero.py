@@ -1,5 +1,12 @@
 from behave import *
+# from selenium import webdriver
 # from core.models import Genero
+
+def before_all(context):  
+	context.browser = webdriver.Chrome()
+
+def after_all(context):  
+      context.browser.quit()
 
 @given(u'a tela de cadastro de generos')
 def step_impl(context):
