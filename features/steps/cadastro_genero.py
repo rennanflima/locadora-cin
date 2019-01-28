@@ -1,5 +1,5 @@
 from behave import *
-# from selenium import webdriver
+from selenium import webdriver
 # from core.models import Genero
 
 def before_all(context):  
