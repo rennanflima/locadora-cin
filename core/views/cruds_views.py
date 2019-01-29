@@ -13,6 +13,7 @@ from django.db import transaction
 from django.utils.html import strip_tags
 from pycep_correios import consultar_cep
 from pycep_correios.excecoes import ExcecaoPyCEPCorreios
+from core.filters import *
 
 # Create your views here.
 
@@ -98,9 +99,9 @@ def criar_filme(request):
     elenco_forms = ElencoInlineFormSet(queryset=Elenco.objects.none())
 
     if request.method == 'POST':
-        form = FilmeForm(request.POST)
+        form = FilmeForm(request.POST, request.FILES)
         elenco_forms = ElencoInlineFormSet(
-            request.POST,
+            request.POST, request.FILES,
             queryset=Elenco.objects.none()
         )
         if form.is_valid():
@@ -129,8 +130,8 @@ def editar_filme(request, pk):
     elenco_forms = ElencoInlineFormSet(instance=filme)
 
     if request.method == 'POST':
-        form = FilmeForm(request.POST, instance=filme)
-        elenco_forms = ElencoInlineFormSet(request.POST, instance=filme)
+        form = FilmeForm(request.POST, request.FILES, instance=filme)
+        elenco_forms = ElencoInlineFormSet(request.POST, request.FILES, instance=filme)
         if form.is_valid():
             if elenco_forms.is_valid():
                 filme = form.save()
@@ -288,7 +289,7 @@ class MidiaListar(generic.ListView):
 
     def get_queryset(self):
         nome = self.request.GET.get('nome', '')
-        return self.model.objects.filter(Q(nome__icontains = nome)| Q(sigla=nome))
+        return self.model.objects.filter(nome__icontains = nome)
 
 class MidiaDetalhe(generic.DetailView):
     model = Midia
@@ -305,16 +306,8 @@ class MidiaDeletar(generic.DeleteView):
         return super(MidiaDeletar, self).delete(request, *args, **kwargs)
 
 
-# Início CRUD Distribuidora
-
-# class DistribuidoraCriar(SuccessMessageMixin, generic.CreateView):
-#     model = Distribuidora
-#     form_class = DistribuidoraForm
-#     template_name = 'core/distribuidora/novo.html'
-#     success_message = "Distribuidora adicionada com sucesso."
-        
-def criar_distribuidora(request):
-    
+# Início CRUD Distribuidora        
+def criar_distribuidora(request):    
     form = DistribuidoraForm()
     end_form = EnderecoForm()
 
@@ -336,12 +329,28 @@ def criar_distribuidora(request):
     
     return render(request, 'core/distribuidora/novo.html', {'form': form, 'end_form':end_form})
 
+def editar_distribuidora(request, pk):    
+    distribuidora = get_object_or_404(Distribuidora, pk=pk)
+    form = DistribuidoraForm(instance=distribuidora)
+    end_form = EnderecoForm(instance=distribuidora.endereco)
 
-class DistribuidoraEditar(SuccessMessageMixin, generic.UpdateView):
-    model = Distribuidora
-    form_class = DistribuidoraForm
-    template_name = 'core/distribuidora/editar.html'
-    success_message = "Distribuidora editada com sucesso."
+    if request.method == 'POST':
+        form = DistribuidoraForm(request.POST, instance=distribuidora)
+        end_form = EnderecoForm(request.POST, instance=distribuidora.endereco)
+        if form.is_valid():
+            if end_form.is_valid():
+                distribuidora = form.save(commit=False)
+                endereco = end_form.save()
+                distribuidora.endereco = endereco
+                distribuidora.save()
+                messages.success(request, "Distribuidora editada com sucesso.")
+                return HttpResponseRedirect(reverse('core:distribuidora-detalhe', kwargs={'pk': distribuidora.pk}))
+            else:
+                messages.error(request, end_form.errors)
+        else:
+            messages.error(request, form.errors)
+    
+    return render(request, 'core/distribuidora/editar.html', {'form': form, 'end_form':end_form})
 
 class DistribuidoraListar(generic.ListView):
     model = Distribuidora
@@ -354,6 +363,7 @@ class DistribuidoraListar(generic.ListView):
 
 class DistribuidoraDetalhe(generic.DetailView):
     model = Distribuidora
+    context_object_name = 'distribuidora' 
     template_name = 'core/distribuidora/detalhe.html'
 
 
@@ -389,3 +399,40 @@ def buscar_cep(request):
         data['error'] = exc.message       
 
     return JsonResponse(data)
+
+# Início CRUD Item
+class ItemCriar(SuccessMessageMixin, generic.CreateView):
+    model = Item
+    form_class = ItemForm
+    template_name = 'core/item/novo.html'
+    success_message = "Item adicionado com sucesso."
+        
+class ItemEditar(SuccessMessageMixin, generic.UpdateView):
+    model = Item
+    form_class = ItemForm
+    template_name = 'core/item/editar.html'
+    success_message = "Item editado com sucesso."
+
+class ItemListar(generic.ListView):
+    model = Item
+    paginate_by = 10
+    template_name = 'core/item/lista.html'    
+
+    def get_queryset(self):
+        nome = self.request.GET.get('nome', '')
+        return self.model.objects.filter(Q(numero_serie__icontains = nome)| Q(filme__titulo__icontains = nome) | Q(filme__titulo_original__icontains=nome))
+
+class ItemDetalhe(generic.DetailView):
+    model = Item
+    context_object_name = 'item'
+    template_name = 'core/item/detalhe.html'
+
+class ItemDeletar(SuccessMessageMixin, generic.DeleteView):
+    model = Item
+    template_name = "core/item/deletar.html"
+    success_url = reverse_lazy('core:item-listar')
+    success_message = "Item excluído com sucesso."
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(ItemDeletar, self).delete(request, *args, **kwargs)

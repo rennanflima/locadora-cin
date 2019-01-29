@@ -41,7 +41,14 @@ urlpatterns = [
     # Início URL CRUD Distribuidora
     path('distribuidora/', cruds_views.DistribuidoraListar.as_view(), name="distribuidora-listar"),
     path('distribuidora/novo/', cruds_views.criar_distribuidora, name="distribuidora-novo"),
-    path('distribuidora/<int:pk>/editar/', cruds_views.DistribuidoraEditar.as_view(), name="distribuidora-editar"),
+    path('distribuidora/<int:pk>/editar/', cruds_views.editar_distribuidora, name="distribuidora-editar"),
     path('distribuidora/<int:pk>/deletar/', cruds_views.DistribuidoraDeletar.as_view(), name="distribuidora-deletar"),
     path('distribuidora/<int:pk>/detalhe/', cruds_views.DistribuidoraDetalhe.as_view(), name="distribuidora-detalhe"),
+
+    # Início URL CRUD Item
+    path('item/', cruds_views.ItemListar.as_view(), name="item-listar"),
+    path('item/novo/', cruds_views.ItemCriar.as_view(), name="item-novo"),
+    path('item/<int:pk>/editar/', cruds_views.ItemEditar.as_view(), name="item-editar"),
+    path('item/<int:pk>/deletar/', cruds_views.ItemDeletar.as_view(), name="item-deletar"),
+    path('item/<int:pk>/detalhe/', cruds_views.ItemDetalhe.as_view(), name="item-detalhe"),
 ]

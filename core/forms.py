@@ -46,7 +46,7 @@ class FilmeForm(forms.ModelForm):
     diretor = forms.ModelMultipleChoiceField(queryset = Artista.objects.filter(tipo__icontains='Diretor'))
     class Meta:
         model = Filme
-        fields = ('titulo', 'titulo_original', 'duracao', 'diretor', 'ano', 'pais', 'classificacao', 'genero', 'sinopse',)
+        fields = ('titulo', 'titulo_original', 'duracao', 'diretor', 'ano', 'pais', 'classificacao', 'genero', 'distribuidora', 'capa','sinopse',)
     
     def __init__(self, *args, **kwargs):
         super(FilmeForm, self).__init__(*args, **kwargs)
@@ -71,6 +71,11 @@ class FilmeForm(forms.ModelForm):
             Row(
                 Column('diretor', css_class='form-group col-md-6 mb-0'),
                 Column('genero', css_class='form-group col-md-6 mb-0'),
+                css_class='form-row'
+            ),
+            Row(
+                Column('distribuidora', css_class='form-group col-md-6 mb-0'),
+                Column('capa', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
             ),
             'sinopse',
@@ -120,9 +125,6 @@ class ElencoForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(ElencoForm, self).clean()
-
-
-
 
 class BaseElencoFormSet(BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
@@ -196,26 +198,26 @@ ElencoInlineFormSet = forms.inlineformset_factory(
 )
 
 class EnderecoForm(forms.ModelForm):
-    estado = forms.ModelChoiceField(queryset = Estado.objects.all(), empty_label='Selecione um estado ...')
-
+    
     class Meta:
         model = Endereco
-        fields = ('logradouro','numero','complemento', 'bairro', 'cep', 'cidade')
+        fields = ('logradouro','numero','complemento', 'bairro', 'cep', 'estado','cidade')
     
     def __init__(self, *args, **kwargs):
         super(EnderecoForm, self).__init__(*args, **kwargs)
-        self.base_fields['cep'].widget.attrs['class'] = 'form-control cep'
-        self.base_fields['cidade'].queryset = Cidade.objects.none()
-
-    def clean(self):
-        self.cleaned_data['cidade'] = self.clean_cidade()
-        return self.cleaned_data
-
-    def clean_cidade(self):
-        if self['cidade'].value() != '':
-            del self._errors['cidade']
-        return self['cidade']
-
+        self.fields['cep'].widget.attrs['class'] = 'form-control cep'
+        self.fields['cidade'].queryset = Cidade.objects.none()
+        
+        if 'estado' in self.data:
+            try:
+                estado_id = int(self.data.get('estado'))
+                print('Estado: '+str(estado_id))
+                self.fields['cidade'].queryset = Cidade.objects.filter(estado_id=estado_id).order_by('nome')
+            except (ValueError, TypeError):
+                pass
+        
+        elif self.instance.pk:
+            self.fields['cidade'].queryset = self.instance.estado.cidade_set.order_by('nome')
 
 class DistribuidoraForm(forms.ModelForm):
     class Meta:
@@ -227,5 +229,13 @@ class DistribuidoraForm(forms.ModelForm):
         self.base_fields['cnpj'].widget.attrs['class'] = 'form-control cnpj'
         self.base_fields['telefone'].widget.attrs['class'] = 'form-control sp_celphones'
 
-
+class ItemForm(forms.ModelForm):
+    class Meta:
+        model = Item
+        fields = ('filme', 'tipo_midia', 'numero_serie', 'data_aquisicao',)
+    
+    def __init__(self, *args, **kwargs):
+        super(ItemForm, self).__init__(*args, **kwargs)
+        self.fields['data_aquisicao'].widget.attrs['class'] = 'form-control data'
+        
 

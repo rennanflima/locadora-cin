@@ -20,7 +20,7 @@
     <div class="container-fluid">
         <h2>Adicionar Filme</h2>
         <hr>
-        <form method="POST" class="form">
+        <form method="POST" class="form" enctype="multipart/form-data">
             {% csrf_token %}
             {% crispy form %}
             

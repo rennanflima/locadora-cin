@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load crispy_forms_tags %}
 {% load bootstrap4 %}
 
 {% block conteudo %}
@@ -18,10 +19,94 @@
         <form method="POST" class="form">
             {% csrf_token %}
             {% bootstrap_form form %}
-            <hr>
-            <a href="{%url 'core:distribuidora-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
-            <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Distribuidora</button>
-                       
+            <fieldset class="mt-4">
+                <legend><b>Endereço<hr></b></legend>
+                <!-- {% crispy end_form %} -->
+                <div class="form-row">
+                    <div class="col">
+                        {{ end_form.cep|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-10">
+                        {{ end_form.logradouro|as_crispy_field }}
+                    </div>
+                    <div class="col-md-2">
+                        {{ end_form.numero|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-6">
+                        {{ end_form.complemento|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ end_form.bairro|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-6">
+                        {{ end_form.estado|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ end_form.cidade|as_crispy_field }}
+                    </div>
+                </div>
+            </fieldset>
+            <div class="form-actions">
+                <hr>
+                <a href="{%url 'core:distribuidora-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+                <input type="submit" name="save_changes" value="Salvar Distribuidora" class="btn btn-primary btn-success ml-2 mb-4 float-right" id="submit-id-save_changes">
+            </div>
         </form>
     </div>
 {% endblock conteudo %}
+
+{% block javascript %}
+    <script>
+
+        function carregar_cidades(estado_id){
+            var url =  "{% url 'core:ajax-cidades-carregar' %}";
+            var estadoId = estado_id;
+            var dfd = $.Deferred();
+
+            $.ajax({
+                url: url,
+                data:{'estado': estadoId},
+                success: function(data){
+                    $('#id_cidade').html(data);
+                    dfd.resolve();
+                }
+            });
+            return dfd.promise();
+        }
+
+        $('#id_estado').change(function(){
+            var estadoId = $(this).val();
+            carregar_cidades(estadoId);
+        });
+
+        
+        $('#id_cep').blur(function(){
+            var url =  "{% url 'core:ajax-buscar-cep' %}";
+            cep = $(this).val();
+
+            $.ajax({
+                url: url,
+                data: {'cep': cep},
+                success: function(data){
+                    $('#id_logradouro').val(data.end);
+                    $('#id_bairro').val(data.bairro);
+                    $('#id_complemento').val(data.complemento2);
+                    $('#id_estado').val(data.uf).change();
+                    var retorno = carregar_cidades(data.uf);
+                    retorno.then(function(){
+                        $('#id_cidade').val(data.cidade).change();
+                    });
+                    $("#id_numero").focus();
+                    
+                    
+                }
+            });
+        });
+    </script>
+{% endblock javascript %}

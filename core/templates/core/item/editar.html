@@ -1,6 +1,5 @@
 {% extends 'core/base.html' %}
 {% load bootstrap4 %}
-{% load crispy_forms_tags %}
 
 {% block conteudo %}
     <ol class="breadcrumb">
@@ -8,17 +7,23 @@
             <a href="{% url 'core:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item ">
-            <a href="{%url 'core:midia-listar'%}">Mídia</a>
+            <a href="{%url 'core:item-listar'%}">Itens</a>
         </li>
         <li class="breadcrumb-item active">Editar</li>
     </ol>
 
     <div class="container-fluid">
-        <h2>Editar Tipo de Mídia</h2>
+        <h2>Editar Item</h2>
         <hr>
         <form method="POST" class="form">
             {% csrf_token %}
-            {% crispy form %}
+            {% bootstrap_form form %}
+            <hr>
+            
+            <a href="{%url 'core:filme-novo'%}" class="btn btn-primary ml-2 mb-4 float-right">Adicionar Filme</a>
+            <a href="{%url 'core:item-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+            <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Item</button>
+                       
         </form>
     </div>
 {% endblock conteudo %}

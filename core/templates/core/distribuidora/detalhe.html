@@ -18,11 +18,24 @@
         <h2>Detalhar Distribuidora</h2>
         <hr>
         <div class="form-group">
-            <label class="negrito">Nome: </label>    
-            {{object.nome }}
+            <label class="negrito">Razão Social: </label>    
+            {{ distribuidora.razao_social }}
         </div> 
+        <div class="form-group">
+            <label class="negrito">CNPJ: </label>    
+            {{ distribuidora.cnpj }}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Contato: </label>    
+            {{ distribuidora.contato }} - {{ distribuidora.telefone}}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Endereço: </label>    
+            {{ distribuidora.endereco }}
+        </div>
         <hr>
         <a href="{% url 'core:distribuidora-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
-        <a href="{% url 'core:distribuidora-novo' %}" class="btn btn-success ml-2 float-right">Adicionar outra Distribuidora</a>
+        <a href="{% url 'core:distribuidora-novo' %}" class="btn btn-primary ml-2 float-right">Adicionar outra Distribuidora</a>
+        <a href="{% url 'core:distribuidora-editar' distribuidora.pk %}" class="btn btn-success ml-2 mb-4 float-right">Editar Distribuidora</a>
     </div>
 {% endblock conteudo %}

@@ -18,6 +18,13 @@
     <div class="container-fluid">
         <h2>Detalhar Filme</h2>
         <hr>
+        {% if filme.capa %}
+            <img src="{{ filme.capa.url }}" class="img-thumbnail col-2" style="float: right; min-width: 182px;"/>
+        {% else %}
+            <div class="col-2" style="float: right;">
+                <i class="fas fa-file-image fa-10x"></i>
+            </div>
+        {% endif %}
         <div class="form-group">
             <label class="negrito">Título: </label>    
             {{filme.titulo }}
@@ -53,6 +60,10 @@
         <div class="form-group">
             <label class="negrito">Classificação Indicativa: </label>    
             {{filme.get_classificacao_display }}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Distribuidora: </label>    
+            {{ filme.distribuidora }}
         </div> 
         <div class="form-group">
             <label class="negrito">Sinopse: </label><br/>   
@@ -75,9 +86,7 @@
                                 <td>{{ elenco.personagem }}</td>
                                 <td>
                                     {% if elenco.principal %}
-                                        <img src="{% static '/img/icon_yes.svg' %}" width="17" height="17" alt="Sim"/>
-                                    {% else %}
-                                        <img src="{% static '/img/icon_no.svg' %}" width="17" height="17" alt="Não"/>
+                                        <i class="fas fa-star text-warning"></i> 
                                     {% endif %}
                                 </td>
                             </tr>
@@ -88,7 +97,7 @@
         </fieldset>
         <hr>
         <a href="{% url 'core:filme-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
-        <a href="{% url 'core:filme-novo' %}" class="btn btn-primary ml-2 float-right">Adicionar Filme</a>
+        <a href="{% url 'core:filme-novo' %}" class="btn btn-primary ml-2 float-right">Adicionar outro Filme</a>
         <a href="{% url 'core:filme-editar' filme.pk %}" class="btn btn-success ml-2 mb-4 float-right">Editar Filme</a>
     </div>
 {% endblock conteudo %}
