@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block head_title %}{% endblock %}</title>
+        {% block extra_head %}
+        {% endblock %}
+
+        {% load static %}
+        {% load bootstrap4 %}
+
+        <link rel="shortcut icon" type="image/png" href="{% static '/img/coroa.png' %}"/>
+
+        {% bootstrap_css %}
+        {% bootstrap_javascript jquery='full' %}
+
+        <!-- Bootstrap core CSS -->
+        <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+        <!-- Custom fonts for this template-->
+        <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+
+        <!-- Page level plugin CSS-->
+        <link href="{% static 'vendor/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet">
+
+        <!-- Custom styles for this template-->
+        <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet">
+        <link href="{% static 'vendor/bootstrap-toggle/css/bootstrap-toggle.min.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'vendor/notifyMessage/css/notifyMessage.css' %}">
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    </head>
+    <body class="bg-dark">
+        {% block body %}
+
+            {% if messages %}
+                <div>
+                    <strong>Messages:</strong>
+                    <ul>
+                        {% for message in messages %}
+                            <li>{{message}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div>
+                <strong>Menu:</strong>
+                <ul>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'account_email' %}">Change E-mail</a></li>
+                        <li><a href="{% url 'account_logout' %}">Sign Out</a></li>
+                    {% else %}
+                        <li><a href="{% url 'account_login' %}">Sign In</a></li>
+                        <li><a href="{% url 'account_signup' %}">Sign Up</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="container">
+                {% block content %}
+                {% endblock %}
+            </div>
+        {% endblock %}
+        {% block extra_body %}
+        {% endblock %}
+    </body>
+</html>

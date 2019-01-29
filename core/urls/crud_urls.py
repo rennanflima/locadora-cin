@@ -51,4 +51,11 @@ urlpatterns = [
     path('item/<int:pk>/editar/', cruds_views.ItemEditar.as_view(), name="item-editar"),
     path('item/<int:pk>/deletar/', cruds_views.ItemDeletar.as_view(), name="item-deletar"),
     path('item/<int:pk>/detalhe/', cruds_views.ItemDetalhe.as_view(), name="item-detalhe"),
+
+    # Início URL CRUD Cliente
+    path('cliente/', cruds_views.ClienteListar.as_view(), name="cliente-listar"),
+    path('cliente/novo/', cruds_views.ClienteCriar.as_view(), name="cliente-novo"),
+    path('cliente/<int:pk>/editar/', cruds_views.ClienteEditar.as_view(), name="cliente-editar"),
+    path('cliente/<int:pk>/deletar/', cruds_views.ClienteDeletar.as_view(), name="cliente-deletar"),
+    path('cliente/<int:pk>/detalhe/', cruds_views.ClienteDetalhe.as_view(), name="cliente-detalhe"),
 ]

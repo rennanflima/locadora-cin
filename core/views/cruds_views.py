@@ -41,6 +41,7 @@ class GeneroListar(generic.ListView):
 
 class GeneroDetalhe(generic.DetailView):
     model = Genero
+    context_object_name = 'genero'
     template_name = 'core/genero/detalhe.html'
 
 
@@ -436,3 +437,50 @@ class ItemDeletar(SuccessMessageMixin, generic.DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super(ItemDeletar, self).delete(request, *args, **kwargs)
+
+
+# Início CRUD Cliente
+class ClienteCriar(SuccessMessageMixin, generic.CreateView):
+    model = Cliente
+    form_class = ClienteForm
+    template_name = 'core/cliente/novo.html'
+    success_message = "Cliente adicionado com sucesso."
+
+    
+    def get_context_data(self, **kwargs):
+        context = super(ClienteCriar, self).get_context_data(**kwargs)
+        context['form_user'] = UserForm()
+        context['end_form'] = EnderecoForm()
+        return context
+    
+        
+class ClienteEditar(SuccessMessageMixin, generic.UpdateView):
+    model = Cliente
+    form_class = ClienteForm
+    template_name = 'core/cliente/editar.html'
+    success_message = "Cliente editado com sucesso."
+
+class ClienteListar(generic.ListView):
+    model = Cliente
+    paginate_by = 10
+    template_name = 'core/cliente/lista.html'    
+
+    def get_queryset(self):
+        nome = self.request.GET.get('nome', '')
+        return self.model.objects.filter(codigo__icontains = nome)
+
+class ClienteDetalhe(generic.DetailView):
+    model = Cliente
+    context_object_name = 'cliente'
+    template_name = 'core/cliente/detalhe.html'
+
+
+class ClienteDeletar(SuccessMessageMixin, generic.DeleteView):
+    model = Cliente
+    template_name = "core/cliente/deletar.html"
+    success_url = reverse_lazy('core:cliente-listar')
+    success_message = "Cliente excluído com sucesso."
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(ClienteDeletar, self).delete(request, *args, **kwargs)

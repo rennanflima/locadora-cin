@@ -24,11 +24,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'core',
+    'loja',
     'bootstrap4',
     'multiselectfield',
     'crispy_forms',
     'localflavor',
+
+    # Autenticação com Redes Sociais
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    # 'allauth.socialaccount.providers.facebook',
+    # 'allauth.socialaccount.providers.twitter',
 ]
 
 MIDDLEWARE = [
@@ -61,6 +71,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'locadora.wsgi.application'
 
+AUTH_USER_MODEL = 'core.User'
+
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -131,3 +150,8 @@ BOOTSTRAP4 = {
 #Crispy Form
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# `allauth`
+SITE_ID = 1
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False

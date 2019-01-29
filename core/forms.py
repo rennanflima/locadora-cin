@@ -239,3 +239,15 @@ class ItemForm(forms.ModelForm):
         self.fields['data_aquisicao'].widget.attrs['class'] = 'form-control data'
         
 
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', 'cpf', 'data_nascimento', 'sexo',)
+
+class ClienteForm(forms.ModelForm):
+    class Meta:
+        model = Cliente
+        fields = ('codigo', 'telefones', 'local_trabalho',)
+    
+    def __init__(self, *args, **kwargs):
+        super(ClienteForm, self).__init__(*args, **kwargs)
