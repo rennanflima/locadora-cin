@@ -2,11 +2,15 @@ from django.db import models
 from django.urls import reverse
 from multiselectfield import MultiSelectField
 from core.choices import *
-from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from core.managers import UserManager
+from datetime import date
+from django.conf import settings
 
 
 # Create your models here.
@@ -27,14 +31,35 @@ class Role(models.Model):
         return self.get_id_display()
 
 # Create your models here.
-class User(AbstractUser):
+class User(AbstractBaseUser, PermissionsMixin):
     roles = models.ManyToManyField(Role)
+    email = models.EmailField(_('email address'), unique=True)
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=_(
+            'Designates whether this user should be treated as active. '
+            'Unselect this instead of deleting accounts.'
+        ),
+    )
+    is_staff = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_('Designates whether the user can log into this admin site.'),
+    )
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
-    cpf = models.CharField('CPF', max_length=15, unique=True, blank=True, null=True)
-    data_nascimento = models.DateField('Data de Nascimento', blank=True, null=True)
-    sexo = models.CharField('Sexo', max_length=2, choices=tipo_sexo)
 
     objects = UserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    class Meta:
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
 
     def get_full_name(self):
         '''
@@ -42,6 +67,18 @@ class User(AbstractUser):
         '''
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
+
+    def get_short_name(self):
+        '''
+        Returns the short name for the user.
+        '''
+        return self.first_name
+
+    def email_user(self, subject, message, from_email=None, **kwargs):
+        '''
+        Sends an email to this User.
+        '''
+        send_mail(subject, message, from_email, [self.email], **kwargs)
 
 class Genero(models.Model):
     nome = models.CharField('Nome', max_length=100, unique=True)
@@ -88,6 +125,7 @@ class Estado(models.Model):
         return reverse('core:estado-detalhe', kwargs={'pk': self.pk})
     
     def clean(self):
+        self.nome = self.nome.lower().capitalize()
         self.sigla = self.sigla.upper()
 
 class Cidade(models.Model):
@@ -113,7 +151,7 @@ class Endereco(models.Model):
     bairro = models.CharField('Bairro', max_length=50)
     cep = models.CharField('CEP', max_length=10)
     cidade = models.ForeignKey(Cidade, on_delete=models.PROTECT)
-    estado = models.ForeignKey(Estado, on_delete=models.PROTECT, null=True)
+    estado = models.ForeignKey(Estado, on_delete=models.PROTECT)
 
     class Meta:
         ordering = ['logradouro', 'numero', 'cidade',]
@@ -125,22 +163,6 @@ class Endereco(models.Model):
 
     def get_absolute_url(self):
         return reverse('core:endereco-detalhe', kwargs={'pk': self.pk})
-
-class Telefone(models.Model):
-    prefixo = models.CharField('Prefixo', max_length=10)
-    numero = models.CharField('Número', max_length=20)
-    tipo = models.CharField('Tipo de Telefone', max_length=15, choices=tipo_classificacao)
-
-    class Meta:
-        ordering = ['prefixo', 'tipo',]
-        verbose_name = 'Telefone'
-        verbose_name_plural = 'Telefones'
-
-    def __str__(self):
-        return "(%s) %s - %s" % (self.prefixo, self.numero, self.tipo)
-
-    def get_absolute_url(self):
-        return reverse('core:cidade-detalhe', kwargs={'pk': self.pk})
 
 class Distribuidora(models.Model):
     razao_social = models.CharField('Razão Social', max_length=150)
@@ -238,14 +260,71 @@ class Item(models.Model):
     def get_absolute_url(self):
         return reverse('core:item-detalhe', kwargs={'pk': self.pk})
 
+class Perfil(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    cpf = models.CharField('CPF', max_length=15, unique=True, blank=True, null=True)
+    data_nascimento = models.DateField('Data de Nascimento', blank=True, null=True)
+    sexo = models.CharField('Sexo', max_length=2, choices=tipo_sexo)
+    endereco = models.OneToOneField(Endereco, on_delete=models.CASCADE, blank=True, null=True)
 
+    class Meta:
+        # ordering = ['data_aquisicao',]
+        verbose_name = 'Perfil'
+        verbose_name_plural = 'Perfis'
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Perfil.objects.create(user=instance)
+    instance.perfil.save()
+
+class Telefone(models.Model):
+    numero = models.CharField('Número', max_length=30)
+    tipo = models.CharField('Tipo de Telefone', max_length=15, choices=tipo_telefone)
+    perfil = models.ForeignKey(Perfil, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['tipo',]
+        verbose_name = 'Telefone'
+        verbose_name_plural = 'Telefones'
+
+    def __str__(self):
+        return "%s - %s" % (self.numero, self.tipo)
+
+class Dependente(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=_(
+            'Designates whether this dependent should be treated as active. '
+            'Unselect this instead of deleting accounts.'
+        ),
+    )
+    class Meta:
+        # ordering = ['data_aquisicao',]
+        verbose_name = 'Dependente'
+        verbose_name_plural = 'Dependentes'
+
+    def __str__(self):
+        return "%s" % (self.user.get_full_name())
+
+    def get_absolute_url(self):
+        return reverse('core:dependente-detalhe', kwargs={'pk': self.pk})
 
 class Cliente(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     codigo = models.CharField('Código', max_length=150, unique=True)
-    endereco = models.OneToOneField(Endereco, on_delete=models.CASCADE)
-    telefones = models.ManyToManyField(Telefone)
     local_trabalho = models.CharField('Local de Trabalho', max_length=150)
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=_(
+            'Designates whether this client should be treated as active. '
+            'Unselect this instead of deleting accounts.'
+        ),
+    )
+    dependentes = models.ManyToManyField(Dependente)
 
     class Meta:
         # ordering = ['data_aquisicao',]
@@ -257,4 +336,8 @@ class Cliente(models.Model):
 
     def get_absolute_url(self):
         return reverse('core:cliente-detalhe', kwargs={'pk': self.pk})
+
+    def clean(self):
+        today = date.today()
+        self.codigo = '%s%s' % (str(today.year), str(self.pk))
     

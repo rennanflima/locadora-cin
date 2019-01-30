@@ -6,6 +6,7 @@ from crispy_forms.layout import Layout, Submit, Row, Column, HTML
 from crispy_forms.bootstrap import AppendedText, PrependedText, FormActions
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from localflavor.br.forms import BRCPFField, BRCNPJField, BRZipCodeField
+from django.utils.translation import gettext_lazy as _
 
 class GeneroForm(forms.ModelForm):
     class Meta:
@@ -198,7 +199,8 @@ ElencoInlineFormSet = forms.inlineformset_factory(
 )
 
 class EnderecoForm(forms.ModelForm):
-    
+    cep = BRZipCodeField(label='CEP')
+
     class Meta:
         model = Endereco
         fields = ('logradouro','numero','complemento', 'bairro', 'cep', 'estado','cidade')
@@ -227,7 +229,7 @@ class DistribuidoraForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(DistribuidoraForm, self).__init__(*args, **kwargs)
         self.base_fields['cnpj'].widget.attrs['class'] = 'form-control cnpj'
-        self.base_fields['telefone'].widget.attrs['class'] = 'form-control sp_celphones'
+        self.base_fields['telefone'].widget.attrs['class'] = 'form-control phone_with_ddd'
 
 class ItemForm(forms.ModelForm):
     class Meta:
@@ -236,18 +238,50 @@ class ItemForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super(ItemForm, self).__init__(*args, **kwargs)
-        self.fields['data_aquisicao'].widget.attrs['class'] = 'form-control data'
+        self.fields['data_aquisicao'].widget.attrs['class'] = 'form-control date'
         
 
-class UserForm(forms.ModelForm):
+class PerfilForm(forms.ModelForm):
+    first_name = forms.CharField(label='Primeiro nome')
+    last_name = forms.CharField(label='Último nome')
+    cpf = BRCPFField(label='CPF')
+    data_nascimento = forms.DateField()
+    sexo = forms.ChoiceField(label='Sexo', choices=tipo_sexo)
+    local_trabalho = forms.CharField(label='Local de Trabalho')
+
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'cpf', 'data_nascimento', 'sexo',)
+        fields = ('first_name', 'last_name', 'email',)
 
-class ClienteForm(forms.ModelForm):
-    class Meta:
-        model = Cliente
-        fields = ('codigo', 'telefones', 'local_trabalho',)
-    
     def __init__(self, *args, **kwargs):
-        super(ClienteForm, self).__init__(*args, **kwargs)
+        super(PerfilForm, self).__init__(*args, **kwargs)
+        self.fields['cpf'].widget.attrs['class'] = 'form-control cpf'
+        self.fields['data_nascimento'].widget.attrs['class'] = 'form-control date'
+
+class TelefoneForm(forms.ModelForm):
+
+    class Meta:
+        model = Telefone
+        fields = ('numero', 'tipo',)
+
+    def __init__(self, *args, **kwargs):
+        super(TelefoneForm, self).__init__(*args, **kwargs)
+        self.fields['numero'].widget.attrs['class'] = 'form-control phone_with_ddd'
+
+        self.helper = FormHelper()
+        self.helper.form_show_labels = False
+
+
+  
+TelefoneInlineFormSet = forms.inlineformset_factory(
+    Perfil, 
+    Telefone, 
+    form=TelefoneForm,
+    extra=2,
+    # widgets={'personagem': forms.TextInput(attrs={
+    #             'class': 'form-control',
+    #             'placeholder': 'Informe o personagem aqui'
+    #         }),
+    # },
+    min_num=1,
+)

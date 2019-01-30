@@ -210,7 +210,7 @@
                 });
             });
 
-            $('.data').mask('00/00/0000');
+            $('.date').mask('00/00/0000');
 
             $('.date_time').mask('00/00/0000 00:00:00');
 
@@ -224,16 +224,27 @@
 
             $('.money2').mask("#.##0,00", {reverse: true});
 
-            var SPMaskBehavior = function (val) {
+            var PhoneDDMaskBehavior = function (val) {
                 return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
             },
             spOptions = {
                 onKeyPress: function(val, e, field, options) {
-                    field.mask(SPMaskBehavior.apply({}, arguments), options);
+                    field.mask(PhoneDDMaskBehavior.apply({}, arguments), options);
                 }
             };
             
-            $('.sp_celphones').mask(SPMaskBehavior, spOptions);
+            $('.phone_with_ddd').mask(PhoneDDMaskBehavior, spOptions);
+
+            var PhoneMaskBehavior = function (val) {
+                return val.replace(/\D/g, '').length === 11 ? '00000-0000' : '0000-00009';
+            },
+            phoneOptions = {
+                onKeyPress: function(val, e, field, options) {
+                    field.mask(PhoneMaskBehavior.apply({}, arguments), options);
+                }
+            };
+
+            $('.phone').mask(PhoneMaskBehavior, phoneOptions);
 
             $('.formset').formset({
                 addText: 'Adicionar outro',

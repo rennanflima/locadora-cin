@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load bootstrap4 %}
+{% load static %} 
 
 
 {% block conteudo %}
@@ -33,28 +34,48 @@
                 <table class="table table-striped table-bordered" cellspacing="0">
                     <thead class="text-center">
                         <tr>
+                            <th scope="col">Código</th>
                             <th scope="col">Nome</th>
+                            <th scope="col">Ativo?</th>
+                            <th scope="col">Dependentes</th>
                             <th scope="col">Ações</th>
                         </tr>
                     </thead>
                     <tfoot class="text-center">
                         <tr>
+                            <th>Código</th>
                             <th>Nome</th>
+                            <th>Ativo?</th>
+                            <th>Dependentes</th>
                             <th>Opções</th>
                         </tr>
                     </tfoot>
                     <tbody>
                         {% for cliente in object_list %}
                             <tr class="text-center">
-                                <th scope="row"><a href="{% url 'core:cliente-detalhe' cliente.id %}">{{ cliente.nome }}</a></th>
+                                <td>{{ cliente.codigo }}</td>
+                                <th scope="row"><a href="{% url 'core:cliente-detalhe' cliente.id %}">{{ cliente.user.get_full_name }}</a></th>
                                 <td>
+                                    {% if cliente.is_active %}
+                                        <img src="{% static '/img/icon_yes.svg' %}" width="17" height="17" alt="Sim"/>
+                                    {% else %}
+                                        <img src="{% static '/img/icon_no.svg' %}" width="17" height="17" alt="Não"/>
+                                    {% endif %}
+                                </td>
+                                <td><button type="button" class="btn btn-primary m-2 btn-sm" ><i class="fas fa-list-ul"></i></button></td>
+                                <td>
+                                    {% if cliente.is_active %}
+                                        <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:cliente-desativar' cliente.id %}'">Desativar</button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:cliente-ativar' cliente.id %}'">Ativar</button>
+                                    {% endif %}
                                     <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:cliente-editar' cliente.id %}'">Editar</button>
                                     <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:cliente-deletar' cliente.id %}'">Excluir</button>
                                 </td>
                             </tr>
                         {% empty %}
                             <tr class="text-center">
-                                <td colspan="2">Nenhum cliente encontrado.</td>
+                                <td colspan="5">Nenhum cliente encontrado.</td>
                             </tr>
                         {% endfor %}
                     </tbody>

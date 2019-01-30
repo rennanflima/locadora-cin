@@ -440,25 +440,97 @@ class ItemDeletar(SuccessMessageMixin, generic.DeleteView):
 
 
 # Início CRUD Cliente
-class ClienteCriar(SuccessMessageMixin, generic.CreateView):
-    model = Cliente
-    form_class = ClienteForm
-    template_name = 'core/cliente/novo.html'
-    success_message = "Cliente adicionado com sucesso."
+# class ClienteCriar(SuccessMessageMixin, generic.CreateView):
+#     model = Cliente
+#     form_class = ClienteForm
+#     template_name = 'core/cliente/novo.html'
+#     success_message = "Cliente adicionado com sucesso."
 
     
-    def get_context_data(self, **kwargs):
-        context = super(ClienteCriar, self).get_context_data(**kwargs)
-        context['form_user'] = UserForm()
-        context['end_form'] = EnderecoForm()
-        return context
+#     def get_context_data(self, **kwargs):
+#         context = super(ClienteCriar, self).get_context_data(**kwargs)
+#         context['form_user'] = UserForm()
+#         context['end_form'] = EnderecoForm()
+#         return context
     
-        
-class ClienteEditar(SuccessMessageMixin, generic.UpdateView):
-    model = Cliente
-    form_class = ClienteForm
-    template_name = 'core/cliente/editar.html'
-    success_message = "Cliente editado com sucesso."
+
+def criar_cliente(request):    
+    form = PerfilForm()
+    end_form = EnderecoForm()
+    formset = TelefoneInlineFormSet(queryset=Telefone.objects.none())
+    role = Role.objects.get(id=Role.CLIENTE)
+    today = date.today()
+
+    if request.method == 'POST':
+        form = PerfilForm(request.POST)
+        end_form = EnderecoForm(request.POST)
+        formset = TelefoneInlineFormSet(request.POST, queryset=Telefone.objects.none())
+        if form.is_valid() and end_form.is_valid() and formset.is_valid():
+            user = form.save()
+            user.refresh_from_db()
+            user.perfil.cpf = form.cleaned_data.get('cpf')
+            user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
+            user.perfil.sexo = form.cleaned_data.get('sexo')
+            
+            user.roles.add(role)
+            
+            endereco = end_form.save()
+            user.perfil.endereco = endereco
+            user.save()
+            
+            telefones = formset.save(commit=False)
+            for fone in telefones:
+                fone.perfil = user.perfil
+                fone.save()
+            
+            cliente = Cliente()
+            cliente.codigo = '%s%s' % (str(today.year), str(user.pk))
+            cliente.local_trabalho = form.cleaned_data.get('local_trabalho')
+            cliente.user = user
+            cliente.save()
+            
+            
+            messages.success(request, 'Cliente adicionada com sucesso.')
+            return HttpResponseRedirect(reverse('core:cliente-detalhe', kwargs={'pk': cliente.pk}))
+    
+    return render(request, 'core/cliente/novo.html', {'form': form, 'end_form': end_form, 'formset': formset})
+
+
+def editar_cliente(request, pk):
+    cliente = get_object_or_404(Cliente, pk=pk)
+    form = PerfilForm(instance=cliente.user)
+    end_form = EnderecoForm(instance=cliente.user.perfil.endereco)
+    formset = TelefoneInlineFormSet(instance=cliente.user.perfil)
+
+    if request.method == 'POST':
+        form = PerfilForm(request.POST, instance=cliente.user)
+        end_form = EnderecoForm(request.POST, instance=cliente.user.perfil.endereco)
+        formset = TelefoneInlineFormSet(request.POST, instance=cliente.user.perfil)
+        if form.is_valid() and end_form.is_valid() and formset.is_valid():
+            user = form.save()
+            user.refresh_from_db()
+            user.perfil.cpf = form.cleaned_data.get('cpf')
+            user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
+            user.perfil.sexo = form.cleaned_data.get('sexo')
+
+            endereco = end_form.save()
+            user.perfil.endereco = endereco
+            user.save()
+
+            telefones = formset.save()
+            for fone in telefones:
+                if fone.perfil != user.perfil:
+                    fone.perfil = user.perfil
+                    fone.save()
+
+            cliente.local_trabalho = form.cleaned_data.get('local_trabalho')
+            cliente.save()
+
+            messages.success(request, 'Cliente editado com sucesso.')
+            return HttpResponseRedirect(cliente.get_absolute_url())
+            
+    return render(request, 'core/cliente/editar.html', {'form': form, 'end_form': end_form, 'formset': formset, 'cliente': cliente})
+
 
 class ClienteListar(generic.ListView):
     model = Cliente
@@ -467,7 +539,7 @@ class ClienteListar(generic.ListView):
 
     def get_queryset(self):
         nome = self.request.GET.get('nome', '')
-        return self.model.objects.filter(codigo__icontains = nome)
+        return self.model.objects.filter(Q(codigo__icontains = nome) | Q(user__first_name__icontains = nome)| Q(user__last_name__icontains = nome))
 
 class ClienteDetalhe(generic.DetailView):
     model = Cliente
@@ -484,3 +556,17 @@ class ClienteDeletar(SuccessMessageMixin, generic.DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super(ClienteDeletar, self).delete(request, *args, **kwargs)
+
+def cliente_desativar(request, pk):
+    cliente = get_object_or_404(Cliente, pk=pk)
+    cliente.is_active = False
+    cliente.save()
+    messages.success(request, 'Cliente desativado com sucesso')
+    return HttpResponseRedirect(reverse_lazy('core:cliente-listar'))
+
+def cliente_ativar(request, pk):
+    cliente = get_object_or_404(Cliente, pk=pk)
+    cliente.is_active = True
+    cliente.save()
+    messages.success(request, 'Cliente ativado com sucesso')
+    return HttpResponseRedirect(reverse_lazy('core:cliente-listar'))
