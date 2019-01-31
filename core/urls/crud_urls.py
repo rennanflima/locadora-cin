@@ -60,4 +60,13 @@ urlpatterns = [
     path('cliente/<int:pk>/detalhe/', cruds_views.ClienteDetalhe.as_view(), name="cliente-detalhe"),
     path('cliente/<int:pk>/ativar/', cruds_views.cliente_ativar, name="cliente-ativar"),
     path('cliente/<int:pk>/desativar/', cruds_views.cliente_desativar, name="cliente-desativar"),
+
+    # Início URL CRUD Dependente
+    path('cliente/<int:pk>/dependentes/', cruds_views.dependente_listar, name="dependente-listar"),
+    path('dependente/<int:id>/detalhe/', cruds_views.ClienteDetalhe.as_view(), name="dependente-detalhe"),
+    path('cliente/<int:pk>/depentente/novo/', cruds_views.criar_dependente, name="depentente-novo"),
+    path('cliente/<int:pk>/dependente/<int:id_dep>/editar/', cruds_views.editar_dependente, name="dependente-editar"),
+    path('cliente/<int:pk>/dependente/<int:id_dep>/deletar/', cruds_views.dependente_deletar, name="dependente-deletar"),
+    path('cliente/<int:pk>/dependente/<int:id_dep>/ativar/', cruds_views.dependente_ativar, name="dependente-ativar"),
+    path('cliente/<int:pk>/dependente/<int:id_dep>/desativar/', cruds_views.dependente_desativar, name="dependente-desativar"),
 ]

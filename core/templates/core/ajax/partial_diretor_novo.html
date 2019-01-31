@@ -1,4 +1,5 @@
 {% load bootstrap4 %}
+{% load crispy_forms_tags %}
 
 <form method="POST" class="form js-diretor-novo-form" action="{% url 'core:ajax-diretor-novo' %}">
     {% csrf_token %}
@@ -9,7 +10,7 @@
         </button>
     </div>
     <div class="modal-body">
-        {% bootstrap_form form %}
+        {% crispy form %}
     </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Adicionar Diretor</button>

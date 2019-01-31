@@ -293,6 +293,7 @@ class Telefone(models.Model):
 
 class Dependente(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
+    codigo = models.CharField('Código', max_length=150, unique=True, default='0')
     is_active = models.BooleanField(
         _('active'),
         default=True,
@@ -302,7 +303,7 @@ class Dependente(models.Model):
         ),
     )
     class Meta:
-        # ordering = ['data_aquisicao',]
+        ordering = ['codigo',]
         verbose_name = 'Dependente'
         verbose_name_plural = 'Dependentes'
 
@@ -324,7 +325,7 @@ class Cliente(models.Model):
             'Unselect this instead of deleting accounts.'
         ),
     )
-    dependentes = models.ManyToManyField(Dependente)
+    dependentes = models.ManyToManyField(Dependente, related_name='clientes', related_query_name='cliente')
 
     class Meta:
         # ordering = ['data_aquisicao',]
@@ -336,8 +337,4 @@ class Cliente(models.Model):
 
     def get_absolute_url(self):
         return reverse('core:cliente-detalhe', kwargs={'pk': self.pk})
-
-    def clean(self):
-        today = date.today()
-        self.codigo = '%s%s' % (str(today.year), str(self.pk))
     

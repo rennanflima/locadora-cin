@@ -14,6 +14,7 @@ from django.utils.html import strip_tags
 from pycep_correios import consultar_cep
 from pycep_correios.excecoes import ExcecaoPyCEPCorreios
 from core.filters import *
+from django.core.paginator import Paginator
 
 # Create your views here.
 
@@ -389,14 +390,12 @@ def buscar_cep(request):
     cep = request.GET.get('cep')
     try:
         data = consultar_cep(cep)
-        print(data)
         estado = Estado.objects.get(sigla=data['uf'])
         cidade = Cidade.objects.get(nome=data['cidade'], estado=estado)
 
         data['uf'] = estado.id
         data['cidade'] = cidade.id
     except ExcecaoPyCEPCorreios as exc:
-        print(exc)
         data['error'] = exc.message       
 
     return JsonResponse(data)
@@ -440,29 +439,16 @@ class ItemDeletar(SuccessMessageMixin, generic.DeleteView):
 
 
 # Início CRUD Cliente
-# class ClienteCriar(SuccessMessageMixin, generic.CreateView):
-#     model = Cliente
-#     form_class = ClienteForm
-#     template_name = 'core/cliente/novo.html'
-#     success_message = "Cliente adicionado com sucesso."
-
-    
-#     def get_context_data(self, **kwargs):
-#         context = super(ClienteCriar, self).get_context_data(**kwargs)
-#         context['form_user'] = UserForm()
-#         context['end_form'] = EnderecoForm()
-#         return context
-    
 
 def criar_cliente(request):    
-    form = PerfilForm()
+    form = ClienteForm()
     end_form = EnderecoForm()
     formset = TelefoneInlineFormSet(queryset=Telefone.objects.none())
     role = Role.objects.get(id=Role.CLIENTE)
     today = date.today()
 
     if request.method == 'POST':
-        form = PerfilForm(request.POST)
+        form = ClienteForm(request.POST)
         end_form = EnderecoForm(request.POST)
         formset = TelefoneInlineFormSet(request.POST, queryset=Telefone.objects.none())
         if form.is_valid() and end_form.is_valid() and formset.is_valid():
@@ -498,12 +484,13 @@ def criar_cliente(request):
 
 def editar_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
-    form = PerfilForm(instance=cliente.user)
+    data_init = {'cpf': cliente.user.perfil.cpf, 'data_nascimento': cliente.user.perfil.data_nascimento, 'sexo':cliente.user.perfil.sexo, 'local_trabalho': cliente.local_trabalho,}
+    form = ClienteForm(instance=cliente.user, initial=data_init)
     end_form = EnderecoForm(instance=cliente.user.perfil.endereco)
     formset = TelefoneInlineFormSet(instance=cliente.user.perfil)
 
     if request.method == 'POST':
-        form = PerfilForm(request.POST, instance=cliente.user)
+        form = ClienteForm(request.POST, instance=cliente.user)
         end_form = EnderecoForm(request.POST, instance=cliente.user.perfil.endereco)
         formset = TelefoneInlineFormSet(request.POST, instance=cliente.user.perfil)
         if form.is_valid() and end_form.is_valid() and formset.is_valid():
@@ -529,7 +516,7 @@ def editar_cliente(request, pk):
             messages.success(request, 'Cliente editado com sucesso.')
             return HttpResponseRedirect(cliente.get_absolute_url())
             
-    return render(request, 'core/cliente/editar.html', {'form': form, 'end_form': end_form, 'formset': formset, 'cliente': cliente})
+    return render(request, 'core/cliente/editar.html', {'form': form, 'end_form': end_form, 'formset': formset,})
 
 
 class ClienteListar(generic.ListView):
@@ -570,3 +557,100 @@ def cliente_ativar(request, pk):
     cliente.save()
     messages.success(request, 'Cliente ativado com sucesso')
     return HttpResponseRedirect(reverse_lazy('core:cliente-listar'))
+
+
+
+# Inicio CRUD Dependente
+def criar_dependente(request, pk):
+    titular = get_object_or_404(Cliente, pk=pk)
+    
+    form = DependenteForm
+
+    data = dict()
+    role = Role.objects.get(id=Role.CLIENTE)
+    today = date.today()
+
+    if request.method == 'POST':
+        form = DependenteForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.refresh_from_db()
+            user.perfil.cpf = form.cleaned_data.get('cpf')
+            user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
+            user.perfil.sexo = form.cleaned_data.get('sexo')
+            user.roles.add(role)
+            user.save()
+
+            dependente = Dependente()
+            dependente.codigo = '%s%s%s' % (str(today.year), str(titular.pk), str(user.pk))
+            dependente.user = user
+            dependente.save()
+
+            titular.dependentes.add(dependente)
+            titular.save()
+
+            messages.success(request, 'Dependente salvo com sucesso.')
+            return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))
+
+    return render(request, 'core/dependente/novo.html', {'form': form, 'pk': pk,})
+
+def editar_dependente(request, pk, id_dep):
+    titular = get_object_or_404(Cliente, pk=pk)
+    dependente = get_object_or_404(Dependente, pk=id_dep)
+    data_init = {'cpf': dependente.user.perfil.cpf, 'data_nascimento': dependente.user.perfil.data_nascimento, 'sexo':dependente.user.perfil.sexo,}
+    form = DependenteForm(instance=dependente.user, initial=data_init)
+    data = dict()
+
+    if request.method == 'POST':
+        form = DependenteForm(request.POST, instance=dependente.user)
+        if form.is_valid():
+            user = form.save()
+            user.perfil.cpf = form.cleaned_data.get('cpf')
+            user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
+            user.perfil.sexo = form.cleaned_data.get('sexo')
+            user.save()
+            messages.success(request, 'Dependente atualizado com sucesso.')
+            return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))
+
+    context = {'form': form, 'pk': pk, 'id_dep': id_dep,}
+    return render(request, 'core/dependente/editar.html', context)
+
+
+def dependente_listar(request, pk):
+    cliente = get_object_or_404(Cliente, pk=pk)
+    nome = request.GET.get('nome', '')
+    dependente_list = Dependente.objects.filter(Q(cliente=cliente) & Q(codigo__icontains = nome) | Q(user__first_name__icontains = nome) | Q(user__last_name__icontains = nome))
+    paginator = Paginator(dependente_list, 10)
+
+    page = request.GET.get('page')
+    dependentes = paginator.get_page(page)
+    return render(request, 'core/dependente/lista.html', {'dependentes': dependentes, 'pk': pk, 'titular': cliente,})
+
+
+class DependenteDetalhe(generic.DetailView):
+    model = Dependente
+    context_object_name = 'dependente'
+    template_name = 'core/dependente/detalhe.html'
+
+def dependente_deletar(request, pk, id_dep):
+    dependente = get_object_or_404(Dependente, pk=id_dep)
+    if request.method == 'POST':
+        dependente.delete()
+        messages.success(request, 'Dependente atualizado com sucesso.')
+        return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))
+    
+    return render(request, 'core/dependente/deletar.html')
+
+def dependente_desativar(request, pk, id_dep):
+    dependente = get_object_or_404(Dependente, pk=id_dep)
+    dependente.is_active = False
+    dependente.save()
+    messages.success(request, 'Dependente desativado com sucesso')
+    return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))
+
+def dependente_ativar(request, pk, id_dep):
+    dependente = get_object_or_404(Dependente, pk=id_dep)
+    dependente.is_active = True
+    dependente.save()
+    messages.success(request, 'Dependente ativado com sucesso')
+    return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))

@@ -241,7 +241,7 @@ class ItemForm(forms.ModelForm):
         self.fields['data_aquisicao'].widget.attrs['class'] = 'form-control date'
         
 
-class PerfilForm(forms.ModelForm):
+class ClienteForm(forms.ModelForm):
     first_name = forms.CharField(label='Primeiro nome')
     last_name = forms.CharField(label='Último nome')
     cpf = BRCPFField(label='CPF')
@@ -254,7 +254,7 @@ class PerfilForm(forms.ModelForm):
         fields = ('first_name', 'last_name', 'email',)
 
     def __init__(self, *args, **kwargs):
-        super(PerfilForm, self).__init__(*args, **kwargs)
+        super(ClienteForm, self).__init__(*args, **kwargs)
         self.fields['cpf'].widget.attrs['class'] = 'form-control cpf'
         self.fields['data_nascimento'].widget.attrs['class'] = 'form-control date'
 
@@ -271,6 +271,22 @@ class TelefoneForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_show_labels = False
 
+
+class DependenteForm(forms.ModelForm):
+    first_name = forms.CharField(label='Primeiro nome')
+    last_name = forms.CharField(label='Último nome')
+    cpf = BRCPFField(label='CPF')
+    data_nascimento = forms.DateField()
+    sexo = forms.ChoiceField(label='Sexo', choices=tipo_sexo)
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email',)
+
+    def __init__(self, *args, **kwargs):
+        super(DependenteForm, self).__init__(*args, **kwargs)
+        self.fields['cpf'].widget.attrs['class'] = 'form-control cpf'
+        self.fields['data_nascimento'].widget.attrs['class'] = 'form-control date'
 
   
 TelefoneInlineFormSet = forms.inlineformset_factory(

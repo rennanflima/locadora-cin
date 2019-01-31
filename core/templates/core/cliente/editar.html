@@ -112,10 +112,6 @@
 {% endblock conteudo %}
 {% block javascript %}
     <script>
-        $('#id_cpf').val("{{ cliente.user.perfil.cpf }}");
-        $('#id_data_nascimento').val("{{ cliente.user.perfil.data_nascimento|date:'d/m/Y' }}");
-        $('#id_local_trabalho').val("{{ cliente.local_trabalho }}");
-
         function carregar_cidades(estado_id){
             var url =  "{% url 'core:ajax-cidades-carregar' %}";
             var estadoId = estado_id;
