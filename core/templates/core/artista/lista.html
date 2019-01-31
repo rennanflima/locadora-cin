@@ -1,0 +1,116 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+
+
+{% block conteudo %}
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'admin:index'%}">Início</a>
+        </li>
+        <li class="breadcrumb-item active">Artistas</li>
+    </ol>
+
+    {% bootstrap_messages %}
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+                Artistas
+        </div>   
+        <div class="card-body">
+            <div class="table-responsive">  
+                <a href="{% url 'admin:artista-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                <form method="GET" action="{%url 'admin:artista-listar'%}">
+                    <div class="input-group mb-3">
+                        <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Buscar</button>
+                        </div>
+                    </div>
+                </form>
+                    
+                <table class="table table-striped table-bordered" cellspacing="0">
+                    <thead class="text-center">
+                        <tr>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Ações</th>
+                        </tr>
+                    </thead>
+                    <tfoot class="text-center">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Opções</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        {% for artista in object_list %}
+                            <tr class="text-center">
+                                <th scope="row"><a href="{% url 'admin:artista-detalhe' artista.id %}">{{ artista.nome }}</a></th>
+                                <td>
+                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'admin:artista-editar' artista.id %}'">Editar</button>
+                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'admin:artista-deletar' artista.id %}'">Excluir</button>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr class="text-center">
+                                <td colspan="2">Nenhum gênero encontrado.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>   
+                
+                {% if is_paginated %}
+                    <hr>
+                    <span class="float-left">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.</span>
+                    
+                    <nav aria-label="Páginação do artista" class="float-right">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <!-- If it ain't a search result display, don't append the search query
+                                to the URL. -->
+                                {% if not search %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{% url 'admin:artista-listar' %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                    </li>
+                                {% else %}
+                                    <!-- Append the searched query to the URL, so that on a search results page,
+                                    the pagination don't revert to listing all the listview items. -->
+                                    <li class="page-item">
+                                        <a class="page-link" href="{% url 'admin:artista-listar' %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                    </li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1">Página anterior</a>
+                                </li>
+                            {% endif %} 
+                            {% for object in page_obj.paginator.page_range %}
+                                <li class="page-item"><a class="page-link" href="{% url 'admin:artista-listar' %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
+                            {% endfor %} 
+                            {% if page_obj.has_next %}
+                                {% if not search %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{% url 'admin:artista-listar' %}?page={{ page_obj.next_page_number }}">Próxima página</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{% url 'admin:artista-listar' %}?{{search}}&page={{ page_obj.next_page_number }}">Próxima página</a>
+                                    </li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">Próxima página</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+                
+            </div>
+        </div>
+        <div class="card-footer small text-muted">Atualizado as 12:54 PM</div>
+    </div>
+
+
+{% endblock conteudo %}

@@ -1,0 +1,9 @@
+[run]
+omit = */env/*
+       */travis/virtualenv/*
+       */virtualenv/*
+       */python?.?/*
+       */site-packages/nose/*
+       *__init__*
+       */tests/*
+       */migrations/*
