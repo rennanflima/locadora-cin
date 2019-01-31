@@ -2,6 +2,9 @@ from nose.tools import assert_equal, assert_true
 from behave import Given, When, Then
 from core.models import Genero
 from datetime import datetime
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+
 
 # Cadastro de generos
 @given('Eu navego até a página de cadastro de gênero')
@@ -10,11 +13,13 @@ def step_impl(context):
 
 @when('Eu preencho o nome do gênero')
 def step_impl(context):
-    context.browser.find_element_by_id("id_nome").send_keys("Outro{}".format(datetime.now()))
+    elem = context.browser.find_element(By.ID, "id_nome")
+    nome_genero = "Outro".format(datetime.now())
+    elem.send_keys(nome_genero)
 
 @then('Eu clico no botão salvar')
 def step_impl(context):
-    context.browser.find_element_by_id("id_submit").click()
+    context.browser.find_element(By.ID, "id_submit").click()
 
 @then('Eu sou redirecionado para a tela de detalhes')
 def step_impl(context):
