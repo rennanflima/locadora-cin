@@ -54,4 +54,4 @@ EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'Não Responda <nao-responda@gmail.com>'
 
 
-django_heroku.settings(locals())
+# django_heroku.settings(locals())
