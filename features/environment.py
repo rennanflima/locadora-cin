@@ -7,8 +7,11 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'locadora.settings.behave')
 django.setup()
 
 def before_all(context):
-    # context.browser = webdriver.Chrome("/usr/local/share/chromedriver")
-    context.browser = webdriver.Chrome("/usr/local/share/chromedriver")
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    context.browser = webdriver.Chrome("/usr/local/share/chromedriver", chrome_options=chrome_options)
 
 def after_all(context):
     context.browser.quit()
