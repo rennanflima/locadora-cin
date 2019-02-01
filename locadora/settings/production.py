@@ -1,5 +1,6 @@
 from locadora.settings.common import *
 import re
+import django_heroku
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -11,7 +12,6 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-
 
 ADMINS = [
     ('Woshington Valdeci de Sousa', 'wvs2@cin.ufpe.br'),
@@ -58,4 +58,4 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-# django_heroku.settings(locals())
+django_heroku.settings(locals())
