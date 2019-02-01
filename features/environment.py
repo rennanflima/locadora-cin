@@ -8,7 +8,7 @@ django.setup()
 
 def before_all(context):
     # context.browser = webdriver.Chrome("/usr/local/share/chromedriver")
-    context.browser = webdriver.Chrome()
+    context.browser = webdriver.Chrome("/usr/local/share/chromedriver")
 
 def after_all(context):
     context.browser.quit()
