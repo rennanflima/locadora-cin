@@ -54,4 +54,8 @@ EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'Não Responda <nao-responda@gmail.com>'
 
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
 # django_heroku.settings(locals())
