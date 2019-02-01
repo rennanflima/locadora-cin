@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import Estado, Cidade, User, Role, Perfil
+from core.models import Estado, Cidade, User, Role, Perfil, Reserva
 from django.utils.translation import gettext_lazy as _
 # Register your models here.
 
@@ -39,3 +39,4 @@ admin.site.register(Cidade, CidadeAdmin)
 admin.site.register(User, UsuarioAdmin)
 admin.site.register(Role)
 admin.site.register(Perfil)
+admin.site.register(Reserva)

@@ -1,6 +1,5 @@
 {% extends 'core/base.html' %}
 {% load bootstrap4 %}
-{% load static %} 
 
 
 {% block conteudo %}
@@ -9,10 +8,7 @@
         <li class="breadcrumb-item">
             <a href="{% url 'core:index'%}">Início</a>
         </li>
-        <li class="breadcrumb-item ">
-            <a href="{%url 'core:cliente-listar'%}">Clientes</a>
-        </li>
-        <li class="breadcrumb-item active">Dependentes</li>
+        <li class="breadcrumb-item active">Reservas</li>
     </ol>
 
     {% bootstrap_messages %}
@@ -20,13 +16,12 @@
     <div class="card mb-3">
         <div class="card-header">
             <i class="fas fa-table"></i>
-            Dependentes
+                Reservas
         </div>   
         <div class="card-body">
-            <p style="font-size: 18px;"><b>Titular:</b> {{ titular.user.get_full_name }}</p>
             <div class="table-responsive">  
-                    <a href="{% url 'core:dependente-novo' pk %}" class="btn btn-primary float-right mb-3">Adicionar</a>
-                <form method="GET" action="{%url 'core:dependente-listar' pk %}">
+                <a href="{% url 'core:reserva-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                <form method="GET" action="{%url 'core:reserva-listar'%}">
                     <div class="input-group mb-3">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
                         <div class="input-group-append">
@@ -35,48 +30,47 @@
                     </div>
                 </form>
                     
-                <table id="id_dependente_table" class="table table-striped table-bordered" cellspacing="0">
+                <table class="table table-striped table-bordered" cellspacing="0">
                     <thead class="text-center">
                         <tr>
-                            <th scope="col">Código</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">Ativo?</th>
+                            <th scope="col">Cliente</th>
+                            <th scope="col">Filme</th>
+                            <th scope="col">Data da Reserva</th>
+                            <th scope="col">Situação</th>
                             <th scope="col">Ações</th>
                         </tr>
                     </thead>
                     <tfoot class="text-center">
                         <tr>
-                            <th>Código</th>
-                            <th>Nome</th>
-                            <th>Ativo?</th>
+                            <th>Cliente</th>
+                            <th>Filme</th>
+                            <th>Data da Reserva</th>
+                            <th>Situação</th>
                             <th>Opções</th>
                         </tr>
                     </tfoot>
                     <tbody>
-                        {% for dependente in dependentes %}
+                        {% for reserva in object_list %}
                             <tr class="text-center">
-                                <td>{{ dependente.codigo }}</td>
-                                <th scope="row"><a href="{% url 'core:dependente-detalhe' pk dependente.id %}">{{ dependente.user.get_full_name }}</a></th>
+                                <th scope="row"><a href="{% url 'core:reserva-detalhe' reserva.id %}">{{ reserva.cliente }}</a></th>
+                                <td>{{ reserva.filme.titulo }}</td>
+                                <td>{{ reserva.data_reserva }}</td>
                                 <td>
-                                    {% if dependente.is_active %}
-                                        <img src="{% static '/img/icon_yes.svg' %}" width="17" height="17" alt="Sim"/>
+                                    {%if reserva.status == 'Pendente' %}
+                                        <span class="badge badge-warning">{{ reserva.status }}</span>
+                                    {% elif reserva.status == 'Expirada' %}
+                                        <span class="badge badge-danger">{{ reserva.status }}</span>
                                     {% else %}
-                                        <img src="{% static '/img/icon_no.svg' %}" width="17" height="17" alt="Não"/>
+                                        <span class="badge badge-success">{{ reserva.status }}</span>
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if dependente.is_active %}
-                                        <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:dependente-desativar' pk dependente.id %}'">Desativar</button>
-                                    {% else %}
-                                        <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:dependente-ativar' pk dependente.id %}'">Ativar</button>
-                                    {% endif %}
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:dependente-editar' pk dependente.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:dependente-deletar' pk dependente.id %}'">Excluir</button>
+                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:reserva-editar' reserva.id %}'">Editar</button>
                                 </td>
                             </tr>
                         {% empty %}
                             <tr class="text-center">
-                                <td colspan="2">Nenhum dependente encontrado.</td>
+                                <td colspan="5">Nenhuma reserva encontrada.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -86,20 +80,20 @@
                     <hr>
                     <span class="float-left">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.</span>
                     
-                    <nav aria-label="Páginação do dependente" class="float-right">
+                    <nav aria-label="Páginação do reserva" class="float-right">
                         <ul class="pagination">
                             {% if page_obj.has_previous %}
                                 <!-- If it ain't a search result display, don't append the search query
                                 to the URL. -->
                                 {% if not search %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'core:dependente-listar' pk %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                        <a class="page-link" href="{% url 'core:reserva-listar' %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
                                     </li>
                                 {% else %}
                                     <!-- Append the searched query to the URL, so that on a search results page,
                                     the pagination don't revert to listing all the listview items. -->
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'core:dependente-listar' pk %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                        <a class="page-link" href="{% url 'core:reserva-listar' %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
                                     </li>
                                 {% endif %}
                             {% else %}
@@ -108,16 +102,16 @@
                                 </li>
                             {% endif %} 
                             {% for object in page_obj.paginator.page_range %}
-                                <li class="page-item"><a class="page-link" href="{% url 'core:dependente-listar' pk %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
+                                <li class="page-item"><a class="page-link" href="{% url 'core:reserva-listar' %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
                             {% endfor %} 
                             {% if page_obj.has_next %}
                                 {% if not search %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'core:dependente-listar' pk %}?page={{ page_obj.next_page_number }}">Próxima página</a>
+                                        <a class="page-link" href="{% url 'core:reserva-listar' %}?page={{ page_obj.next_page_number }}">Próxima página</a>
                                     </li>
                                 {% else %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'core:dependente-listar' pk %}?{{search}}&page={{ page_obj.next_page_number }}">Próxima página</a>
+                                        <a class="page-link" href="{% url 'core:reserva-listar' %}?{{search}}&page={{ page_obj.next_page_number }}">Próxima página</a>
                                     </li>
                                 {% endif %}
                             {% else %}

@@ -63,8 +63,8 @@ urlpatterns = [
 
     # Início URL CRUD Dependente
     path('cliente/<int:pk>/dependentes/', cruds_views.dependente_listar, name="dependente-listar"),
-    path('dependente/<int:id>/detalhe/', cruds_views.ClienteDetalhe.as_view(), name="dependente-detalhe"),
-    path('cliente/<int:pk>/depentente/novo/', cruds_views.criar_dependente, name="depentente-novo"),
+    path('cliente/<int:pk>/dependente/<int:id_dep>/detalhe/', cruds_views.dependente_detalhe, name="dependente-detalhe"),
+    path('cliente/<int:pk>/depentente/novo/', cruds_views.criar_dependente, name="dependente-novo"),
     path('cliente/<int:pk>/dependente/<int:id_dep>/editar/', cruds_views.editar_dependente, name="dependente-editar"),
     path('cliente/<int:pk>/dependente/<int:id_dep>/deletar/', cruds_views.dependente_deletar, name="dependente-deletar"),
     path('cliente/<int:pk>/dependente/<int:id_dep>/ativar/', cruds_views.dependente_ativar, name="dependente-ativar"),

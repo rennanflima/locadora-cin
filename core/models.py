@@ -61,6 +61,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
+    def __str__(self):
+        return self.get_full_name()
+
     def get_full_name(self):
         '''
         Returns the first_name plus the last_name, with a space in between.
@@ -82,7 +85,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Genero(models.Model):
     nome = models.CharField('Nome', max_length=100, unique=True)
-
+    slug = models.SlugField(max_length=100)
     class Meta:
         ordering = ['nome',]
         verbose_name = 'Gênero'
@@ -115,6 +118,7 @@ class Estado(models.Model):
 
     class Meta:
         ordering = ['nome',]
+        unique_together = ('nome', 'sigla')
         verbose_name = 'Estado'
         verbose_name_plural = 'Estados'
 
@@ -135,6 +139,7 @@ class Cidade(models.Model):
 
     class Meta:
         ordering = ['nome', 'estado',]
+        unique_together = ('nome', 'estado')
         verbose_name = 'Cidade'
         verbose_name_plural = 'Cidades'
 
@@ -190,10 +195,18 @@ class Filme(models.Model):
     duracao = models.TimeField('Duração')
     diretor = models.ManyToManyField(Artista)
     ano = models.PositiveSmallIntegerField('Ano de Lançamento')
-    pais = models.CharField('País', max_length=150)
+    pais = models.CharField('Nacionalidade', max_length=150)
     genero = models.ManyToManyField(Genero)
     distribuidora = models.ForeignKey(Distribuidora, on_delete=models.PROTECT)
     capa = models.ImageField('Capa do Filme', upload_to = 'capas/', blank=True, null=True)
+    is_lancamento = models.BooleanField(
+        _('release'),
+        default=True,
+        help_text=_(
+            'Designates whether this movie should be treated as release. '
+            'Uncheck this if it is not a release.'
+        ),
+    )
 
     class Meta:
         ordering = ['titulo',]
@@ -201,7 +214,10 @@ class Filme(models.Model):
         verbose_name_plural = 'Filmes'
 
     def __str__(self):
-        return "%s (%s)" % (self.titulo, self.titulo_original)
+        if self.titulo.strip() != self.titulo_original.strip():
+            return "%s (%s)" % (self.titulo, self.titulo_original)
+        else:
+            return "%s" % self.titulo
     
     def get_absolute_url(self):
         return reverse('core:filme-detalhe', kwargs={'pk': self.pk})
@@ -246,8 +262,8 @@ class Midia(models.Model):
 class Item(models.Model):
     numero_serie = models.CharField('Número de Série', max_length=150)
     data_aquisicao = models.DateField('Data de Aquisição')
-    tipo_midia = models.ForeignKey(Midia, on_delete=models.PROTECT)
-    filme = models.ForeignKey(Filme, on_delete=models.PROTECT)
+    tipo_midia = models.ForeignKey(Midia, on_delete=models.PROTECT, related_name='itens_midia', related_query_name='item_midia')
+    filme = models.ForeignKey(Filme, on_delete=models.PROTECT, related_name='itens_filme', related_query_name='item_filme')
 
     class Meta:
         ordering = ['data_aquisicao',]
@@ -291,32 +307,10 @@ class Telefone(models.Model):
     def __str__(self):
         return "%s - %s" % (self.numero, self.tipo)
 
-class Dependente(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
-    codigo = models.CharField('Código', max_length=150, unique=True, default='0')
-    is_active = models.BooleanField(
-        _('active'),
-        default=True,
-        help_text=_(
-            'Designates whether this dependent should be treated as active. '
-            'Unselect this instead of deleting accounts.'
-        ),
-    )
-    class Meta:
-        ordering = ['codigo',]
-        verbose_name = 'Dependente'
-        verbose_name_plural = 'Dependentes'
-
-    def __str__(self):
-        return "%s" % (self.user.get_full_name())
-
-    def get_absolute_url(self):
-        return reverse('core:dependente-detalhe', kwargs={'pk': self.pk})
-
 class Cliente(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     codigo = models.CharField('Código', max_length=150, unique=True)
-    local_trabalho = models.CharField('Local de Trabalho', max_length=150)
+    local_trabalho = models.CharField('Local de Trabalho', max_length=150, null=True, blank=True)
     is_active = models.BooleanField(
         _('active'),
         default=True,
@@ -325,7 +319,7 @@ class Cliente(models.Model):
             'Unselect this instead of deleting accounts.'
         ),
     )
-    dependentes = models.ManyToManyField(Dependente, related_name='clientes', related_query_name='cliente')
+    titular = models.ForeignKey('self', on_delete=models.PROTECT, related_name='clientes', blank=True, null=True)
 
     class Meta:
         # ordering = ['data_aquisicao',]
@@ -337,4 +331,45 @@ class Cliente(models.Model):
 
     def get_absolute_url(self):
         return reverse('core:cliente-detalhe', kwargs={'pk': self.pk})
+
+
+class HistoricoCliente(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, related_name='historico_cliente')
+    titular = models.ForeignKey(Cliente, on_delete=models.PROTECT, related_name='historico_dependente', null=True, blank=True)
+    situacao_cliente = models.BooleanField('Situação do Cliente', default=True)
+    data_alteracao = models.DateTimeField(_('update date'), auto_now_add=True)
+
+    class Meta:
+        ordering = ['data_alteracao',]
+        verbose_name = 'Histórico do Cliente'
+        verbose_name_plural = 'Históricos dos Clientes'
+
+    def __str__(self):
+        return "%s - Titular: %s (%s)" % (self.cliente.user.get_full_name(), self.titular if self.titular else 'Não tem titular', str(self.data_alteracao))
+    
+
+class Reserva(models.Model):
+    cliente = models.OneToOneField(Cliente, on_delete=models.PROTECT)
+    filme = models.ForeignKey(Filme, on_delete=models.PROTECT, related_name='reservas_filme', related_query_name='reserva')
+    midia = models.ForeignKey(Midia, on_delete=models.PROTECT, related_name='reservas_midia', related_query_name='reserva', null=True, blank=True)
+    data_reserva = models.DateTimeField(_('booking date'), auto_now_add=True)
+    status  = models.CharField('Situação da Reserva', max_length=10, choices=tipor_reserva, default='Pendente')
+    # vincular a locação quando for atendida
+
+    class Meta:
+        ordering = ['data_reserva',]
+        verbose_name = 'Reserva'
+        verbose_name_plural = 'Reserva'
+
+    def __str__(self):
+        return "%s - %s (%s)" % (self.cliente.user.get_full_name(), self.filme, self.midia)
+
+    def get_absolute_url(self):
+        return reverse('core:reserva-detalhe', kwargs={'pk': self.pk})
+
+    def clean(self):
+        if not self.status:
+            self.status = 'Pendente'
+
+    
     

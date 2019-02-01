@@ -23,3 +23,9 @@ tipo_sexo = (
     ('F', 'Feminino'),
     ('M', 'Masculino'),
 )
+
+tipor_reserva = (
+    ('Pendente', 'Pendente'),
+    ('Expirada', 'Expirada'),
+    ('Atendida', 'Atendida'),
+)

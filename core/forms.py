@@ -124,6 +124,9 @@ class ElencoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ElencoForm, self).__init__(*args, **kwargs)
 
+        self.helper = FormHelper()
+        self.helper.form_show_labels = False
+
     def clean(self):
         cleaned_data = super(ElencoForm, self).clean()
 
@@ -301,3 +304,33 @@ TelefoneInlineFormSet = forms.inlineformset_factory(
     # },
     min_num=1,
 )
+
+class ReservaForm(forms.ModelForm):
+    class Meta:
+        model = Reserva
+        fields = ('cliente', 'filme', 'midia')
+    
+    def __init__(self, *args, **kwargs):
+        super(ReservaForm, self).__init__(*args, **kwargs)
+
+        self.fields['midia'].queryset = Midia.objects.none()
+
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            'cliente',
+            'filme',
+            'midia',
+            HTML('<hr>'),
+            HTML("<a href='{% url 'core:reserva-listar' %}' class='btn btn-danger ml-2 float-right'>Cancelar</a>"),
+            Submit('save_changes', 'Adicionar Reserva', css_class="btn-success ml-2 mb-4 float-right"),
+        )
+
+        if 'filme' in self.data:
+            try:
+                filme_id = int(self.data.get('filme'))
+                self.fields['midia'].queryset = Midia.objects.filter(item_midia__filme_id=filme_id).order_by('nome')
+            except (ValueError, TypeError):
+                pass
+        
+        elif self.instance.pk:
+            self.fields['midia'].queryset = Midia.objects.filter(item_midia__filme_id=self.instance.filme) 

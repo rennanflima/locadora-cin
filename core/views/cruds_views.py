@@ -106,21 +106,18 @@ def criar_filme(request):
             request.POST, request.FILES,
             queryset=Elenco.objects.none()
         )
-        if form.is_valid():
-            if elenco_forms.is_valid():
-                filme = form.save()
-                elencos = elenco_forms.save(commit=False)
-                for elenco in elencos:
-                    elenco.filme = filme
-                    elenco.save()
-                messages.success(request, 'Filme adicionado com sucesso.')
-                return HttpResponseRedirect(reverse('core:filme-detalhe', kwargs={'pk': filme.pk}))
-            else:
-                for eform in elenco_forms:
-                    if eform.errors:
-                        messages.error(request, eform.errors)
-        else:
-            messages.error(request, form.errors)
+        if form.is_valid() and elenco_forms.is_valid():
+            try:
+                with transaction.atomic():
+                    filme = form.save()
+                    elencos = elenco_forms.save(commit=False)
+                    for elenco in elencos:
+                        elenco.filme = filme
+                        elenco.save()
+                    messages.success(request, 'Filme adicionado com sucesso.')
+                    return HttpResponseRedirect(reverse('core:filme-detalhe', kwargs={'pk': filme.pk}))
+            except Exception as e:
+                messages.error(request, e)
     
     return render(request, 'core/filme/novo.html', {'form': form, 'formset':elenco_forms})
              
@@ -134,25 +131,20 @@ def editar_filme(request, pk):
     if request.method == 'POST':
         form = FilmeForm(request.POST, request.FILES, instance=filme)
         elenco_forms = ElencoInlineFormSet(request.POST, request.FILES, instance=filme)
-        if form.is_valid():
-            if elenco_forms.is_valid():
-                filme = form.save()
-                elencos = elenco_forms.save()
-                for obj in elencos:
-                    if obj.filme != filme:
-                        obj.filme = filme
-                        obj.save()
+        if form.is_valid() and elenco_forms.is_valid():
+            try:
+                with transaction.atomic():
+                    filme = form.save()
+                    elencos = elenco_forms.save()
+                    for obj in elencos:
+                        if obj.filme != filme:
+                            obj.filme = filme
+                            obj.save()
 
-                messages.success(request, 'Filme editado com sucesso.')
-                return HttpResponseRedirect(filme.get_absolute_url())
-            else:
-                for eform in elenco_forms:
-                    if eform.errors:
-                        messages.error(request, eform.errors)
-        else:
-            messages.error(request, form.errors)
-            
-            
+                    messages.success(request, 'Filme editado com sucesso.')
+                    return HttpResponseRedirect(filme.get_absolute_url())
+            except Exception as e:
+                messages.error(request, e)
             
     return render(request, 'core/filme/editar.html', {'form': form, 'formset':elenco_forms})
 
@@ -308,7 +300,8 @@ class MidiaDeletar(generic.DeleteView):
         return super(MidiaDeletar, self).delete(request, *args, **kwargs)
 
 
-# Início CRUD Distribuidora        
+# Início CRUD Distribuidora      
+# @transaction.atomic  
 def criar_distribuidora(request):    
     form = DistribuidoraForm()
     end_form = EnderecoForm()
@@ -316,20 +309,20 @@ def criar_distribuidora(request):
     if request.method == 'POST':
         form = DistribuidoraForm(request.POST)
         end_form = EnderecoForm(request.POST)
-        if form.is_valid():
-            if end_form.is_valid():
-                distribuidora = form.save(commit=False)
-                endereco = end_form.save()
-                distribuidora.endereco = endereco
-                distribuidora.save()
-                messages.success(request, 'Distribuidora adicionada com sucesso.')
-                return HttpResponseRedirect(reverse('core:distribuidora-detalhe', kwargs={'pk': distribuidora.pk}))
-            else:
-                messages.error(request, end_form.errors)
-        else:
-            messages.error(request, form.errors)
+        if form.is_valid() and end_form.is_valid():
+            try:
+                with transaction.atomic():
+                    distribuidora = form.save(commit=False)
+                    endereco = end_form.save()
+                    distribuidora.endereco = endereco
+                    distribuidora.save()
+                    messages.success(request, 'Distribuidora adicionada com sucesso.')
+                    return HttpResponseRedirect(reverse('core:distribuidora-detalhe', kwargs={'pk': distribuidora.pk}))
+            except Exception as e:
+                messages.error(request, e)
     
     return render(request, 'core/distribuidora/novo.html', {'form': form, 'end_form':end_form})
+
 
 def editar_distribuidora(request, pk):    
     distribuidora = get_object_or_404(Distribuidora, pk=pk)
@@ -339,18 +332,17 @@ def editar_distribuidora(request, pk):
     if request.method == 'POST':
         form = DistribuidoraForm(request.POST, instance=distribuidora)
         end_form = EnderecoForm(request.POST, instance=distribuidora.endereco)
-        if form.is_valid():
-            if end_form.is_valid():
-                distribuidora = form.save(commit=False)
-                endereco = end_form.save()
-                distribuidora.endereco = endereco
-                distribuidora.save()
-                messages.success(request, "Distribuidora editada com sucesso.")
-                return HttpResponseRedirect(reverse('core:distribuidora-detalhe', kwargs={'pk': distribuidora.pk}))
-            else:
-                messages.error(request, end_form.errors)
-        else:
-            messages.error(request, form.errors)
+        if form.is_valid() and end_form.is_valid():
+            try:
+                with transaction.atomic():
+                    distribuidora = form.save(commit=False)
+                    endereco = end_form.save()
+                    distribuidora.endereco = endereco
+                    distribuidora.save()
+                    messages.success(request, "Distribuidora editada com sucesso.")
+                    return HttpResponseRedirect(reverse('core:distribuidora-detalhe', kwargs={'pk': distribuidora.pk}))
+            except Exception as e:
+                messages.error(request, e)
     
     return render(request, 'core/distribuidora/editar.html', {'form': form, 'end_form':end_form})
 
@@ -382,8 +374,9 @@ class DistribuidoraDeletar(SuccessMessageMixin, generic.DeleteView):
 
 def carregar_cidades(request):
     estado_id = request.GET.get('estado')
-    cidades = Cidade.objects.filter(estado_id=estado_id)
+    cidades = Cidade.objects.filter(estado_id=estado_id)    
     return render(request, 'core/ajax/partial_select_cidade.html', {'cidades': cidades})
+
 
 def buscar_cep(request):
     data = dict()
@@ -452,32 +445,39 @@ def criar_cliente(request):
         end_form = EnderecoForm(request.POST)
         formset = TelefoneInlineFormSet(request.POST, queryset=Telefone.objects.none())
         if form.is_valid() and end_form.is_valid() and formset.is_valid():
-            user = form.save()
-            user.refresh_from_db()
-            user.perfil.cpf = form.cleaned_data.get('cpf')
-            user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
-            user.perfil.sexo = form.cleaned_data.get('sexo')
-            
-            user.roles.add(role)
-            
-            endereco = end_form.save()
-            user.perfil.endereco = endereco
-            user.save()
-            
-            telefones = formset.save(commit=False)
-            for fone in telefones:
-                fone.perfil = user.perfil
-                fone.save()
-            
-            cliente = Cliente()
-            cliente.codigo = '%s%s' % (str(today.year), str(user.pk))
-            cliente.local_trabalho = form.cleaned_data.get('local_trabalho')
-            cliente.user = user
-            cliente.save()
-            
-            
-            messages.success(request, 'Cliente adicionada com sucesso.')
-            return HttpResponseRedirect(reverse('core:cliente-detalhe', kwargs={'pk': cliente.pk}))
+            try:
+                with transaction.atomic():
+                    user = form.save()
+                    user.refresh_from_db()
+                    user.perfil.cpf = form.cleaned_data.get('cpf')
+                    user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
+                    user.perfil.sexo = form.cleaned_data.get('sexo')
+                    
+                    user.roles.add(role)
+                    
+                    endereco = end_form.save()
+                    user.perfil.endereco = endereco
+                    user.save()
+                    
+                    telefones = formset.save(commit=False)
+                    for fone in telefones:
+                        fone.perfil = user.perfil
+                        fone.save()
+                    
+                    cliente = Cliente()
+                    cliente.codigo = '%s%s' % (str(today.year), str(user.pk))
+                    cliente.local_trabalho = form.cleaned_data.get('local_trabalho')
+                    cliente.user = user
+                    cliente.save()
+
+                    historico = HistoricoCliente()
+                    historico.cliente = cliente
+                    historico.save()
+                    
+                    messages.success(request, 'Cliente adicionada com sucesso.')
+                    return HttpResponseRedirect(reverse('core:cliente-detalhe', kwargs={'pk': cliente.pk}))
+            except Exception as e:
+                messages.error(request, e)
     
     return render(request, 'core/cliente/novo.html', {'form': form, 'end_form': end_form, 'formset': formset})
 
@@ -494,27 +494,31 @@ def editar_cliente(request, pk):
         end_form = EnderecoForm(request.POST, instance=cliente.user.perfil.endereco)
         formset = TelefoneInlineFormSet(request.POST, instance=cliente.user.perfil)
         if form.is_valid() and end_form.is_valid() and formset.is_valid():
-            user = form.save()
-            user.refresh_from_db()
-            user.perfil.cpf = form.cleaned_data.get('cpf')
-            user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
-            user.perfil.sexo = form.cleaned_data.get('sexo')
+            try:
+                with transaction.atomic():
+                    user = form.save()
+                    user.refresh_from_db()
+                    user.perfil.cpf = form.cleaned_data.get('cpf')
+                    user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
+                    user.perfil.sexo = form.cleaned_data.get('sexo')
 
-            endereco = end_form.save()
-            user.perfil.endereco = endereco
-            user.save()
+                    endereco = end_form.save()
+                    user.perfil.endereco = endereco
+                    user.save()
 
-            telefones = formset.save()
-            for fone in telefones:
-                if fone.perfil != user.perfil:
-                    fone.perfil = user.perfil
-                    fone.save()
+                    telefones = formset.save()
+                    for fone in telefones:
+                        if fone.perfil != user.perfil:
+                            fone.perfil = user.perfil
+                            fone.save()
 
-            cliente.local_trabalho = form.cleaned_data.get('local_trabalho')
-            cliente.save()
+                    cliente.local_trabalho = form.cleaned_data.get('local_trabalho')
+                    cliente.save()
 
-            messages.success(request, 'Cliente editado com sucesso.')
-            return HttpResponseRedirect(cliente.get_absolute_url())
+                    messages.success(request, 'Cliente editado com sucesso.')
+                    return HttpResponseRedirect(cliente.get_absolute_url())
+            except Exception as e:
+                messages.error(request, e)
             
     return render(request, 'core/cliente/editar.html', {'form': form, 'end_form': end_form, 'formset': formset,})
 
@@ -544,17 +548,31 @@ class ClienteDeletar(SuccessMessageMixin, generic.DeleteView):
         messages.success(self.request, self.success_message)
         return super(ClienteDeletar, self).delete(request, *args, **kwargs)
 
+@transaction.atomic
 def cliente_desativar(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
     cliente.is_active = False
     cliente.save()
+    
+    historico = HistoricoCliente()
+    historico.cliente = cliente
+    historico.situacao_cliente = False
+    historico.save()
+    
     messages.success(request, 'Cliente desativado com sucesso')
     return HttpResponseRedirect(reverse_lazy('core:cliente-listar'))
 
+@transaction.atomic
 def cliente_ativar(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
     cliente.is_active = True
     cliente.save()
+
+    historico = HistoricoCliente()
+    historico.cliente = cliente
+    historico.situacao_cliente = True
+    historico.save()
+
     messages.success(request, 'Cliente ativado com sucesso')
     return HttpResponseRedirect(reverse_lazy('core:cliente-listar'))
 
@@ -573,30 +591,38 @@ def criar_dependente(request, pk):
     if request.method == 'POST':
         form = DependenteForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            user.refresh_from_db()
-            user.perfil.cpf = form.cleaned_data.get('cpf')
-            user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
-            user.perfil.sexo = form.cleaned_data.get('sexo')
-            user.roles.add(role)
-            user.save()
+            try:
+                with transaction.atomic():
+                    user = form.save()
+                    user.refresh_from_db()
+                    user.perfil.cpf = form.cleaned_data.get('cpf')
+                    user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
+                    user.perfil.sexo = form.cleaned_data.get('sexo')
+                    user.roles.add(role)
+                    user.save()
 
-            dependente = Dependente()
-            dependente.codigo = '%s%s%s' % (str(today.year), str(titular.pk), str(user.pk))
-            dependente.user = user
-            dependente.save()
 
-            titular.dependentes.add(dependente)
-            titular.save()
+                    dependente = Cliente()
+                    dependente.codigo = '%s%s%s' % (str(today.year), str(titular.pk), str(user.pk))
+                    dependente.user = user
+                    dependente.titular = titular
+                    dependente.save()
 
-            messages.success(request, 'Dependente salvo com sucesso.')
-            return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))
+                    historico = HistoricoCliente()
+                    historico.cliente = dependente
+                    historico.titular = titular
+                    historico.save()
+
+                    messages.success(request, 'Dependente salvo com sucesso.')
+                    return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))
+            except Exception as e:
+                messages.error(request, e)
 
     return render(request, 'core/dependente/novo.html', {'form': form, 'pk': pk,})
 
 def editar_dependente(request, pk, id_dep):
     titular = get_object_or_404(Cliente, pk=pk)
-    dependente = get_object_or_404(Dependente, pk=id_dep)
+    dependente = get_object_or_404(Cliente, pk=id_dep)
     data_init = {'cpf': dependente.user.perfil.cpf, 'data_nascimento': dependente.user.perfil.data_nascimento, 'sexo':dependente.user.perfil.sexo,}
     form = DependenteForm(instance=dependente.user, initial=data_init)
     data = dict()
@@ -604,36 +630,47 @@ def editar_dependente(request, pk, id_dep):
     if request.method == 'POST':
         form = DependenteForm(request.POST, instance=dependente.user)
         if form.is_valid():
-            user = form.save()
-            user.perfil.cpf = form.cleaned_data.get('cpf')
-            user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
-            user.perfil.sexo = form.cleaned_data.get('sexo')
-            user.save()
-            messages.success(request, 'Dependente atualizado com sucesso.')
-            return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))
+            try:
+                with transaction.atomic():
+                    user = form.save()
+                    user.perfil.cpf = form.cleaned_data.get('cpf')
+                    user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
+                    user.perfil.sexo = form.cleaned_data.get('sexo')
+                    user.save()
+                    messages.success(request, 'Dependente atualizado com sucesso.')
+                    return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))
+            except Exception as e:
+                messages.error(request, e)
+            
 
     context = {'form': form, 'pk': pk, 'id_dep': id_dep,}
     return render(request, 'core/dependente/editar.html', context)
 
 
 def dependente_listar(request, pk):
-    cliente = get_object_or_404(Cliente, pk=pk)
+    titular = get_object_or_404(Cliente, pk=pk)
     nome = request.GET.get('nome', '')
-    dependente_list = Dependente.objects.filter(Q(cliente=cliente) & Q(codigo__icontains = nome) | Q(user__first_name__icontains = nome) | Q(user__last_name__icontains = nome))
+    dependente_list = Cliente.objects.filter(Q(titular=titular) & (Q(codigo__icontains = nome) | Q(user__first_name__icontains = nome) | Q(user__last_name__icontains = nome)))
     paginator = Paginator(dependente_list, 10)
 
     page = request.GET.get('page')
     dependentes = paginator.get_page(page)
-    return render(request, 'core/dependente/lista.html', {'dependentes': dependentes, 'pk': pk, 'titular': cliente,})
+    return render(request, 'core/dependente/lista.html', {'dependentes': dependentes, 'pk': pk, 'titular': titular,})
+
+
+def dependente_detalhe(request, pk, id_dep):
+    dependente = get_object_or_404(Cliente, pk=id_dep)
+    return render(request, 'core/dependente/detalhe.html', {'dependente': dependente, 'pk': pk, 'id_dep': id_dep,})
 
 
 class DependenteDetalhe(generic.DetailView):
-    model = Dependente
+    model = Cliente
     context_object_name = 'dependente'
     template_name = 'core/dependente/detalhe.html'
 
+
 def dependente_deletar(request, pk, id_dep):
-    dependente = get_object_or_404(Dependente, pk=id_dep)
+    dependente = get_object_or_404(Cliente, pk=id_dep)
     if request.method == 'POST':
         dependente.delete()
         messages.success(request, 'Dependente atualizado com sucesso.')
@@ -641,16 +678,34 @@ def dependente_deletar(request, pk, id_dep):
     
     return render(request, 'core/dependente/deletar.html')
 
+@transaction.atomic
 def dependente_desativar(request, pk, id_dep):
-    dependente = get_object_or_404(Dependente, pk=id_dep)
+    titular = get_object_or_404(Cliente, pk=pk)
+    dependente = get_object_or_404(Cliente, pk=id_dep)
+    
     dependente.is_active = False
     dependente.save()
+
+    historico = HistoricoCliente()
+    historico.cliente = dependente
+    historico.titular = titular
+    historico.save()
+
     messages.success(request, 'Dependente desativado com sucesso')
     return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))
 
+@transaction.atomic
 def dependente_ativar(request, pk, id_dep):
-    dependente = get_object_or_404(Dependente, pk=id_dep)
+    titular = get_object_or_404(Cliente, pk=pk)
+    dependente = get_object_or_404(Cliente, pk=id_dep)
+
     dependente.is_active = True
     dependente.save()
+    
+    historico = HistoricoCliente()
+    historico.cliente = dependente
+    historico.titular = titular
+    historico.save()
+    
     messages.success(request, 'Dependente ativado com sucesso')
     return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))
