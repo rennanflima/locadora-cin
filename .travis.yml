@@ -10,22 +10,19 @@ python:
 #     - DISPLAY=:99.0
 #     - CHROME_BIN=/usr/bin/google-chrome
 addons:
-   apt:
-    sources:
-      - google-chrome
-    packages:
-      - google-chrome-stable
-      - oracle-java8-set-default
+  chrome: stable
 before_install:
   - wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz
   - mkdir geckodriver
   - tar -xzf geckodriver-v0.23.0-linux64.tar.gz -C geckodriver
-  - wget https://chromedriver.storage.googleapis.com/2.45/chromedriver_linux64.zip
-  - unzip chromedriver_linux64.zip
   - export PATH=$PATH:$PWD/geckodriver
-  - sudo mv chromedriver_linux64/chromedriver /usr/bin/chromedriver
-  - sudo chown root:root /usr/bin/chromedriver
-  - sudo chmod +x /usr/bin/chromedriver
+  # Chrome driver
+  - wget -N https://chromedriver.storage.googleapis.com/2.45/chromedriver_linux64.zip -P ~/
+  - unzip ~/chromedriver_linux64.zip -d ~/
+  - rm ~/chromedriver_linux64.zip
+  - sudo mv -f ~/chromedriver /usr/local/share/
+  - sudo chmod +x /usr/local/share/chromedriver
+  - sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
 install:
   - pip install --upgrade pip
   - pip install -r requirements.txt
@@ -33,6 +30,8 @@ install:
 #    - "sh -e /etc/init.d/xvfb start"
 #    - sleep 3 #wait a while before xvfb to start
 script:
+  - whereis google-chrome-stable
+  - whereis chromedriver
   - tox
   - coverage run -m pytest
   - behave
