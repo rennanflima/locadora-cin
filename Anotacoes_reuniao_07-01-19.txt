@@ -1,0 +1,16 @@
+Reunião 07-01-19
+
+Apresentação do diagrama de classes;
+Definição de lançamento: 60 dias a partir da disponibilidade na locadora;
+No diagrama alterar pessoa para cliente, para diferenciar titular de dependente;
+A classe reserva se relaciona com filme e deve conter um atributo tipo de mídia;
+Apresentação de casos de uso
+	Acervo
+	Locação
+
+
+Verificar se no documento do professor diz se o pagamento pode ser feito na retirada ou devolução;
+Localizado no documento "Caso a locação do item não tenha sido paga no ato da locação, terá
+́ de ser paga  obrigatoriamente  na  devolução. Não são aceitos  pagamentos  mensais  ou 
+em outros momentos que não a locação ou a devolução." Decidido que será enviado um email ao professor questionando
+se é possível deixar só na devolução.

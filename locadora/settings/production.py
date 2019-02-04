@@ -1,8 +1,9 @@
 from locadora.settings.common import *
 import re
+import django_heroku
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 SECRET_KEY = 'pr1c7f_vn81cmvo+zlcmt)9jmtwx@p_l^@wga+l#(%3&h6mrcs'
 
@@ -11,7 +12,6 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-
 
 ADMINS = [
     ('Woshington Valdeci de Sousa', 'wvs2@cin.ufpe.br'),
@@ -53,5 +53,9 @@ EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'Não Responda <nao-responda@gmail.com>'
 
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 
 django_heroku.settings(locals())
