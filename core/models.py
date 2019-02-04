@@ -11,7 +11,7 @@ from django.dispatch import receiver
 from core.managers import UserManager
 from datetime import date
 from django.conf import settings
-
+from django.utils.text import slugify
 
 # Create your models here.
 class Role(models.Model):
@@ -85,7 +85,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Genero(models.Model):
     nome = models.CharField('Nome', max_length=100, unique=True)
-    slug = models.SlugField(max_length=100)
+    slug = models.SlugField(max_length=100, unique=True)
     class Meta:
         ordering = ['nome',]
         verbose_name = 'Gênero'
@@ -96,6 +96,9 @@ class Genero(models.Model):
 
     def get_absolute_url(self):
         return reverse('core:genero-detalhe', kwargs={'pk': self.pk})
+
+    def clean(self):
+        self.slug = slugify(self.nome)
 
 class Artista(models.Model):
     nome = models.CharField('Nome', max_length=150, unique=True)
@@ -200,12 +203,9 @@ class Filme(models.Model):
     distribuidora = models.ForeignKey(Distribuidora, on_delete=models.PROTECT)
     capa = models.ImageField('Capa do Filme', upload_to = 'capas/', blank=True, null=True)
     is_lancamento = models.BooleanField(
-        _('release'),
-        default=True,
-        help_text=_(
-            'Designates whether this movie should be treated as release. '
-            'Uncheck this if it is not a release.'
-        ),
+        'Lançamento',
+        default=False,
+        help_text='Designa se este filme deve ser tratado como lançamento. Desmarque esta opção se não for um lançamento.',
     )
 
     class Meta:
@@ -370,6 +370,37 @@ class Reserva(models.Model):
     def clean(self):
         if not self.status:
             self.status = 'Pendente'
+   
+class Locacao(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
+    valor_total = models.DecimalField('Valor Total da Locação', max_digits=8, decimal_places=2, default=0)
+    data_locacao = models.DateTimeField('Data de Locação', auto_now_add=True)
 
+    class Meta:
+        ordering = ['data_locacao',]
+        verbose_name = 'Locação'
+        verbose_name_plural = 'Locações'
+
+    def __str__(self):
+        return "%s - %s" % (self.cliente.user.get_full_name(), str(self.data_locacao))
+
+
+class ItemLocacao(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.PROTECT)
+    is_lancamento = models.BooleanField(
+        'Lançamento',
+        default=False,
+        help_text='Designa se este filme deve ser tratado como lançamento. Desmarque esta opção se não for um lançamento.',
+    )
+    valor = models.DecimalField('Valor da Locação', max_digits=8, decimal_places=2, default=0)
+    data_devolucao_prevista = models.DateField('Data de Devolução Prevista', blank=True, null=True)
+    locacao = models.ForeignKey(Locacao, on_delete=models.PROTECT)
     
+    class Meta:
+        # ordering = ['data_reserva',]
+        verbose_name = 'Item de Locação'
+        verbose_name_plural = 'Itens de Locação'
+
+    def __str__(self):
+        return "%s - %s" % (self.item, str(self.data_devolucao_prevista))
     

@@ -8,7 +8,7 @@
         <li class="breadcrumb-item">
             <a href="{% url 'core:index'%}">Início</a>
         </li>
-        <li class="breadcrumb-item active">Reservas</li>
+        <li class="breadcrumb-item active">Locações</li>
     </ol>
 
     {% bootstrap_messages %}
@@ -16,12 +16,12 @@
     <div class="card mb-3">
         <div class="card-header">
             <i class="fas fa-table"></i>
-                Reservas
+                Locações
         </div>   
         <div class="card-body">
             <div class="table-responsive">  
-                <a href="{% url 'core:reserva-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
-                <form method="GET" action="{%url 'core:reserva-listar'%}">
+                <a href="{% url 'core:locacao-realizar' %}" class="btn btn-primary float-right mb-3">Realizar Locação</a>
+                <form method="GET" action="{%url 'core:locacao-listar'%}">
                     <div class="input-group mb-3">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
                         <div class="input-group-append">
@@ -34,44 +34,32 @@
                     <thead class="text-center">
                         <tr>
                             <th scope="col">Cliente</th>
-                            <th scope="col">Filme</th>
-                            <th scope="col">Data da Reserva</th>
-                            <th scope="col">Situação</th>
+                            <th scope="col">Data da Locação</th>
+                            <th scope="col">Valor</th>
                             <th scope="col">Ações</th>
                         </tr>
                     </thead>
                     <tfoot class="text-center">
                         <tr>
                             <th>Cliente</th>
-                            <th>Filme</th>
-                            <th>Data da Reserva</th>
-                            <th>Situação</th>
+                            <th>Data da Locação</th>
+                            <th>Valor</th>
                             <th>Opções</th>
                         </tr>
                     </tfoot>
                     <tbody>
-                        {% for reserva in object_list %}
+                        {% for locacao in object_list %}
                             <tr class="text-center">
-                                <th scope="row"><a href="{% url 'core:reserva-detalhe' reserva.id %}">{{ reserva.cliente }}</a></th>
-                                <td>{{ reserva.filme.titulo }}</td>
-                                <td>{{ reserva.data_reserva }}</td>
+                                <th scope="row"><a href="{% url 'core:locacao-detalhe' locacao.id %}">{{ locacao.cliente }}</a></th>
+                                <td>{{ locacao.data_locacao }}</td>
+                                <td>{{ locacao.valor_total }}</td>
                                 <td>
-                                    {%if reserva.status == 'Pendente' %}
-                                        <span class="badge badge-warning">{{ reserva.status }}</span>
-                                    {% elif reserva.status == 'Expirada' %}
-                                        <span class="badge badge-danger">{{ reserva.status }}</span>
-                                    {% else %}
-                                        <span class="badge badge-success">{{ reserva.status }}</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:reserva-editar' reserva.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:reserva-cancelar' reserva.id %}'">Cancelar</button>
+    
                                 </td>
                             </tr>
                         {% empty %}
                             <tr class="text-center">
-                                <td colspan="5">Nenhuma reserva encontrada.</td>
+                                <td colspan="4">Nenhuma locacao encontrada.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -81,20 +69,20 @@
                     <hr>
                     <span class="float-left">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.</span>
                     
-                    <nav aria-label="Páginação do reserva" class="float-right">
+                    <nav aria-label="Páginação do locacao" class="float-right">
                         <ul class="pagination">
                             {% if page_obj.has_previous %}
                                 <!-- If it ain't a search result display, don't append the search query
                                 to the URL. -->
                                 {% if not search %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'core:reserva-listar' %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                        <a class="page-link" href="{% url 'core:locacao-listar' %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
                                     </li>
                                 {% else %}
                                     <!-- Append the searched query to the URL, so that on a search results page,
                                     the pagination don't revert to listing all the listview items. -->
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'core:reserva-listar' %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                        <a class="page-link" href="{% url 'core:locacao-listar' %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
                                     </li>
                                 {% endif %}
                             {% else %}
@@ -103,16 +91,16 @@
                                 </li>
                             {% endif %} 
                             {% for object in page_obj.paginator.page_range %}
-                                <li class="page-item"><a class="page-link" href="{% url 'core:reserva-listar' %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
+                                <li class="page-item"><a class="page-link" href="{% url 'core:locacao-listar' %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
                             {% endfor %} 
                             {% if page_obj.has_next %}
                                 {% if not search %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'core:reserva-listar' %}?page={{ page_obj.next_page_number }}">Próxima página</a>
+                                        <a class="page-link" href="{% url 'core:locacao-listar' %}?page={{ page_obj.next_page_number }}">Próxima página</a>
                                     </li>
                                 {% else %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'core:reserva-listar' %}?{{search}}&page={{ page_obj.next_page_number }}">Próxima página</a>
+                                        <a class="page-link" href="{% url 'core:locacao-listar' %}?{{search}}&page={{ page_obj.next_page_number }}">Próxima página</a>
                                     </li>
                                 {% endif %}
                             {% else %}

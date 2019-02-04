@@ -47,7 +47,7 @@ class FilmeForm(forms.ModelForm):
     diretor = forms.ModelMultipleChoiceField(queryset = Artista.objects.filter(tipo__icontains='Diretor'))
     class Meta:
         model = Filme
-        fields = ('titulo', 'titulo_original', 'duracao', 'diretor', 'ano', 'pais', 'classificacao', 'genero', 'distribuidora', 'capa','sinopse',)
+        fields = ('titulo', 'titulo_original', 'duracao', 'diretor', 'ano', 'pais', 'classificacao', 'genero', 'distribuidora', 'capa','sinopse', 'is_lancamento')
     
     def __init__(self, *args, **kwargs):
         super(FilmeForm, self).__init__(*args, **kwargs)
@@ -79,6 +79,7 @@ class FilmeForm(forms.ModelForm):
                 Column('capa', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
             ),
+            'is_lancamento',
             'sinopse',
             # HTML('<hr>'),
             # HTML("<a href='{% url 'core:genero-novo' %}' class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Gênero</a>"),
@@ -102,10 +103,10 @@ class MidiaForm(forms.ModelForm):
         self.helper.layout = Layout(
             'nome',
             PrependedText('valor','R$'),
-            HTML('<hr>'),
-            HTML("<a href='{% url 'core:filme-novo' %}' class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Filme</a>"),
-            HTML("<a href='{% url 'core:midia-listar' %}' class='btn btn-danger ml-2 float-right'>Cancelar</a>"),
-            Submit('save_changes', 'Adicionar Tipo de Mídia', css_class="btn-success ml-2 mb-4 float-right"),
+            # HTML('<hr>'),
+            # HTML("<a href='{% url 'core:filme-novo' %}' class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Filme</a>"),
+            # HTML("<a href='{% url 'core:midia-listar' %}' class='btn btn-danger ml-2 float-right'>Cancelar</a>"),
+            # Submit('save_changes', 'Adicionar Tipo de Mídia', css_class="btn-success ml-2 mb-4 float-right"),
 
         )
 
@@ -334,3 +335,28 @@ class ReservaForm(forms.ModelForm):
         
         elif self.instance.pk:
             self.fields['midia'].queryset = Midia.objects.filter(item_midia__filme_id=self.instance.filme) 
+
+
+class LocacaoForm(forms.ModelForm):
+    # valor_total = forms.DecimalField(label='Valor da Locação', max_digits=8, decimal_places=2, localize=True)
+    class Meta:
+        model = Locacao
+        fields = ('cliente',)
+    
+    def __init__(self, *args, **kwargs):
+        super(LocacaoForm, self).__init__(*args, **kwargs)
+        # self.fields['valor_total'].widget.attrs['class'] = 'form-control money2'
+
+
+class ItemLocacaoForm(forms.ModelForm):
+    valor = forms.DecimalField(label='Valor da Locação', max_digits=8, decimal_places=2, localize=True)
+    class Meta:
+        model = ItemLocacao
+        fields = ('item', 'valor', 'data_devolucao_prevista',)
+    
+    def __init__(self, *args, **kwargs):
+        super(ItemLocacaoForm, self).__init__(*args, **kwargs)
+        self.fields['data_devolucao_prevista'].widget.attrs['class'] = 'form-control date'
+        self.fields['valor'].widget.attrs['class'] = 'form-control money2'
+        self.helper = FormHelper()
+        self.helper.form_show_labels = False

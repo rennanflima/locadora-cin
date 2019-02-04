@@ -689,6 +689,7 @@ def dependente_desativar(request, pk, id_dep):
     historico = HistoricoCliente()
     historico.cliente = dependente
     historico.titular = titular
+    historico.situacao_cliente = False
     historico.save()
 
     messages.success(request, 'Dependente desativado com sucesso')
@@ -705,6 +706,7 @@ def dependente_ativar(request, pk, id_dep):
     historico = HistoricoCliente()
     historico.cliente = dependente
     historico.titular = titular
+    historico.situacao_cliente = True
     historico.save()
     
     messages.success(request, 'Dependente ativado com sucesso')

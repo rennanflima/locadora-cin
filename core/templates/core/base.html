@@ -128,25 +128,11 @@
                         <i class="fas fa-fw fa-calendar"></i>
                         <span>Reservas</span>
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admin:genero-listar' %}">
-                      <i class="fas fa-fw fa-venus-mars"></i>
-                      <span>Gênero</span>
+                    <a class="nav-link" href="{%url 'core:locacao-listar'%}">
+                        <i class="fas fa-fw fa-calendar"></i>
+                        <span>Locações</span>
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-fw fa-user-plus"></i>
-                        <span>Usuário</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admin:midia-listar' %}">
-                        <i class="fas fa-compact-disc"></i>
-                        <span>Mídia</span>
-                    </a>
-                </li>          
+                </li>        
             </ul>
 
             <div id="content-wrapper">

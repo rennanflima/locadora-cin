@@ -44,6 +44,10 @@
             {{filme.duracao }}
         </div> 
         <div class="form-group">
+            <label class="negrito">Lançamento ?: </label>    
+            {{filme.is_lancamento|yesno:"Sim, Não" }}
+        </div> 
+        <div class="form-group">
             <label class="negrito">Ano de Lançamento: </label>    
             {{filme.ano }}
         </div>
