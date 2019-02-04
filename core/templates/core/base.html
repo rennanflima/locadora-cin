@@ -51,7 +51,7 @@
                         <button class="btn btn-primary" type="button">
                             <i class="fas fa-search"></i>
                         </button>
-                    </div>  
+                    </div>
                 </div>
             </form>
 
@@ -129,14 +129,32 @@
                         <span>Reservas</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin:genero-listar' %}">
+                      <i class="fas fa-fw fa-venus-mars"></i>
+                      <span>Gênero</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-fw fa-user-plus"></i>
+                        <span>Usuário</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin:midia-listar' %}">
+                        <i class="fas fa-compact-disc"></i>
+                        <span>Mídia</span>
+                    </a>
+                </li>          
             </ul>
-            
+
             <div id="content-wrapper">
 
             <div class="container-fluid">
-                
+
                 {% block conteudo %}
-                
+
                 {% endblock conteudo %}
 
             </div>
@@ -208,7 +226,7 @@
 
         <script type="application/javascript">
             $(document).ready(function () {
-                //called when key is pressed in textbox  
+                //called when key is pressed in textbox
                 $('.upper').keyup(function(){
                     $(this).val($(this).val().toUpperCase());
                 });
