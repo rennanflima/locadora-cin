@@ -1,0 +1,38 @@
+{% load bootstrap4 %}
+
+<form method="POST" class="form js-item-add-form" action="{% url 'core:ajax-item-add' %}">
+    {% csrf_token %}
+    <div class="modal-header">
+        <h5 class="modal-title" id="itemAddModalLabel">Adicionar Item</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <!-- <input type="hidden" id="id_locacao_pk"/> -->
+        {% bootstrap_form form %}
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Adicionar Item</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+    </div>    
+</form>
+{% block javascript %}
+    <script>
+        $(function () {
+            $('#id_item').change(function(){
+                var itemId = $(this).val();
+                var url =  "{% url 'core:ajax-item-carregar' %}";
+                $.ajax({
+                    url: url,
+                    data:{'item': itemId},
+                    success: function(data){
+                        $('#id_valor').val(data.valor).change();
+                        $('#id_data_devolucao_prevista').val(data.data_devolucao).change();
+                    }
+                });
+            });
+        });
+        
+    </script>
+{% endblock javascript %}

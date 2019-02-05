@@ -24,8 +24,16 @@ tipo_sexo = (
     ('M', 'Masculino'),
 )
 
-tipor_reserva = (
+tipo_reserva = (
     ('Pendente', 'Pendente'),
     ('Expirada', 'Expirada'),
     ('Atendida', 'Atendida'),
+)
+
+tipo_locacao = (
+    ('EM_ANDAMENTO', 'Em Andamento'),
+    ('CONCLUIDA', 'Concluída'),
+    ('PAGA', 'Paga'),
+    ('PAGA_PARCIAL', 'Paga Parcialmente'),
+    ('CANCELADA', 'Cancelada'),
 )

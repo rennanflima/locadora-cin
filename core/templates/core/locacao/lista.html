@@ -54,7 +54,7 @@
                                 <td>{{ locacao.data_locacao }}</td>
                                 <td>{{ locacao.valor_total }}</td>
                                 <td>
-    
+                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:locacao-realizar-itens' locacao.id %}'">Editar</button>
                                 </td>
                             </tr>
                         {% empty %}

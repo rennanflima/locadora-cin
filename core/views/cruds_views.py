@@ -14,7 +14,9 @@ from django.utils.html import strip_tags
 from pycep_correios import consultar_cep
 from pycep_correios.excecoes import ExcecaoPyCEPCorreios
 from core.filters import *
+from datetime import date
 from django.core.paginator import Paginator
+
 
 # Create your views here.
 

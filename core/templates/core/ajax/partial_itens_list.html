@@ -1,0 +1,19 @@
+{% for i in itens_list %}
+    <tr class="text-center">
+        <th scope="row">{{ i.item }}</th>
+        <td>{{ i.data_devolucao_prevista }}</td>
+        <td>{{ i.valor }}</td>
+        <td>
+            <button type="button" class="btn btn-warning btn-sm js-update-item"
+                    data-url="{% url 'core:ajax-item-update' i.id %}"> Editar
+            </button>
+            <button type="button" class="btn btn-danger btn-sm js-delete-item"
+                    data-url="{% url 'core:ajax-item-delete' i.id %}"> Remover
+            </button>
+        </td>
+    </tr>
+{% empty %}
+    <tr class="text-center">
+        <td colspan="4">Nenhum item encontrado.</td>
+    </tr>
+{% endfor %}

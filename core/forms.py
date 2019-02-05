@@ -238,7 +238,7 @@ class DistribuidoraForm(forms.ModelForm):
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ('filme', 'tipo_midia', 'numero_serie', 'data_aquisicao',)
+        fields = ('filme', 'tipo_midia', 'numero_serie', 'data_aquisicao', 'quantidade',)
     
     def __init__(self, *args, **kwargs):
         super(ItemForm, self).__init__(*args, **kwargs)
@@ -338,7 +338,7 @@ class ReservaForm(forms.ModelForm):
 
 
 class LocacaoForm(forms.ModelForm):
-    # valor_total = forms.DecimalField(label='Valor da Locação', max_digits=8, decimal_places=2, localize=True)
+    # valor_total = forms.DecimalField(label='Valor da Locação', max_digits=8, decimal_places=2, localize=True,)
     class Meta:
         model = Locacao
         fields = ('cliente',)
@@ -346,17 +346,18 @@ class LocacaoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(LocacaoForm, self).__init__(*args, **kwargs)
         # self.fields['valor_total'].widget.attrs['class'] = 'form-control money2'
+        # self.fields['valor_total'].widget.attrs['readonly'] = True
+
 
 
 class ItemLocacaoForm(forms.ModelForm):
     valor = forms.DecimalField(label='Valor da Locação', max_digits=8, decimal_places=2, localize=True)
+    locacao = forms.ModelChoiceField(queryset=Locacao.objects.all(), widget=forms.HiddenInput())
     class Meta:
         model = ItemLocacao
-        fields = ('item', 'valor', 'data_devolucao_prevista',)
+        fields = ('item', 'valor', 'data_devolucao_prevista','locacao')
     
     def __init__(self, *args, **kwargs):
         super(ItemLocacaoForm, self).__init__(*args, **kwargs)
         self.fields['data_devolucao_prevista'].widget.attrs['class'] = 'form-control date'
         self.fields['valor'].widget.attrs['class'] = 'form-control money2'
-        self.helper = FormHelper()
-        self.helper.form_show_labels = False

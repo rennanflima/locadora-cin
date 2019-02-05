@@ -19,4 +19,10 @@ urlpatterns = [
     path('locacao/', main.LocacaoListar.as_view(), name="locacao-listar"),
     path('locacao/realizar/', main.realizar_locacao, name="locacao-realizar"),
     path('locacao/realizar/<int:pk>/itens/', main.seleciona_itens_locacao, name="locacao-realizar-itens"),
+    path('locacao/<int:pk>/detalhe/', main.LocacaoDetalhe.as_view(), name="locacao-detalhe"),
+    path('locacao/item/adicionar/', main.item_add, name='ajax-item-add'),
+    path('locacao/item/<int:pk>/editar/', main.item_edit, name='ajax-item-update'),
+    path('locacao/item/<int:pk>/deletar/', main.item_delete, name='ajax-item-delete'),
+    path('ajax/carregar/item/', main.carregar_item_ajax, name="ajax-item-carregar"),
+    path('locacao/<int:pk>/detalhe/', main.LocacaoDetalhe.as_view(), name="locacao-detalhe"),
 ]

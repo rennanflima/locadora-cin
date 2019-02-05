@@ -264,6 +264,7 @@ class Item(models.Model):
     data_aquisicao = models.DateField('Data de Aquisição')
     tipo_midia = models.ForeignKey(Midia, on_delete=models.PROTECT, related_name='itens_midia', related_query_name='item_midia')
     filme = models.ForeignKey(Filme, on_delete=models.PROTECT, related_name='itens_filme', related_query_name='item_filme')
+    quantidade = models.PositiveIntegerField('Número de Cópias', default=1)
 
     class Meta:
         ordering = ['data_aquisicao',]
@@ -353,7 +354,7 @@ class Reserva(models.Model):
     filme = models.ForeignKey(Filme, on_delete=models.PROTECT, related_name='reservas_filme', related_query_name='reserva')
     midia = models.ForeignKey(Midia, on_delete=models.PROTECT, related_name='reservas_midia', related_query_name='reserva', null=True, blank=True)
     data_reserva = models.DateTimeField(_('booking date'), auto_now_add=True)
-    status  = models.CharField('Situação da Reserva', max_length=10, choices=tipor_reserva, default='Pendente')
+    status = models.CharField('Situação da Reserva', max_length=10, choices=tipo_reserva, default='Pendente')
     # vincular a locação quando for atendida
 
     class Meta:
@@ -375,6 +376,7 @@ class Locacao(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     valor_total = models.DecimalField('Valor Total da Locação', max_digits=8, decimal_places=2, default=0)
     data_locacao = models.DateTimeField('Data de Locação', auto_now_add=True)
+    situacao = models.CharField('Situação da Locação', max_length=20, choices=tipo_locacao, default='EM_ANDAMENTO')
 
     class Meta:
         ordering = ['data_locacao',]
@@ -403,4 +405,7 @@ class ItemLocacao(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.item, str(self.data_devolucao_prevista))
+
+    def serialize(self):
+        return self.__dict__
     

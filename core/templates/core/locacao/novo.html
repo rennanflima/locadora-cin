@@ -28,28 +28,31 @@
 
             <fieldset class="mt-4">
                 <legend><b>Itens</b></legend>
-                {{ formset.management_form }}
+                
+                <!-- {{ formset.management_form }} -->
                 <div class="table-responsive">
-                    <table class="table">
+                    <button type="button" class="btn btn-primary js-add-item mb-3 float-right">
+                        Adicionar Item
+                    </button>
+                    <table id="item_locacao_tb" class="table table-striped table-bordered" cellspacing="0">
                         <thead class="text-center">
-                            <th scope="col">Filme</th>
-                            <th scope="col">Data Prevista de Devolução</th>
-                            <th scope="col">Valor</th>
-                            <th scope="col"></th>
+                            <tr>
+                                <th scope="col">Filme</th>
+                                <th scope="col">Data Prevista de Devolução</th>
+                                <th scope="col">Valor</th>
+                                <th scope="col">Ações</th>
+                            </tr>
                         </thead>
+                        <tfoot class="text-center">
+                            <tr>
+                                <th>Filme</th>
+                                <th>Data Prevista de Devolução</th>
+                                <th>Valor</th>
+                                <th>Opções</th>
+                            </tr>
+                        </tfoot>
                         <tbody>
-                            {% for form in formset %}
-                                <tr class="elenco-form {% if form.instance.pk %}item{% else %}new{% endif %} formset">
-                                    <td>{{ form.id }} {{ form.item|as_crispy_field }}</td>
-                                    <td>{{ form.data_devolucao_prevista|as_crispy_field }}</td>
-                                    <td class="text-center">{{ form.valor|as_crispy_field }}</td>
-                                    {% if form.istance.pk %}
-                                        <td class="text-center">{{ form.DELETE }}</td>
-                                    {% else %}
-                                        <td class="text-center"></td>
-                                    {% endif %}
-                                </tr>
-                            {% endfor %}
+                            {% include 'core/ajax/partial_itens_list.html' %}
                         </tbody>
                     </table>
                 </div>
@@ -61,21 +64,4 @@
         </form>
     </div>
 {% endblock conteudo %}
-{% block javascript %}
-    <script>
-        function atualizarDinamico(object){
-    		
-            var indice = object.closest("tr").rowIndex - 1;
-            var data_prevista = $('#id_{{ formset.prefix}}-' + indice + '-data_devolucao_prevista').val();
-            var preco = $('#id_{{ formset.prefix}}-' + indice + '-preco').val();
-    
-            console.log(quantidade);
-            console.log(preco);
-            console.log(object);
-    
-            console.log(parseFloat(quantidade) * parseFloat(preco));
-    
-            document.getElementById('total-'+ indice).innerHTML = parseFloat(quantidade) * parseFloat(preco); 
-        }
-    </script>
-{% endblock javascript %}
+

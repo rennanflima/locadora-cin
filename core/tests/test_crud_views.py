@@ -171,7 +171,7 @@ class TestArtistaViews(TestCase):
         cls.factory = RequestFactory()
     
     def test_artista_lista(self):
-        path = reverse('admin:artista-listar')
+        path = reverse('core:artista-listar')
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
@@ -180,7 +180,7 @@ class TestArtistaViews(TestCase):
         
     
     def test_artista_novo(self):
-        path = reverse('admin:artista-novo')
+        path = reverse('core:artista-novo')
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
@@ -188,7 +188,7 @@ class TestArtistaViews(TestCase):
         assert response.status_code == 200
     
     def test_artista_detalhe(self):
-        path = reverse('admin:artista-detalhe', kwargs={'pk': self.artista.pk})
+        path = reverse('core:artista-detalhe', kwargs={'pk': self.artista.pk})
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
@@ -196,7 +196,7 @@ class TestArtistaViews(TestCase):
         assert response.status_code == 200
     
     def test_artista_editar(self):
-        path = reverse('admin:artista-editar', kwargs={'pk': self.artista.pk})
+        path = reverse('core:artista-editar', kwargs={'pk': self.artista.pk})
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
@@ -204,7 +204,7 @@ class TestArtistaViews(TestCase):
         assert response.status_code == 200
     
     def test_artista_deletar(self):
-        path = reverse('admin:artista-deletar', kwargs={'pk': self.artista.pk})
+        path = reverse('core:artista-deletar', kwargs={'pk': self.artista.pk})
         request = self.factory.get(path)
         # request.user = mixer.blend(User)
 
