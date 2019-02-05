@@ -1,6 +1,4 @@
 from behave import *
-from selenium import webdriver
-
 
 @given('que estou na página de gênero "{page}"')
 
