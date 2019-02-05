@@ -2,7 +2,7 @@
 
 Funcionalidade: Cadastro de gênero
   Cenário: Cadastro de gênero com sucesso
-    Dado que estou na página de gênero "https://locadora-cin.herokuapp.com/admin/genero"
+    Dado que estou na página de gênero "http://127.0.0.1:8000/admin/genero"
     Quando clicar no botão adicionar
     E preencher o campo nome com uma descrição
     E clicar no botão adicionar gênero
@@ -11,7 +11,7 @@ Funcionalidade: Cadastro de gênero
     Então serão listados os gêneros cadastrados
 
     Cenário: Cancelar cadastro de gênero
-        Dado que estou na página de gênero "https://locadora-cin.herokuapp.com/admin/genero"
+        Dado que estou na página de gênero "http://127.0.0.1:8000/admin/genero"
         Quando clicar no botão adicionar
         E preencher o campo nome com uma descrição
         E clicar no botão cancelar
