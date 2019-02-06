@@ -361,3 +361,8 @@ class ItemLocacaoForm(forms.ModelForm):
         super(ItemLocacaoForm, self).__init__(*args, **kwargs)
         self.fields['data_devolucao_prevista'].widget.attrs['class'] = 'form-control date'
         self.fields['valor'].widget.attrs['class'] = 'form-control money2'
+
+
+
+
+

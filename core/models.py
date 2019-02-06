@@ -12,6 +12,7 @@ from core.managers import UserManager
 from datetime import date
 from django.conf import settings
 from django.utils.text import slugify
+from django.template.defaultfilters import slugify as slug_template
 
 # Create your models here.
 class Role(models.Model):
@@ -371,7 +372,7 @@ class Reserva(models.Model):
     def clean(self):
         if not self.status:
             self.status = 'Pendente'
-   
+
 class Locacao(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     valor_total = models.DecimalField('Valor Total da Locação', max_digits=8, decimal_places=2, default=0)
@@ -409,3 +410,60 @@ class ItemLocacao(models.Model):
     def serialize(self):
         return self.__dict__
     
+
+class FormaPagamento(models.Model):
+    descricao = models.CharField('Descrição', max_length=100, unique=True)
+
+    class Meta:
+        verbose_name = 'Forma de Pagamento'
+        verbose_name_plural = 'Formas de Pagamento'
+
+    def __str__(self):
+        return self.descricao
+
+
+class ArgumentoPagamento(models.Model):
+    argumento = models.CharField('Nome do argumento', max_length=100)
+    requerido = models.BooleanField('Argumento obrigatório?', default=False)
+    tipo_dado = models.CharField('Tipo de dado do argumento', max_length=20, choices=tipo_dado)
+    forma_pagamento = models.ManyToManyField(FormaPagamento)
+    
+    class Meta:
+        verbose_name = 'Argumento do Pagamento'
+        verbose_name_plural = 'Argumentos dos Pagamentos'
+
+    def __str__(self):
+        return '%s' % (self.argumento)
+
+    def pagamentos(self):
+        return ', '.join([p.descricao for p in self.forma_pagamento.all()])
+    pagamentos.short_description = "Formas de Pagamentos associados ao argumento"
+
+    def slug(self):
+        return slug_template(self.argumento)
+
+
+class Pagamento(models.Model):
+    forma_pagamento = models.ForeignKey(FormaPagamento, on_delete=models.PROTECT)
+    data_pagamento = models.DateTimeField('Data de Pagamento', auto_now_add=True)
+    locacao = models.ForeignKey(Locacao, on_delete=models.PROTECT)
+    # devolucao = models.ForeignKey(Pagamento)
+
+    class Meta:
+        verbose_name = 'Pagamento'
+        verbose_name_plural = 'Pagamentos'
+
+
+class InformacaoPagamento(models.Model):
+    argumento = models.ForeignKey(ArgumentoPagamento, related_name='informacoes_argumentos', on_delete=models.PROTECT)
+    valor_texto = models.TextField('Valor da informação em Texto', blank=True, null=True)
+    valor_inteiro = models.IntegerField('Valor da informação em Número Inteiro', blank=True, null=True)
+    valor_decimal = models.DecimalField('Valor da informação em Número Decimal', decimal_places=2, max_digits=10, blank=True, null=True)
+    valor_data_hora = models.DateTimeField('Valor da informação em Data/Hora', blank=True, null=True)
+    valor_boolean = models.BooleanField('Valor da informação Verdadeiro ou Falso', blank=True, null=True)
+    valor_arquivo = models.FileField('Valor da informação em Arquivo', upload_to='arquivo_pessoa/', blank=True, null=True)
+    pagamento = models.ForeignKey(Pagamento, on_delete=models.PROTECT)
+
+    class Meta:
+        verbose_name = 'Informação do Pagamento'
+        verbose_name_plural = 'Informações dos Pagamentos'

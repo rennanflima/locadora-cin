@@ -1,0 +1,14 @@
+
+{% load display_custom %}
+
+{% for pg in pagamentos %}
+    <tr>
+        <td>{{ pg.forma_pagamento }}</td>
+        <td>{{ pg.data_pagamento }}</td>
+        <td></td>
+    </tr>
+{% empty %}
+    <tr class="text-center">
+        <td colspan="3">Nenhum pagamento encontrado.</td>
+    </tr>
+{% endfor %}

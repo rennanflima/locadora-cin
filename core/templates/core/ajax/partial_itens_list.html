@@ -1,8 +1,10 @@
+{% load display_custom %}
+
 {% for i in itens_list %}
     <tr class="text-center">
         <th scope="row">{{ i.item }}</th>
         <td>{{ i.data_devolucao_prevista }}</td>
-        <td>{{ i.valor }}</td>
+        <td>R$ {{ i.valor }}</td>
         <td>
             <button type="button" class="btn btn-warning btn-sm js-update-item"
                     data-url="{% url 'core:ajax-item-update' i.id %}"> Editar

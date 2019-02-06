@@ -37,3 +37,14 @@ tipo_locacao = (
     ('PAGA_PARCIAL', 'Paga Parcialmente'),
     ('CANCELADA', 'Cancelada'),
 )
+
+tipo_dado = (
+    ('TEXTO', 'Texto'),
+    ('INTEIRO', 'Inteiro'),
+    ('DECIMAL', 'Decimal'),
+    ('BOOLEAN', 'Boolean'),
+    ('DATA', 'Data'),
+    ('HORA', 'Hora'),
+    ('DATA_HORA', 'Data/Hora'),
+)
+

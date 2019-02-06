@@ -1,0 +1,26 @@
+{% for arg in argumentos %}
+    <div class="form-group">
+        {% if arg.tipo_dado == 'DECIMAL' %}
+            <label for="id_{{ arg.slug }}">{{ arg.argumento }}</label>
+            <input type="text" name="{{ arg.slug }}" class="form-control money2" placeholder="{{ arg.argumento }}" title="" required="{{ arg.requerido}}" id="id_{{ arg.slug }}">
+        {% elif arg.tipo_dado == 'DATA_HORA' %}
+            <label for="id_{{ arg.slug }}">{{ arg.argumento }}</label>
+            <input type="text" name="{{ arg.slug }}" class="form-control date_time" placeholder="{{ arg.argumento }}" title="" required="{{ arg.requerido}}" id="id_{{ arg.slug }}">
+        {% elif arg.tipo_dado == 'INTEIRO' %}
+            <label for="id_{{ arg.slug }}">{{ arg.argumento }}</label>
+            <input type="number" name="{{ arg.slug }}" min="0" class="numberinput form-control" required="{{ arg.requerido}}" id="id_{{ arg.slug }}">
+        {% elif arg.tipo_dado == 'BOOLEAN' %}
+            <div class="form-group">
+                <div id="div_id_{{ arg.slug }}" class="form-check"> 
+                    <label for="id_{{ arg.slug }}" class="form-check-label"> 
+                        <input type="checkbox" name="is_{{ arg.slug }}" class="checkboxinput form-check-input" id="id_{{ arg.slug }}">
+                        {{ arg.argumento }}
+                    </label>
+                </div> 
+            </div>
+        {% else %}
+            <label for="id_{{ arg.slug }}">{{ arg.argumento }}</label>
+            <input type="text" name="{{ arg.slug }}" class="form-control" placeholder="{{ arg.argumento }}" title="" required="{{ arg.requerido}}" id="id_{{ arg.slug }}">
+        {% endif %}
+    </div>
+{% endfor%}
