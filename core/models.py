@@ -13,27 +13,10 @@ from datetime import date
 from django.conf import settings
 from django.utils.text import slugify
 from django.template.defaultfilters import slugify as slug_template
-
-# Create your models here.
-class Role(models.Model):
-    CLIENTE = 1
-    FUNCIONARIO = 2
-    ADMIN = 3
-    SUPER_USER = 4
-    ROLE_CHOICES = (
-        (CLIENTE, 'Cliente'),
-        (FUNCIONARIO, 'Funcionário'),
-        (ADMIN, 'Admin'),
-    )
-
-    id = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, primary_key=True)
-
-    def __str__(self):
-        return self.get_id_display()
+from django.core.mail import send_mail
 
 # Create your models here.
 class User(AbstractBaseUser, PermissionsMixin):
-    roles = models.ManyToManyField(Role)
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
