@@ -352,15 +352,20 @@ class LocacaoForm(forms.ModelForm):
 
 class ItemLocacaoForm(forms.ModelForm):
     valor = forms.DecimalField(label='Valor da Locação', max_digits=8, decimal_places=2, localize=True)
+    desconto = forms.DecimalField(label='Desconto', max_digits=8, decimal_places=2, localize=True, required=False)
     locacao = forms.ModelChoiceField(queryset=Locacao.objects.all(), widget=forms.HiddenInput())
+    is_nova_data = forms.BooleanField(label='Deseja estender a data de devolução? ', required=False)
     class Meta:
         model = ItemLocacao
-        fields = ('item', 'valor', 'data_devolucao_prevista','locacao')
+        fields = ('item', 'valor', 'desconto', 'data_devolucao_prevista', 'nova_data_devolucao', 'locacao',)
     
     def __init__(self, *args, **kwargs):
         super(ItemLocacaoForm, self).__init__(*args, **kwargs)
-        self.fields['data_devolucao_prevista'].widget.attrs['class'] = 'form-control date'
-        self.fields['valor'].widget.attrs['class'] = 'form-control money2'
+        self.fields['data_devolucao_prevista'].widget.attrs['class'] = 'date'
+        self.fields['valor'].widget.attrs['class'] = 'money2'
+        self.fields['valor'].widget.attrs['readonly'] = True
+        self.fields['data_devolucao_prevista'].widget.attrs['readonly'] = True
+
 
 
 

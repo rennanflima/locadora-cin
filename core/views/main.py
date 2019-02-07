@@ -82,6 +82,9 @@ class LocacaoDetalhe(generic.DetailView):
 def realizar_locacao(request, pk = None):
     if pk:
         locacao = get_object_or_404(Locacao, pk=pk)
+        if locacao.is_editavel:
+            messages.error(request, 'Locação não pode ser editada.')
+            return HttpResponseRedirect(reverse_lazy('core:locacao-listar'))
         form = LocacaoForm(request.POST or None, instance=locacao)
     else:
         form = LocacaoForm(request.POST or None)
@@ -94,6 +97,9 @@ def realizar_locacao(request, pk = None):
 # Step 2 - Locação
 def seleciona_itens_locacao(request, pk):
     locacao = get_object_or_404(Locacao, pk=pk)
+    if locacao.is_editavel:
+            messages.error(request, 'Locação não pode ser editada.')
+            return HttpResponseRedirect(reverse_lazy('core:locacao-listar'))
     itens = ItemLocacao.objects.filter(locacao=locacao)
     if request.method == 'POST':
         if itens.count() > 0:
@@ -105,14 +111,35 @@ def seleciona_itens_locacao(request, pk):
 # Step 3 - Locação
 def confirmar_locacao(request, pk):
     locacao = get_object_or_404(Locacao, pk=pk)
+    if locacao.is_editavel:
+            messages.error(request, 'Locação não pode ser editada.')
+            return HttpResponseRedirect(reverse_lazy('core:locacao-listar'))
     itens = ItemLocacao.objects.filter(locacao=locacao)
-    pagamentos = Pagamento.objects.filter(locacao=locacao)
     if request.method == 'POST':
         locacao.situacao = 'CONCLUIDA'
         locacao.save()
-        messages.success(request, 'Locação realizada com sucesso.')
-        return HttpResponseRedirect(reverse_lazy('core:reserva-listar'))
+        messages.success(request, 'Locação concluída com sucesso.')
+        return HttpResponseRedirect(reverse('core:locacao-finalizar', kwargs={'pk': locacao.pk}))
     return render(request, 'core/locacao/confirma.html', {'item_list': itens, 'locacao': locacao,})
+
+# Step 4 - Locação
+def finalizar_locacao(request, pk):
+    locacao = get_object_or_404(Locacao, pk=pk)
+    if locacao.is_editavel:
+            messages.error(request, 'Locação não pode ser editada.')
+            return HttpResponseRedirect(reverse_lazy('core:locacao-listar'))
+    itens = ItemLocacao.objects.filter(locacao=locacao)
+    pagamentos = Pagamento.objects.filter(locacao=locacao)
+    valor_restante = locacao.valor_total - locacao.valor_pago()
+    if request.method == 'POST':
+        if valor_restante == 0:
+            locacao.situacao = 'PAGA'
+        elif valor_restante < locacao.valor_total:
+            locacao.situacao = 'PAGA_PARCIAL'
+        locacao.save()
+        messages.success(request, 'Locação realizada com sucesso.')
+        return HttpResponseRedirect(reverse_lazy('core:locacao-listar'))
+    return render(request, 'core/locacao/finalizar.html', {'item_list': itens, 'locacao': locacao, 'pagamentos': pagamentos, 'valor_restante': valor_restante,})
 
 
 @transaction.atomic
@@ -127,13 +154,18 @@ def save_item_form(request, form, template_name, mensagem):
             itens_list = ItemLocacao.objects.filter(locacao=locacao)
             
             soma = 0
+            desconto = 0
             for i in itens_list:
                 soma = soma + i.valor
+                desconto = desconto + i.desconto
 
-            locacao.valor_total = soma
+            locacao.sub_total = soma
+            locacao.total_descontos = desconto
             locacao.save()
 
             data['qtd_item'] = itens_list.count()
+            data['sub_total'] = localize(locacao.sub_total)
+            data['total_descontos'] = localize(locacao.total_descontos)
             data['valor_total'] = localize(locacao.valor_total)
             data['html_item_list'] = render_to_string('core/ajax/partial_itens_list.html', {'itens_list': itens_list, })
         else:
@@ -165,13 +197,18 @@ def item_delete(request, pk):
         itens_list = ItemLocacao.objects.filter(locacao=locacao)
 
         soma = 0
+        desconto = 0
         for i in itens_list:
             soma = soma + i.valor
+            desconto = desconto + i.desconto
 
-        locacao.valor_total = soma
+        locacao.sub_total = soma
+        locacao.total_descontos = desconto
         locacao.save()
 
         data['qtd_item'] = itens_list.count()
+        data['sub_total'] = localize(locacao.sub_total)
+        data['total_descontos'] = localize(locacao.total_descontos)
         data['valor_total'] = localize(locacao.valor_total)
         data['html_item_list'] = render_to_string('core/ajax/partial_itens_list.html', {'itens_list': itens_list, })
     else:
@@ -201,30 +238,67 @@ class LocacaoDetalhe(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(LocacaoDetalhe, self).get_context_data(**kwargs)
         context['item_list'] = ItemLocacao.objects.filter(locacao=self.object)
+        context['pagamentos'] = Pagamento.objects.filter(locacao=self.object)
         return context
 
 
+@transaction.atomic
 def pagamento_locacao(request):
     data = dict()
     formas_pagamento = FormaPagamento.objects.all()
     if request.method == 'POST':
         data['form_is_valid'] = True
-        forma_pagamento = request.POST.get('forma_pagamento')
+        fp_id = request.POST.get('forma_pagamento')
+        lc_id = request.POST.get('locacao')
+
+        locacao = Locacao.objects.get(pk=lc_id)
+        forma_pagamento = FormaPagamento.objects.get(pk=fp_id)
         argumentos = ArgumentoPagamento.objects.filter(forma_pagamento=forma_pagamento)
+
+        pagamento = Pagamento()
+        pagamento.locacao = locacao
+        pagamento.forma_pagamento = forma_pagamento
+        pagamento.save()
         
         locacao = request.POST.get('locacao')
         
         campos = dict()
         for arg in argumentos:
-            campos[arg.slug()][arg.tipo_dado] = arg.pk
+            campos[arg.slug()] = arg.pk
 
-        print(campos)
-        valores = dict()
-        for k in campos:
-            valores[k] = request.POST.get(k)
-            print(k +' ' +valores[k])
+        for k, v in campos.items():
+            vlr = request.POST.get(k)
+            arg = ArgumentoPagamento.objects.get(pk=v)
+            info_pg = InformacaoPagamento()
+            info_pg.argumento = arg
+            if arg.tipo_dado == 'TEXTO':
+                info_pg.valor_texto = vlr
+            elif arg.tipo_dado == 'INTEIRO':
+                info_pg.valor_inteiro = vlr
+            elif arg.tipo_dado == 'DECIMAL':
+                info_pg.valor_decimal = vlr
+            elif arg.tipo_dado == 'BOOLEAN':
+                info_pg.valor_boolean = vlr
+            elif arg.tipo_dado == 'DATA':
+                info_pg.valor_data = vlr
+            elif arg.tipo_dado == 'HORA':
+                info_pg.valor_hora = vlr
+            elif arg.tipo_dado == 'DATA_HORA':
+                info_pg.valor_data_hora = vlr
 
-        pagamentos = Pagamento.objects.filter(locacao=locacao)
+            info_pg.pagamento = pagamento
+            info_pg.save()
+        
+        valor_restante = locacao.valor_total - locacao.valor_pago()
+        
+        if valor_restante == 0:
+            locacao.situacao = 'PAGA'
+            locacao.save()
+        elif valor_restante < locacao.valor_total:
+            locacao.situacao = 'PAGA_PARCIAL'
+            locacao.save()
+
+        pagamentos = Pagamento.objects.filter(locacao=locacao)        
         data['html_pg_list'] = render_to_string('core/ajax/partial_pagamentos_list.html', {'pagamentos': pagamentos, })
     context = {'formas_pagamento': formas_pagamento}
     data['html_form'] = render_to_string('core/ajax/partial_pagamento_novo.html', context, request=request,)
@@ -235,5 +309,13 @@ def carregar_argumento_forma_pagamento(request):
     forma_pagamento_id = request.GET.get('forma')
     argumentos = ArgumentoPagamento.objects.filter(forma_pagamento__id=forma_pagamento_id)
     return render(request, 'core/ajax/partial_campos_pagamento.html', {'argumentos': argumentos})
+
+
+def detalhe_pagamento(request, pk):
+    pagamento = get_object_or_404(Pagamento, pk=pk)
+    data = dict()
+    context = {'pagamento': pagamento, 'dados_pagamento': pagamento.informacoes_pagamentos.all()}
+    data['html_form'] = render_to_string('core/ajax/partial_detalhe_pagamento.html', context, request=request,)
+    return JsonResponse(data)
 
     

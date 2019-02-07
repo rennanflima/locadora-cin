@@ -8,9 +8,13 @@
             <a href="{% url 'core:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item ">
-            <a href="{%url 'core:cliente-listar'%}">Clientes</a>
+            <a href="{%url 'core:cliente-listar'%}">Cliente</a>
         </li>
-        <li class="breadcrumb-item active">Detalhar</li>
+        <li class="breadcrumb-item">
+            <a href="{%url 'core:cliente-detalhe' titular.pk %}">{{ titular }}</a>
+        </li>
+        <li class="breadcrumb-item">Detalhar</li>
+        <li class="breadcrumb-item active">{{ dependente }}</li>
     </ol>
 
     {% bootstrap_messages %}

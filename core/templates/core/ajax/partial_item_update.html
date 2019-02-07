@@ -20,6 +20,16 @@
 {% block javascript %}
     <script>
         $(function () {
+            $('#id_nova_data_devolucao').parent('div').hide();
+            $('input[name="is_nova_data"]').on('click', function(){
+                console.log('clicou');
+                if($(this).is(':checked')){
+                    console.log('Checked');
+                    $('#id_nova_data_devolucao').parent('div').show('speed');
+                } else{
+                    $('#id_nova_data_devolucao').parent('div').hide('speed');
+                }
+            });
             $('#id_item').change(function(){
                 var itemId = $(this).val();
                 var url =  "{% url 'core:ajax-item-carregar' %}";

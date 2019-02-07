@@ -50,7 +50,7 @@
                         {% for midia in object_list %}
                             <tr class="text-center">
                                 <th scope="row"><a href="{% url 'core:midia-detalhe' midia.id %}">{{ midia.nome }}</a></th>
-                                <td>{{ midia.valor|currency }}</td>
+                                <td>R$ {{ midia.valor }}</td>
                                 <td>
                                     <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:midia-editar' midia.id %}'">Editar</button>
                                     <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:midia-deletar' midia.id %}'">Excluir</button>

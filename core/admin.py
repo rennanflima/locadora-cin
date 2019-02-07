@@ -34,10 +34,11 @@ class UsuarioAdmin(admin.ModelAdmin):
             return list()
         return super(UsuarioAdmin, self).get_inline_instances(request, obj)
 
+class ArgumentoPagamentoAdmin(admin.ModelAdmin):
+    list_display = ('campo', 'is_requerido', 'pagamentos')
+
 admin.site.register(Estado, EstadoAdmin)
 admin.site.register(Cidade, CidadeAdmin)
 admin.site.register(User, UsuarioAdmin)
-admin.site.register(Perfil)
-admin.site.register(Reserva)
 admin.site.register(FormaPagamento)
-admin.site.register(ArgumentoPagamento)
+admin.site.register(ArgumentoPagamento, ArgumentoPagamentoAdmin)

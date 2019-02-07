@@ -9,7 +9,8 @@
         <li class="breadcrumb-item ">
             <a href="{%url 'core:item-listar'%}">Itens</a>
         </li>
-        <li class="breadcrumb-item active">Detalhar</li>
+        <li class="breadcrumb-item">Detalhar</li>
+        <li class="breadcrumb-item active">{{ item }}</li>
     </ol>
 
     {% bootstrap_messages %}
@@ -17,6 +18,13 @@
     <div class="container-fluid">
         <h2>Detalhar Item</h2>
         <hr>
+        {% if item.filme.capa %}
+            <img src="{{ item.filme.capa.url }}" class="img-thumbnail col-2" style="float: right; min-width: 182px;"/>
+        {% else %}
+            <div class="col-2" style="float: right;">
+                <i class="fas fa-file-image fa-10x"></i>
+            </div>
+        {% endif %}
         <div class="form-group">
             <label class="negrito">Filme: </label>    
             {{ item.filme }}

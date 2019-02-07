@@ -36,13 +36,22 @@
                         <th scope="col">Filme</th>
                         <th scope="col">Data Prevista de Devolução</th>
                         <th scope="col">Valor</th>
+                        <th scope="col">Desconto</th>
                         <th scope="col">Ações</th>
                     </tr>
                 </thead>
                 <tfoot class="text-center">
                     <tr>
-                        <th class="text-right" colspan="3">Valor Total</th>
-                        <th>R$ <span id="id_valor_total">{{ locacao.valor_total }}</span></th>
+                        <th class="text-right" colspan="2">Sub-Total</th>
+                        <th colspan="3">R$ <span id="id_sub_total">{{ locacao.sub_total }}</span></th>
+                    </tr>
+                    <tr class="text-danger">
+                        <th class="text-right" colspan="2">Descontos</th>
+                        <th colspan="3">R$ -<span id="id_total_descontos">{{ locacao.total_descontos }}</span></th>
+                    </tr>
+                    <tr>
+                        <th class="text-right" colspan="2">Valor Total</th>
+                        <th colspan="3">R$ <span id="id_valor_total">{{ locacao.valor_total }}</span></th>
                     </tr>
                 </tfoot>
                 <tbody>
@@ -63,9 +72,8 @@
 {% endblock conteudo %}
 {% block javascript %}
     <script>
-        // {% if itens_list.count <= 0 %}
-        //     $("#id_submit_iten").prop('disabled', true);
-        // {% endif %}
+        // $('#div_id_nova_data_devolucao').hide();
+        
         var loadForm = function () {
             var btn = $(this);
             $.ajax({
@@ -99,6 +107,8 @@
                         });
                         $("#item_locacao_tb tbody").html(data.html_item_list);
                         $("#genericModal").modal("hide");
+                        $("#id_sub_total").text(data.sub_total);
+                        $("#id_total_descontos").text(data.total_descontos);
                         $("#id_valor_total").text(data.valor_total);
                         // if(data.qtd_item > 0) {
                         //     $("#id_submit_iten").prop('disabled', false);
@@ -129,6 +139,8 @@
                         });
                         $("#item_locacao_tb tbody").html(data.html_item_list);
                         $("#genericModal").modal("hide");
+                        $("#id_sub_total").text(data.sub_total);
+                        $("#id_total_descontos").text(data.total_descontos);
                         $("#id_valor_total").text(data.valor_total);
                         // if(data.qtd_item > 0){
                         //     $("#id_submit_iten").prop('disabled', false);

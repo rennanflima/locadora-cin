@@ -14,6 +14,7 @@ from django.conf import settings
 from django.utils.text import slugify
 from django.template.defaultfilters import slugify as slug_template
 from django.core.mail import send_mail
+from django.utils.formats import localize
 
 # Create your models here.
 class User(AbstractBaseUser, PermissionsMixin):
@@ -116,7 +117,7 @@ class Estado(models.Model):
         return reverse('core:estado-detalhe', kwargs={'pk': self.pk})
     
     def clean(self):
-        self.nome = self.nome.lower().capitalize()
+        self.nome = self.nome.lower().title()
         self.sigla = self.sigla.upper()
 
 class Cidade(models.Model):
@@ -125,7 +126,7 @@ class Cidade(models.Model):
     estado = models.ForeignKey(Estado, on_delete=models.PROTECT)
 
     class Meta:
-        ordering = ['nome', 'estado',]
+        ordering = ['estado__nome', 'nome',]
         unique_together = ('nome', 'estado')
         verbose_name = 'Cidade'
         verbose_name_plural = 'Cidades'
@@ -205,6 +206,10 @@ class Filme(models.Model):
     
     def get_absolute_url(self):
         return reverse('core:filme-detalhe', kwargs={'pk': self.pk})
+
+    def generos(self):
+        return ', '.join([g.nome for g in self.genero.all()])
+    generos.short_description = "Gêneros associados ao Filme"
 
 class Elenco(models.Model):
     filme = models.ForeignKey(Filme, on_delete=models.CASCADE)
@@ -358,6 +363,9 @@ class Reserva(models.Model):
 
 class Locacao(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
+    sub_total = models.DecimalField('Sub-Total da Locação', max_digits=8, decimal_places=2, default=0)
+    total_descontos = models.DecimalField('Valor Total de Descontos', max_digits=8, decimal_places=2, default=0)
+    total_multas = models.DecimalField('Valor Total das Multas', max_digits=8, decimal_places=2, default=0)
     valor_total = models.DecimalField('Valor Total da Locação', max_digits=8, decimal_places=2, default=0)
     data_locacao = models.DateTimeField('Data de Locação', auto_now_add=True)
     situacao = models.CharField('Situação da Locação', max_length=20, choices=tipo_locacao, default='EM_ANDAMENTO')
@@ -369,6 +377,24 @@ class Locacao(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.cliente.user.get_full_name(), str(self.data_locacao))
+    
+    def save(self, *args, **kwargs):
+        self.valor_total = self.sub_total - self.total_descontos + self.total_multas        
+        super(Locacao, self).save(*args, **kwargs)
+
+    def valor_pago(self):
+        pagamentos = self.pagamento_set.all()
+        soma = 0
+        for p in pagamentos:
+            for i in p.informacoes_pagamentos.all():
+                if i.argumento.campo == 'Valor':
+                    if i.argumento.tipo_dado == 'DECIMAL':
+                        soma = soma + i.valor_decimal
+        
+        return soma
+
+    def is_editavel(self):
+        return self.situacao == 'EM_ANDAMENTO'
 
 
 class ItemLocacao(models.Model):
@@ -379,7 +405,10 @@ class ItemLocacao(models.Model):
         help_text='Designa se este filme deve ser tratado como lançamento. Desmarque esta opção se não for um lançamento.',
     )
     valor = models.DecimalField('Valor da Locação', max_digits=8, decimal_places=2, default=0)
+    desconto = models.DecimalField('Desconto da Locação', max_digits=8, decimal_places=2, default=0)
     data_devolucao_prevista = models.DateField('Data de Devolução Prevista', blank=True, null=True)
+    multa = models.DecimalField('Multa por Atraso', max_digits=8, decimal_places=2, default=0)
+    nova_data_devolucao = models.DateField('Nova Data de Devolução', blank=True, null=True)
     locacao = models.ForeignKey(Locacao, on_delete=models.PROTECT)
     
     class Meta:
@@ -392,6 +421,15 @@ class ItemLocacao(models.Model):
 
     def serialize(self):
         return self.__dict__
+
+    def valor_com_desconto(self):
+        return self.valor - self.desconto    
+
+    def data_devolucao(self):
+        if self.data_devolucao_prevista == self.nova_data_devolucao:
+            return self.data_devolucao_prevista
+        elif self.data_devolucao_prevista < self.nova_data_devolucao:
+            return self.nova_data_devolucao
     
 
 class FormaPagamento(models.Model):
@@ -406,9 +444,9 @@ class FormaPagamento(models.Model):
 
 
 class ArgumentoPagamento(models.Model):
-    argumento = models.CharField('Nome do argumento', max_length=100)
-    requerido = models.BooleanField('Argumento obrigatório?', default=False)
-    tipo_dado = models.CharField('Tipo de dado do argumento', max_length=20, choices=tipo_dado)
+    campo = models.CharField('Nome do campo', max_length=100)
+    is_requerido = models.BooleanField('Campo obrigatório?', default=False)
+    tipo_dado = models.CharField('Tipo de dado do campo', max_length=20, choices=tipo_dado)
     forma_pagamento = models.ManyToManyField(FormaPagamento)
     
     class Meta:
@@ -416,14 +454,14 @@ class ArgumentoPagamento(models.Model):
         verbose_name_plural = 'Argumentos dos Pagamentos'
 
     def __str__(self):
-        return '%s' % (self.argumento)
+        return '%s' % (self.campo)
 
     def pagamentos(self):
         return ', '.join([p.descricao for p in self.forma_pagamento.all()])
     pagamentos.short_description = "Formas de Pagamentos associados ao argumento"
 
     def slug(self):
-        return slug_template(self.argumento)
+        return slug_template(self.campo)
 
 
 class Pagamento(models.Model):
@@ -436,17 +474,54 @@ class Pagamento(models.Model):
         verbose_name = 'Pagamento'
         verbose_name_plural = 'Pagamentos'
 
+def pagamento_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return 'pagamentos/pagamento_{0}/{1}'.format(instance.pagamento.id, filename)
 
 class InformacaoPagamento(models.Model):
     argumento = models.ForeignKey(ArgumentoPagamento, related_name='informacoes_argumentos', on_delete=models.PROTECT)
     valor_texto = models.TextField('Valor da informação em Texto', blank=True, null=True)
     valor_inteiro = models.IntegerField('Valor da informação em Número Inteiro', blank=True, null=True)
     valor_decimal = models.DecimalField('Valor da informação em Número Decimal', decimal_places=2, max_digits=10, blank=True, null=True)
+    valor_data = models.DateField('Valor da informação em Data', blank=True, null=True)
+    valor_hora = models.TimeField('Valor da informação em Hora', blank=True, null=True)
     valor_data_hora = models.DateTimeField('Valor da informação em Data/Hora', blank=True, null=True)
     valor_boolean = models.BooleanField('Valor da informação Verdadeiro ou Falso', blank=True, null=True)
-    valor_arquivo = models.FileField('Valor da informação em Arquivo', upload_to='arquivo_pessoa/', blank=True, null=True)
-    pagamento = models.ForeignKey(Pagamento, on_delete=models.PROTECT)
+    valor_arquivo = models.FileField('Valor da informação em Arquivo', upload_to=pagamento_directory_path, blank=True, null=True)
+    pagamento = models.ForeignKey(Pagamento, on_delete=models.PROTECT, related_name='informacoes_pagamentos')
 
     class Meta:
         verbose_name = 'Informação do Pagamento'
         verbose_name_plural = 'Informações dos Pagamentos'
+
+    def __str__(self):
+        if self.argumento.tipo_dado == 'TEXTO':
+            return '%s: %s' % (self.argumento, self.valor_texto)
+        elif self.argumento.tipo_dado == 'INTEIRO':
+            return '%s: %i' % (self.argumento, self.valor_inteiro)
+        elif self.argumento.tipo_dado == 'DECIMAL':
+            return '%s: %d' % (self.argumento, localize(self.valor_decimal))
+        elif self.argumento.tipo_dado == 'BOOLEAN':
+            return '%s: %d' % (self.argumento, 'Sim' if self.valor_boolean else 'Não')
+        elif self.argumento.tipo_dado == 'DATA':
+            return '%s: %d' % (self.argumento, str(self.valor_data))
+        elif self.argumento.tipo_dado == 'HORA':
+            return '%s: %d' % (self.argumento, str(self.valor_hora))
+        elif self.argumento.tipo_dado == 'DATA_HORA':
+            return '%s: %s' % (self.argumento, str(self.valor_data_hora))
+    
+    def valor_argumento(self):
+        if self.argumento.tipo_dado == 'TEXTO':
+            return self.valor_texto
+        elif self.argumento.tipo_dado == 'INTEIRO':
+            return self.valor_inteiro
+        elif self.argumento.tipo_dado == 'DECIMAL':
+            return 'R$ ' + str(localize(self.valor_decimal))
+        elif self.argumento.tipo_dado == 'BOOLEAN':
+            return self.valor_boolean
+        elif self.argumento.tipo_dado == 'DATA':
+            return self.valor_data
+        elif self.argumento.tipo_dado == 'HORA':
+            return self.valor_hora
+        elif self.argumento.tipo_dado == 'DATA_HORA':
+            return self.valor_data_hora

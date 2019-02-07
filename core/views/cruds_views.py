@@ -439,7 +439,6 @@ def criar_cliente(request):
     form = ClienteForm()
     end_form = EnderecoForm()
     formset = TelefoneInlineFormSet(queryset=Telefone.objects.none())
-    role = Role.objects.get(id=Role.CLIENTE)
     today = date.today()
 
     if request.method == 'POST':
@@ -454,8 +453,6 @@ def criar_cliente(request):
                     user.perfil.cpf = form.cleaned_data.get('cpf')
                     user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
                     user.perfil.sexo = form.cleaned_data.get('sexo')
-                    
-                    user.roles.add(role)
                     
                     endereco = end_form.save()
                     user.perfil.endereco = endereco
@@ -587,7 +584,6 @@ def criar_dependente(request, pk):
     form = DependenteForm
 
     data = dict()
-    role = Role.objects.get(id=Role.CLIENTE)
     today = date.today()
 
     if request.method == 'POST':
@@ -600,7 +596,6 @@ def criar_dependente(request, pk):
                     user.perfil.cpf = form.cleaned_data.get('cpf')
                     user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
                     user.perfil.sexo = form.cleaned_data.get('sexo')
-                    user.roles.add(role)
                     user.save()
 
 

@@ -1,4 +1,5 @@
 {% load bootstrap4 %}
+{% load crispy_forms_tags %}
 
 <form method="POST" class="form js-item-add-form" action="{% url 'core:ajax-item-add' %}">
     {% csrf_token %}
@@ -11,6 +12,13 @@
     <div class="modal-body">
         <!-- <input type="hidden" id="id_locacao_pk"/> -->
         {% bootstrap_form form %}
+        <!-- {{ form.locacao|as_crispy_field }}
+        {{ form.item|as_crispy_field }}
+        {{ form.valor|as_crispy_field }}
+        {{ form.desconto|as_crispy_field }}
+        {{ form.data_devolucao_prevista|as_crispy_field }}
+        {{ form.is_nova_data|as_crispy_field }}
+        {{ form.nova_data_devolucao|as_crispy_field }} -->
     </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Adicionar Item</button>
@@ -20,6 +28,16 @@
 {% block javascript %}
     <script>
         $(function () {
+            $('#id_nova_data_devolucao').parent('div').hide();
+            $('input[name="is_nova_data"]').on('click', function(){
+                console.log('clicou');
+                if($(this).is(':checked')){
+                    console.log('Checked');
+                    $('#id_nova_data_devolucao').parent('div').show('speed');
+                } else{
+                    $('#id_nova_data_devolucao').parent('div').hide('speed');
+                }
+            });
             $('#id_item').change(function(){
                 var itemId = $(this).val();
                 var url =  "{% url 'core:ajax-item-carregar' %}";
@@ -28,7 +46,9 @@
                     data:{'item': itemId},
                     success: function(data){
                         $('#id_valor').val(data.valor).change();
+                        $('#id_desconto').val(0).change();
                         $('#id_data_devolucao_prevista').val(data.data_devolucao).change();
+                        $('#id_nova_data_devolucao').val(data.data_devolucao).change();
                     }
                 });
             });

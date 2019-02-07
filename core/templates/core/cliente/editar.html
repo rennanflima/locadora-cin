@@ -10,7 +10,8 @@
         <li class="breadcrumb-item ">
             <a href="{%url 'core:cliente-listar'%}">Clientes</a>
         </li>
-        <li class="breadcrumb-item active">Editar</li>
+        <li class="breadcrumb-item">Editar</li>
+        <li class="breadcrumb-item active">{{ form.instance }}</li>
     </ol>
 
     {% bootstrap_messages %}
@@ -112,6 +113,8 @@
 {% endblock conteudo %}
 {% block javascript %}
     <script>
+
+        $('#id_cpf').prop('disabled', true);
         function carregar_cidades(estado_id){
             var url =  "{% url 'core:ajax-cidades-carregar' %}";
             var estadoId = estado_id;

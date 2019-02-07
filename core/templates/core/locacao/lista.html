@@ -54,10 +54,10 @@
                             <tr class="text-center">
                                 <th scope="row"><a href="{% url 'core:locacao-detalhe' locacao.id %}">{{ locacao.cliente }}</a></th>
                                 <td>{{ locacao.data_locacao }}</td>
-                                <td>{{ locacao.valor_total }}</td>
+                                <td>R$ {{ locacao.valor_total }}</td>
                                 <td>{{ locacao.get_situacao_display }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:locacao-realizar-itens' locacao.id %}'">Editar</button>
+                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:locacao-realizar-itens' locacao.id %}'" {% if not locacao.is_editavel %}disabled="true"{% endif %} >Editar</button>
                                 </td>
                             </tr>
                         {% empty %}

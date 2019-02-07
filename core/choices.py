@@ -48,3 +48,13 @@ tipo_dado = (
     ('DATA_HORA', 'Data/Hora'),
 )
 
+operadoras_cartao = (
+    ('VISA','Visa'),
+    ('MASTERCARD','MasterCard'),
+    ('AMERICAN_EXPRESS','American Express'),
+    ('DINERS','Diners'),
+    ('HIPER','Hiper'),
+    ('ELO','Elo'),
+    ('BANRICOMPRAS','Banricompras'),
+    ('AURA','Aura'),
+)

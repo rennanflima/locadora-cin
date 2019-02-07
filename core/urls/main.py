@@ -23,6 +23,7 @@ urlpatterns = [
     path('locacao/realizar/', main.realizar_locacao, name="locacao-realizar"),
     path('locacao/realizar/<int:pk>/itens/', main.seleciona_itens_locacao, name="locacao-realizar-itens"),
     path('locacao/realizar/<int:pk>/confirmar/', main.confirmar_locacao, name="locacao-confirmar"),
+    path('locacao/realizar/<int:pk>/finalizar/', main.finalizar_locacao, name="locacao-finalizar"),
     
     path('locacao/<int:pk>/detalhe/', main.LocacaoDetalhe.as_view(), name="locacao-detalhe"),
     path('locacao/item/adicionar/', main.item_add, name='ajax-item-add'),
@@ -33,4 +34,5 @@ urlpatterns = [
 
     path('ajax/locacao/pagamento', main.pagamento_locacao, name="locacao-pagamento"),
     path('ajax/carregar/campos/', main.carregar_argumento_forma_pagamento, name="ajax-campos-carregar"), 
+    path('ajax/detalhe/pagamento/<int:pk>/', main.detalhe_pagamento, name="ajax-pagamento-detalhe"), 
 ]
