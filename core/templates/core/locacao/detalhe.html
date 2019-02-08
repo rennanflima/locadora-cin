@@ -95,7 +95,6 @@
         <hr>
         <a href="{% url 'core:locacao-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
         <a href="{% url 'core:locacao-realizar' %}" class="btn btn-primary ml-2 float-right">Realizar outra Locação</a>
-        {{locacao.is_editavel}}
         <a href="{% url 'core:locacao-realizar-itens' locacao.pk %}" class="btn btn-success ml-2 float-right {% if not locacao.is_editavel %}disabled{% endif %}" {% if not locacao.is_editavel %}tabindex="-1" role="button" aria-disabled="true"{% endif %}>Editar Locação</a>
     </div>
 {% endblock conteudo %}

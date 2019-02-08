@@ -30,9 +30,14 @@ urlpatterns = [
     path('locacao/item/<int:pk>/editar/', main.item_edit, name='ajax-item-update'),
     path('locacao/item/<int:pk>/deletar/', main.item_delete, name='ajax-item-delete'),
     path('ajax/carregar/item/', main.carregar_item_ajax, name="ajax-item-carregar"),
-    path('locacao/<int:pk>/detalhe/', main.LocacaoDetalhe.as_view(), name="locacao-detalhe"),
 
     path('ajax/locacao/pagamento', main.pagamento_locacao, name="locacao-pagamento"),
     path('ajax/carregar/campos/', main.carregar_argumento_forma_pagamento, name="ajax-campos-carregar"), 
     path('ajax/detalhe/pagamento/<int:pk>/', main.detalhe_pagamento, name="ajax-pagamento-detalhe"), 
+
+    path('devolucao/', main.DevolucaoListar.as_view(), name="devolucao-listar"),
+    path('devolucao/realizar/', main.DevolucaoCriar.as_view(), name="devolucao-realizar"),
+    path('devolucao/<int:pk>/detalhe/', main.DevolucaoDetalhe.as_view(), name="devolucao-detalhe"),
+    path('ajax/carregar/item/devolucao', main.carrega_item_devolucao_ajax, name="ajax-item-carregar-devolucao"),
+
 ]

@@ -6,7 +6,7 @@
         <hr>
         <form method="post">
             {% csrf_token %}
-            <p>Você tem certeza que quer cancelar a Reserva "{{ object }}"?</p>
+            <p>Você tem certeza que quer cancelar a Reserva "{{ reserva }}"?</p>
             <input type="submit" class="btn btn-danger" value="Sim, tenho certeza">
             <a href="#" class="btn btn-secondary" onclick="window.history.back(); return false;" class="button cancel-link">Não, me leve de volta</a>
         </form>

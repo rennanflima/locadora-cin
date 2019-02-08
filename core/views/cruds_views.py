@@ -575,6 +575,19 @@ def cliente_desativar(request, pk):
     historico.cliente = cliente
     historico.situacao_cliente = False
     historico.save()
+
+    dependentes = Cliente.objects.filter(titular=cliente)
+
+    for d in dependentes:
+        d.is_active = False
+        d.save()
+
+        historico = HistoricoCliente()
+        historico.cliente = d
+        historico.titular = cliente
+        historico.situacao_cliente = False
+        historico.save()
+
     
     messages.success(request, 'Cliente desativado com sucesso')
     return HttpResponseRedirect(reverse_lazy('core:cliente-listar'))
@@ -598,6 +611,10 @@ def cliente_ativar(request, pk):
 # Inicio CRUD Dependente
 def criar_dependente(request, pk):
     titular = get_object_or_404(Cliente, pk=pk)
+
+    if titular.quantidade_dependentes() == 3:
+        messages.error(request, 'O número máximo de dependentes foi alcançado.')
+        return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))
     
     form = DependenteForm
 

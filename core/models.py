@@ -10,6 +10,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from core.managers import UserManager
 from datetime import date
+from datetime import timedelta 
 from django.conf import settings
 from django.utils.text import slugify
 from django.template.defaultfilters import slugify as slug_template
@@ -330,6 +331,10 @@ class Cliente(models.Model):
     def get_absolute_url(self):
         return reverse('core:cliente-detalhe', kwargs={'pk': self.pk})
 
+    def quantidade_dependentes(self):
+        return Cliente.objects.filter(titular=self, is_active=True).count()
+        
+
 
 class HistoricoCliente(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, related_name='historico_cliente')
@@ -373,7 +378,6 @@ class Locacao(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     sub_total = models.DecimalField('Sub-Total da Locação', max_digits=8, decimal_places=2, default=0)
     total_descontos = models.DecimalField('Valor Total de Descontos', max_digits=8, decimal_places=2, default=0)
-    total_multas = models.DecimalField('Valor Total das Multas', max_digits=8, decimal_places=2, default=0)
     valor_total = models.DecimalField('Valor Total da Locação', max_digits=8, decimal_places=2, default=0)
     data_locacao = models.DateTimeField('Data de Locação', auto_now_add=True)
     situacao = models.CharField('Situação da Locação', max_length=20, choices=tipo_locacao, default='EM_ANDAMENTO')
@@ -385,10 +389,9 @@ class Locacao(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.cliente.user.get_full_name(), str(self.data_locacao))
-    
-    def save(self, *args, **kwargs):
-        self.valor_total = self.sub_total - self.total_descontos + self.total_multas        
-        super(Locacao, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('core:locacao-detalhe', kwargs={'pk': self.pk})
 
     def valor_pago(self):
         pagamentos = self.pagamento_set.all()
@@ -404,6 +407,10 @@ class Locacao(models.Model):
     def is_editavel(self):
         return self.situacao == 'EM_ANDAMENTO'
 
+    def save(self, *args, **kwargs):
+        self.valor_total = self.sub_total - self.total_descontos      
+        super(Locacao, self).save(*args, **kwargs)
+
 
 class ItemLocacao(models.Model):
     item = models.ForeignKey(Item, on_delete=models.PROTECT)
@@ -415,17 +422,17 @@ class ItemLocacao(models.Model):
     valor = models.DecimalField('Valor da Locação', max_digits=8, decimal_places=2, default=0)
     desconto = models.DecimalField('Desconto da Locação', max_digits=8, decimal_places=2, default=0)
     data_devolucao_prevista = models.DateField('Data de Devolução Prevista', blank=True, null=True)
-    multa = models.DecimalField('Multa por Atraso', max_digits=8, decimal_places=2, default=0)
     nova_data_devolucao = models.DateField('Nova Data de Devolução', blank=True, null=True)
     locacao = models.ForeignKey(Locacao, on_delete=models.PROTECT)
-    
+    is_pago = models.BooleanField('Pago?', default=False)
+
     class Meta:
         # ordering = ['data_reserva',]
         verbose_name = 'Item de Locação'
         verbose_name_plural = 'Itens de Locação'
 
     def __str__(self):
-        return "%s - %s" % (self.item, str(self.data_devolucao_prevista))
+        return "%s, locado pelo cliente: %s" % (self.item, self.locacao.cliente)
 
     def serialize(self):
         return self.__dict__
@@ -438,7 +445,30 @@ class ItemLocacao(models.Model):
             return self.data_devolucao_prevista
         elif self.data_devolucao_prevista < self.nova_data_devolucao:
             return self.nova_data_devolucao
+
+    def calcular_multa(self, data_entrega):
+        diferenca = data_entrega - self.data_devolucao()
+        return diferenca.days * self.valor
     
+
+class Devolucao(models.Model):
+    item = models.OneToOneField(ItemLocacao, on_delete=models.PROTECT, primary_key=True)
+    data_devolucao = models.DateTimeField('Data de Devolução', auto_now_add=True)
+    multa = models.DecimalField('Multa por Atraso', max_digits=8, decimal_places=2, default=0, blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Devolução'
+        verbose_name_plural = 'Devoluções'
+
+    def __str__(self):
+        return "%s - %s" % (self.item.item, localize(self.data_devolucao))
+
+    def get_absolute_url(self):
+        return reverse('core:devolucao-detalhe', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super(Devolucao, self).save(*args, **kwargs)
+
 
 class FormaPagamento(models.Model):
     descricao = models.CharField('Descrição', max_length=100, unique=True)
@@ -475,8 +505,8 @@ class ArgumentoPagamento(models.Model):
 class Pagamento(models.Model):
     forma_pagamento = models.ForeignKey(FormaPagamento, on_delete=models.PROTECT)
     data_pagamento = models.DateTimeField('Data de Pagamento', auto_now_add=True)
-    locacao = models.ForeignKey(Locacao, on_delete=models.PROTECT)
-    # devolucao = models.ForeignKey(Pagamento)
+    locacao = models.ForeignKey(Locacao, on_delete=models.PROTECT, blank=True, null=True)
+    devolucao = models.ForeignKey(Devolucao, on_delete=models.PROTECT, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Pagamento'
@@ -533,3 +563,8 @@ class InformacaoPagamento(models.Model):
             return self.valor_hora
         elif self.argumento.tipo_dado == 'DATA_HORA':
             return self.valor_data_hora
+
+
+
+
+    

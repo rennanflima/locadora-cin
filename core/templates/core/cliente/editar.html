@@ -114,7 +114,7 @@
 {% block javascript %}
     <script>
 
-        $('#id_cpf').prop('disabled', true);
+        $('#id_cpf').prop('readonly', true);
         function carregar_cidades(estado_id){
             var url =  "{% url 'core:ajax-cidades-carregar' %}";
             var estadoId = estado_id;
