@@ -432,6 +432,24 @@ class ItemDeletar(SuccessMessageMixin, generic.DeleteView):
         messages.success(self.request, self.success_message)
         return super(ItemDeletar, self).delete(request, *args, **kwargs)
 
+@transaction.atomic
+def item_desativar(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    item.is_active = False
+    item.save()
+    
+    messages.success(request, 'Item desativado com sucesso')
+    return HttpResponseRedirect(reverse_lazy('core:item-listar'))
+
+@transaction.atomic
+def item_ativar(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    item.is_active = True
+    item.save()
+
+    messages.success(request, 'Item ativado com sucesso')
+    return HttpResponseRedirect(reverse_lazy('core:item-listar'))
+
 
 # Início CRUD Cliente
 

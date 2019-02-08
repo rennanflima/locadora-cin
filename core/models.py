@@ -254,6 +254,14 @@ class Item(models.Model):
     tipo_midia = models.ForeignKey(Midia, on_delete=models.PROTECT, related_name='itens_midia', related_query_name='item_midia')
     filme = models.ForeignKey(Filme, on_delete=models.PROTECT, related_name='itens_filme', related_query_name='item_filme')
     quantidade = models.PositiveIntegerField('Número de Cópias', default=1)
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=_(
+            'Designates whether this item should be treated as active. '
+            'Unselect this instead of deleting items.'
+        ),
+    )
 
     class Meta:
         ordering = ['data_aquisicao',]

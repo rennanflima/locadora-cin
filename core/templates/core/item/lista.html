@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load bootstrap4 %}
+{% load static %} 
 
 
 {% block conteudo %}
@@ -35,6 +36,7 @@
                         <tr>
                             <th scope="col">Filme</th>
                             <th scope="col">Tipo de Mídia</th>
+                            <th scope="col">Ativo?</th>
                             <th scope="col">Ações</th>
                         </tr>
                     </thead>
@@ -42,6 +44,7 @@
                         <tr>
                             <th>Filme</th>
                             <th>Tipo de Mídia</th>
+                            <th>Ativo?</th>
                             <th>Opções</th>
                         </tr>
                     </tfoot>
@@ -51,6 +54,18 @@
                                 <th scope="row"><a href="{% url 'core:item-detalhe' item.id %}">{{ item.filme }}</a></th>
                                 <td>{{ item.tipo_midia }}</td>
                                 <td>
+                                    {% if item.is_active %}
+                                        <img src="{% static '/img/icon_yes.svg' %}" width="17" height="17" alt="Sim"/>
+                                    {% else %}
+                                        <img src="{% static '/img/icon_no.svg' %}" width="17" height="17" alt="Não"/>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.is_active %}
+                                        <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:item-desativar' item.id %}'">Desativar</button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:item-ativar' item.id %}'">Ativar</button>
+                                    {% endif %}
                                     <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:item-editar' item.id %}'">Editar</button>
                                     <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:item-deletar' item.id %}'">Excluir</button>
                                 </td>
