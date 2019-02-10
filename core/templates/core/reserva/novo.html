@@ -1,0 +1,57 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+
+
+{% block conteudo %}
+<!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'core:index'%}">Início</a>
+        </li>
+        <li class="breadcrumb-item ">
+            <a href="{%url 'core:reserva-listar'%}">Reserva</a>
+        </li>
+        <li class="breadcrumb-item active">Novo</li>
+    </ol>
+
+    {% bootstrap_messages %}
+
+    <div class="container-fluid">
+        <h2>Adicionar Reserva</h2>
+        <hr>
+        <form method="POST" class="form">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <hr>
+            <a href="{%url 'core:reserva-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+            <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Reserva</button>
+        </form>
+    </div>
+{% endblock conteudo %}
+{% block javascript %}
+    <script>
+
+        function carregar_midias(filme_id){
+            var url =  "{% url 'core:ajax-midias-carregar' %}";
+            var filmeId = filme_id;
+            var dfd = $.Deferred();
+
+            $.ajax({
+                url: url,
+                data:{'filme': filmeId},
+                success: function(data){
+                    $('#id_midia').html(data);
+                    dfd.resolve();
+                }
+            });
+            return dfd.promise();
+        }
+
+        $('#id_filme').change(function(){
+            var filmeId = $(this).val();
+            carregar_midias(filmeId);
+        });
+
+    </script>
+{% endblock javascript %}

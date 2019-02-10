@@ -1,0 +1,56 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+
+
+{% block conteudo %}
+<!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'core:index'%}">Início</a>
+        </li>
+        <li class="breadcrumb-item ">
+            <a href="{%url 'core:dependente-listar' pk %}">Dependentes</a>
+        </li>
+        <li class="breadcrumb-item active">Novo</li>
+    </ol>
+
+    {% bootstrap_messages %}
+
+    <div class="container-fluid">
+        <h2>Adicionar Dependente</h2>
+        <hr>
+        <form method="POST" class="form">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="col-md-6">
+                    {{ form.first_name|as_crispy_field }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.last_name|as_crispy_field }}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col">
+                    {{ form.email|as_crispy_field }}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-4">
+                    {{ form.cpf|as_crispy_field }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.data_nascimento|as_crispy_field }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.sexo|as_crispy_field }}
+                </div>
+            </div>
+            <div class="form-actions">
+                <hr>
+                <a href="{%url 'core:dependente-listar' pk %}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+                <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Dependente</button>
+            </div>
+        </form>
+    </div>
+{% endblock conteudo %}

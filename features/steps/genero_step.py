@@ -16,7 +16,7 @@ def step_impl(context):
 
 @then('Eu clico no botão salvar')
 def step_impl(context):
-    context.browser.find_element_by_id("id_submit").click()
+    context.browser.find_element_by_id("id_submit_genero").click()
 
 @then('Eu sou redirecionado para a tela de detalhes')
 def step_impl(context):

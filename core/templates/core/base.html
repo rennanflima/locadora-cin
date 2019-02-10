@@ -29,6 +29,7 @@
 
         <!-- Custom styles for this template-->
         <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet">
+        <link href="{% static 'css/jquery-ui.css' %}" rel="stylesheet">
         <link href="{% static 'vendor/bootstrap-toggle/css/bootstrap-toggle.min.css' %}" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'vendor/notifyMessage/css/notifyMessage.css' %}">
     </head>
@@ -37,7 +38,7 @@
 
         <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
-            <a class="navbar-brand mr-1" href="{% url 'admin:index'%}">Locadora Imperial</a>
+            <a class="navbar-brand mr-1" href="{% url 'core:index'%}">Locadora Imperial</a>
 
             <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
                 <i class="fas fa-bars"></i>
@@ -100,35 +101,43 @@
             <!-- Sidebar -->
             <ul class="sidebar navbar-nav">
                 <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'admin:index'%}">
+                    <a class="nav-link" href="{% url 'core:index'%}">
                         <i class="fas fa-fw fa-tachometer-alt"></i>
                         <span>Início</span>
                     </a>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-fw fa-folder"></i>
+                        <span>Cadastro</span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="pagesDropdown">
+                        <a class="dropdown-item" href="{% url 'core:genero-listar' %}"><i class="fas fa-fw fa-venus-mars"></i> Gênero</a>
+                        <a class="dropdown-item" href="{% url 'core:midia-listar' %}"><i class="fas fa-compact-disc"></i> Mídia</a>
+                        <a class="dropdown-item" href="{% url 'core:distribuidora-listar' %}"><i class="fas fa-city"></i></i> Distribuidora</a>
+                        <a class="dropdown-item" href="{% url 'core:filme-listar' %}"><i class="fas fa-fw fa-film"></i> Filmes</a>
+                        <a class="dropdown-item" href="{% url 'core:item-listar' %}"><i class="fas fa-file"></i> Item</a>
+                        <a class="dropdown-item" href="{% url 'core:cliente-listar' %}"><i class="fas fa-fw fa-user-plus"></i> Cliente</a>
+                    </div>
+                </li> 
                 <li class="nav-item">
-                    <a class="nav-link" href="{%url 'admin:filme-listar'%}">
+                    <a class="nav-link" href="{%url 'core:filme-listar'%}">
                         <i class="fas fa-fw fa-film"></i>
                         <span>Filmes</span>
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admin:genero-listar' %}">
-                      <i class="fas fa-fw fa-venus-mars"></i>
-                      <span>Gênero</span>
+                    <a class="nav-link" href="{%url 'core:reserva-listar'%}">
+                        <i class="fas fa-fw fa-calendar-check"></i>
+                        <span>Reservas</span>
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-fw fa-user-plus"></i>
-                        <span>Usuário</span>
+                    <a class="nav-link" href="{%url 'core:locacao-listar'%}">
+                        <i class="fas fa-fw fa-level-down-alt"></i>
+                        <span>Locações</span>
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admin:midia-listar' %}">
-                        <i class="fas fa-compact-disc"></i>
-                        <span>Mídia</span>
+                    <a class="nav-link" href="{%url 'core:devolucao-listar'%}">
+                        <i class="fas fa-fw fa-level-up-alt"></i>
+                        <span>Devoluções</span>
                     </a>
-                </li>          
+                </li>        
             </ul>
 
             <div id="content-wrapper">
@@ -201,6 +210,7 @@
         <script src="{% static 'vendor/popper/popper.min.js' %}"></script>
         <script src="{% static 'vendor/notifyMessage/js/notifyMessage.js' %}"></script>
         <script src="{% static 'js/jquery.formset.js' %}"></script>
+        <script src="{% static 'js/jquery-ui.js' %}"></script>
         <script src="{% static 'vendor/bootstrap-toggle/js/bootstrap-toggle.min.js' %}"></script>
 
         <!-- Custom scripts for all pages-->
@@ -214,7 +224,7 @@
                 });
             });
 
-            $('.data').mask('00/00/0000');
+            $('.date').mask('00/00/0000');
 
             $('.date_time').mask('00/00/0000 00:00:00');
 
@@ -222,18 +232,33 @@
 
             $('.cep').mask('00000-000');
 
+            $('.cpf').mask('000.000.000-00', {reverse: true});
+
+            $('.cnpj').mask('00.000.000/0000-00', {reverse: true});
+
             $('.money2').mask("#.##0,00", {reverse: true});
 
-            var SPMaskBehavior = function (val) {
+            var PhoneDDMaskBehavior = function (val) {
                 return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
             },
             spOptions = {
                 onKeyPress: function(val, e, field, options) {
-                    field.mask(SPMaskBehavior.apply({}, arguments), options);
+                    field.mask(PhoneDDMaskBehavior.apply({}, arguments), options);
+                }
+            };
+            
+            $('.phone_with_ddd').mask(PhoneDDMaskBehavior, spOptions);
+
+            var PhoneMaskBehavior = function (val) {
+                return val.replace(/\D/g, '').length === 11 ? '00000-0000' : '0000-00009';
+            },
+            phoneOptions = {
+                onKeyPress: function(val, e, field, options) {
+                    field.mask(PhoneMaskBehavior.apply({}, arguments), options);
                 }
             };
 
-            $('.sp_celphones').mask(SPMaskBehavior, spOptions);
+            $('.phone').mask(PhoneMaskBehavior, phoneOptions);
 
             $('.formset').formset({
                 addText: 'Adicionar outro',

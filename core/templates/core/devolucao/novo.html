@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+
+
+{% block conteudo %}
+<!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'core:index'%}">Início</a>
+        </li>
+        <li class="breadcrumb-item ">
+            <a href="{% url 'core:devolucao-listar' %}">Devoluções</a>
+        </li>
+        <li class="breadcrumb-item active">Novo</li>
+    </ol>
+
+    {% bootstrap_messages %}
+
+    <div class="container-fluid">
+        <h2>Realizar Devolução</h2>
+        <hr>
+        <form method="POST" class="form">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <hr>
+            <a href="{% url 'core:devolucao-listar' %}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+            <button id="id_submit_devolucao" type="submit" class="btn btn-success ml-2 float-right">Devolver item</button>
+            
+        </form>
+    </div>
+{% endblock conteudo %}
+{% block javascript %}
+    <script>
+        $('#id_multa').parent('div').hide();
+        $('#id_item').change(function(){
+            var itemId = $(this).val();
+            $.ajax({
+                url: "{% url 'core:ajax-item-carregar-devolucao' %}",
+                data:{'item': itemId},
+                success: function(data){
+                    console.log(data.multa)
+                    if (data.multa > 0) {
+                        $('#id_multa').parent('div').show("speed");
+                        $('#id_multa').val(data.multa).change();
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock javascript %}

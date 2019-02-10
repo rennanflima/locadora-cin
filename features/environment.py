@@ -2,7 +2,7 @@ from selenium import webdriver
 import os
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'locadora.settings.behave')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'locadora.settings.development')
 
 django.setup()
 

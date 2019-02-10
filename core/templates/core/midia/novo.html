@@ -7,10 +7,10 @@
 <!-- Breadcrumbs-->
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="{% url 'admin:index'%}">Início</a>
+            <a href="{% url 'core:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item ">
-            <a href="{%url 'admin:midia-listar'%}">Mídias</a>
+            <a href="{%url 'core:midia-listar'%}">Mídias</a>
         </li>
         <li class="breadcrumb-item active">Novo</li>
     </ol>
@@ -22,7 +22,14 @@
         <hr>
         <form method="POST" class="form">
             {% csrf_token %}
-            {% crispy form %}            
+            {{ form.nome|as_crispy_field }}
+            {{ form.valor|as_crispy_field }}
+            <div class="form-actions">
+                <hr>
+                <a href="{% url 'core:filme-novo' %}" class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Filme</a>
+                <a href="{% url 'core:midia-listar' %}" class='btn btn-danger ml-2 float-right'>Cancelar</a>
+                <input type="submit" name="save_changes" value="Adicionar Tipo de Mídia" class="btn btn-success ml-2 mb-4 float-right" id="submit-id-save_changes"/>
+            </div>
         </form>
     </div>
 {% endblock conteudo %}
