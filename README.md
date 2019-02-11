@@ -24,7 +24,7 @@ Para o desenvolvimento desse projeto, formamos uma equipe de 5 pessoas com as se
 
 Função| Responsabildade| Responsável                      | E-mail     
 ---------|-----------|----------------------------------|-----------
-Arquiteto| Analisa as necessidades do projeto e define a abordagem a ser utilizada  | Woshington Valdeci| wvs2@ci.ufpe.br
-Analista de Testes| Constrói os testes de comportamento| Clayton Ricardo| crf@ci.ufpe.br 
-Programador| Responsável técnico pela codificação do sistema| Rennan Francisco| rfml@ci.ufpe.br
-Web Designer| Construção dos templates| Jeferson Anunciação & Iago Viana | jja@ci.ufpe.br & ivm@ci.ufpe.br
+Arquiteto| Analisa as necessidades do projeto e define a abordagem a ser utilizada  | Woshington Valdeci| wvs2@cin.ufpe.br
+Analista de Testes| Constrói os testes de comportamento| Clayton Ricardo| crf@cin.ufpe.br 
+Programador| Responsável técnico pela codificação do sistema| Rennan Francisco| rfml@cin.ufpe.br
+Web Designer| Construção dos templates| Jeferson Anunciação & Iago Viana | jja@ci.ufpe.br & ivm@cin.ufpe.br

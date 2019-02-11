@@ -5,24 +5,39 @@ python:
   # - "3.7"
 
 # env:
-#   - SECRET_KEY=TopSecretKey DEBUG=True ALLOWED_HOSTS=127.0.0.1 #Configuração das variáveis de ambiente
+#   global:
+#     - CXX=g++-4.8
+#     - DISPLAY=:99.0
+#     - CHROME_BIN=/usr/bin/google-chrome
 addons:
-  - firefox: "latest"
+  chrome: stable
 before_install:
   - wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz
   - mkdir geckodriver
   - tar -xzf geckodriver-v0.23.0-linux64.tar.gz -C geckodriver
   - export PATH=$PATH:$PWD/geckodriver
+  # Chrome driver
+  - wget -N https://chromedriver.storage.googleapis.com/2.45/chromedriver_linux64.zip -P ~/
+  - unzip ~/chromedriver_linux64.zip -d ~/
+  - rm ~/chromedriver_linux64.zip
+  - sudo mv -f ~/chromedriver /usr/local/share/
+  - sudo chmod +x /usr/local/share/chromedriver
+  - sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
 install:
   - pip install --upgrade pip
   - pip install -r requirements.txt
-# before_script:
-#   - echo "DEBUG=False" >> .env
+before_script:
+  - python manage.py migrate
+  - python manage.py runserver &
+  - sleep 3 # give django server time to bind to sockets
 script:
+  - whereis google-chrome-stable
+  - whereis chromedriver
   - tox
   - coverage run -m pytest
   - behave
   - coverage report -m
-
+# after_script:
+#   - "sh -e /etc/init.d/xvfb stop"
 after_success:
   coveralls
