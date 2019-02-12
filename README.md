@@ -16,7 +16,7 @@ A videolocadora imperial necessita de um sistema de informação que irá automa
  
 ## Descrição do Produto
 
-O __locadora_cin__ é um sistema gerencial feito sob demanda cuja finalidade é gerenciar as atividades de locação, reserva e consulta de acervo para videolocadoras, em especial a locadora imperial, contratante deste objeto.
+O __locadora_cin__ é um sistema gerencial feito sob demanda cuja finalidade é gerenciar as atividades de locação, reserva e consulta de acervo para videolocadoras, em especial a locadora imperial, contratante deste objeto, o sistema está disponivel em: https://locadora-cin.herokuapp.com/
 
 ## Equipe
 
