@@ -19,7 +19,7 @@
         <h2>Detalhar Item</h2>
         <hr>
         {% if item.filme.capa %}
-            <img src="{{ item.filme.capa.url }}" class="img-thumbnail col-2" style="float: right; min-width: 182px;"/>
+            <img src="{{ item.filme.capa.url }}" class="img-thumbnail col-2 mb-4" style="float: right; min-width: 182px;"/>
         {% else %}
             <div class="col-2" style="float: right;">
                 <i class="fas fa-file-image fa-10x"></i>
@@ -40,12 +40,8 @@
         <div class="form-group">
             <label class="negrito">Número de Série: </label>    
             {{ item.numero_serie }}
-        </div> 
-        <div class="form-group">
-            <label class="negrito">Número de Cópias: </label>    
-            {{ item.quantidade }}
         </div>
-        <hr>
+        <hr style="clear: both;">
         <a href="{% url 'core:item-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
         <a href="{% url 'core:item-novo' %}" class="btn btn-primary ml-2 float-right">Adicionar outro Item</a>
         <a href="{% url 'core:item-editar' item.id %}" class="btn btn-success ml-2 float-right">Editar Item</a>

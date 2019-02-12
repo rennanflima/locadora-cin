@@ -1,6 +1,6 @@
 {% load bootstrap4 %}
 
-<form method="POST" class="form js-pagamento-add-form" action="{% url 'core:locacao-pagamento' pk %}">
+<form method="POST" class="form js-pagamento-add-form" action="{% url 'core:item-pagamento' %}">
     {% csrf_token %}
     <div class="modal-header">
         <h5 class="modal-title" id="itemAddModalLabel">Adicionar Pagamento</h5>
@@ -9,8 +9,7 @@
         </button>
     </div>
     <div class="modal-body">
-        <input type="hidden" name="locacao" id="id_locacao">
-        <input type="hidden" name="devolucao" id="id_devolucao">
+        <input type="hidden" name="item" id="id_item">
         <div class="form-group">
             <label for="id_forma_pagamento">Forma de Pagamento</label>
             <select name="forma_pagamento" class="form-control" title="" required="" id="id_forma_pagamento">
@@ -27,18 +26,7 @@
         <div class="form-group">
             <label for="id_valor">Valor do Pagamento</label>
             <input type="text" name="valor" class="form-control money2" placeholder="Valor do Pagamento" title="" required="true" id="id_valor">
-        </div>
-
-        <div class="form-group">
-            <label for="id_itens">Itens de Locação</label>
-            <select name="itens" class="form-control selectmultiple" title="" required="true" id="id_itens" multiple>
-                {% for i in itens_list %}
-                    <option value="{{ i.pk }}">{{ i.item }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        
+        </div>        
     </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Adicionar Pagamento</button>

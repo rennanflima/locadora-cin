@@ -238,7 +238,7 @@ class DistribuidoraForm(forms.ModelForm):
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ('filme', 'tipo_midia', 'numero_serie', 'data_aquisicao', 'quantidade',)
+        fields = ('filme', 'tipo_midia', 'numero_serie', 'data_aquisicao', )
     
     def __init__(self, *args, **kwargs):
         super(ItemForm, self).__init__(*args, **kwargs)

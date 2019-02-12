@@ -15,11 +15,13 @@ from django.utils.formats import localize
 from django.core.serializers import serialize
 from django.db import transaction
 import json
+import decimal
 # Email com template html
 from django.template.loader import get_template
 from django.core.mail import send_mail, EmailMessage
 from threading import Thread
 import threading
+
 
 
 class SendMailHTML (threading.Thread):
@@ -85,6 +87,14 @@ class ReservaCriar(SuccessMessageMixin, generic.CreateView):
     template_name = 'core/reserva/novo.html'
     success_message = "Reserva adicionada com sucesso."
 
+    def form_valid(self, form):
+        cliente = form.cleaned_data.get('cliente')
+        filme = form.cleaned_data.get('filme')
+        midia = form.cleaned_data.get('midia')
+        text_msg = "Olá, " + str(cliente) + ". \r\n\r\nInformamos que sua reserva para o filme "+ str(filme)+" ("+ str(midia) +") foi efetivada no dia " + str(localize(datetime.now())) + ". \r\n\r\nPara mais informações visite nossa loja e/ou procure um de nossos funcionários. \r\n\r\nAtenciosamente, Locadora Imperial."
+        SendMail('[Locadora Imperial] Cancelamento de reserva',text_msg, cliente.user.email).start()
+        return super(ReservaCriar, self).form_valid(form)
+
 class ReservaDetalhe(generic.DetailView):
     model = Reserva
     context_object_name = 'reserva'
@@ -113,7 +123,6 @@ def reserva_cancelar(request, pk):
         return HttpResponseRedirect(reverse_lazy('core:reserva-listar'))
     
     return render(request, 'core/reserva/cancelar.html', {'reserva': reserva})
-
 
 
 # Início das views de Locação
@@ -183,7 +192,12 @@ def finalizar_locacao(request, pk):
             messages.error(request, 'Locação não pode ser editada.')
             return HttpResponseRedirect(reverse_lazy('core:locacao-listar'))
     itens = ItemLocacao.objects.filter(locacao=locacao)
-    pagamentos = Pagamento.objects.filter(locacao=locacao)
+    pagamentos = []
+    for i in itens:
+        pgts = i.pagamentos.all()
+        if pgts:
+            for p in pgts:
+                pagamentos.append(p)
     valor_restante = locacao.valor_total - locacao.valor_pago()
     if request.method == 'POST':
         if valor_restante == 0:
@@ -277,9 +291,9 @@ def carregar_item_ajax(request):
     item = get_object_or_404(Item, pk=item_id)
 
     if item.filme.is_lancamento:
-        data['valor'] = localize(item.tipo_midia.valor * 1.5)
+        data['valor'] = localize(decimal.Decimal(item.tipo_midia.valor) * 1.5)
     else:    
-        data['valor'] = localize(item.tipo_midia.valor) 
+        data['valor'] = localize(decimal.Decimal(item.tipo_midia.valor))
     
     today = date.today()
     if item.filme.is_lancamento:
@@ -296,104 +310,108 @@ class LocacaoDetalhe(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(LocacaoDetalhe, self).get_context_data(**kwargs)
-        context['item_list'] = ItemLocacao.objects.filter(locacao=self.object)
-        context['pagamentos'] = Pagamento.objects.filter(locacao=self.object)
+        itens = ItemLocacao.objects.filter(locacao=self.object)
+        context['item_list'] = itens
+        pagamentos = []
+        for i in itens:
+            pgts = i.pagamentos.all()
+            if pgts:
+                for p in pgts:
+                    pagamentos.append(p)
+
+        context['pagamentos'] = pagamentos
         return context
 
 
 @transaction.atomic
-def pagamento_locacao(request):
+def pagamento_locacao(request, pk):
     data = dict()
     formas_pagamento = FormaPagamento.objects.all()
+    locacao = Locacao.objects.get(pk=pk)
+    itens_list = ItemLocacao.objects.filter(locacao=locacao)
     if request.method == 'POST':
-        data['form_is_valid'] = True
-        fp_id = request.POST.get('forma_pagamento')
-        lc_id = request.POST.get('locacao')
-        dv_id = request.POST.get('devolucao')
-
-        if lc_id:
-            locacao = Locacao.objects.get(pk=lc_id)
-            
-        if dv_id:
-            devolucao = Devolucao.objects.get(pk=dv_id)
+        itens = request.POST.getlist('itens')
+        if itens_list.count() == len(itens):
+            valor = request.POST.get('valor')
+            if  decimal.Decimal(valor) < locacao.valor_total:
+                data['form_is_valid'] = False
+                data['message'] = 'Valor informado de R$ %s está abaixo do valor total da locação: R$ %s' % (localize(decimal.Decimal(valor)), localize(locacao.valor_total))
         else:
-            devolucao = None
-        
-        forma_pagamento = FormaPagamento.objects.get(pk=fp_id)
-        argumentos = ArgumentoPagamento.objects.filter(forma_pagamento=forma_pagamento)
+            fp_id = request.POST.get('forma_pagamento')
+            valor = request.POST.get('valor')
+            soma = 0
+            for i in itens:
+                il = ItemLocacao.objects.get(pk=i)
+                soma = soma + il.valor_locacao()
 
-        pagamento = Pagamento()
-        pagamento.locacao = locacao
-        if devolucao:
-            pagamento.devolucao = devolucao
-        pagamento.forma_pagamento = forma_pagamento
-        pagamento.save()
-        
-        campos = dict()
-        for arg in argumentos:
-            campos[arg.slug()] = arg.pk
+            if decimal.Decimal(valor) < soma:
+                data['form_is_valid'] = False
+                data['message'] = 'Valor informado de R$ %s está abaixo do valor da soma do(s) iten(s) informado(s): R$ %s' % (localize(decimal.Decimal(valor)), localize(soma))
+            else:
+                data['form_is_valid'] = True
+                forma_pagamento = FormaPagamento.objects.get(pk=fp_id)
+                argumentos = ArgumentoPagamento.objects.filter(forma_pagamento=forma_pagamento)
 
-        for k, v in campos.items():
-            vlr = request.POST.get(k)
-            arg = ArgumentoPagamento.objects.get(pk=v)
-            info_pg = InformacaoPagamento()
-            info_pg.argumento = arg
-            if arg.tipo_dado == 'TEXTO':
-                info_pg.valor_texto = vlr
-            elif arg.tipo_dado == 'INTEIRO':
-                info_pg.valor_inteiro = vlr
-            elif arg.tipo_dado == 'DECIMAL':
-                info_pg.valor_decimal = vlr
-            elif arg.tipo_dado == 'BOOLEAN':
-                info_pg.valor_boolean = vlr
-            elif arg.tipo_dado == 'DATA':
-                info_pg.valor_data = vlr
-            elif arg.tipo_dado == 'HORA':
-                info_pg.valor_hora = vlr
-            elif arg.tipo_dado == 'DATA_HORA':
-                info_pg.valor_data_hora = vlr
+                pagamento = Pagamento()
+                pagamento.forma_pagamento = forma_pagamento
+                pagamento.valor = valor
+                pagamento.save()
+                
+                campos = dict()
+                for arg in argumentos:
+                    campos[arg.slug()] = arg.pk
 
-            info_pg.pagamento = pagamento
-            info_pg.save()
-        
-        valor_restante = locacao.valor_total - locacao.valor_pago()
-        data['valor_restante'] = valor_restante
-        
-        if valor_restante == 0:
-            locacao.situacao = 'PAGA'
-            itens_list = ItemLocacao.objects.filter(locacao=locacao)
-            
-            for i in itens_list:
-                i.is_pago = True
-                i.save()
+                for k, v in campos.items():
+                    vlr = request.POST.get(k)
+                    arg = ArgumentoPagamento.objects.get(pk=v)
+                    info_pg = InformacaoPagamento()
+                    info_pg.argumento = arg
+                    if arg.tipo_dado == 'TEXTO':
+                        info_pg.valor_texto = vlr
+                    elif arg.tipo_dado == 'INTEIRO':
+                        info_pg.valor_inteiro = vlr
+                    elif arg.tipo_dado == 'DECIMAL':
+                        info_pg.valor_decimal = vlr
+                    elif arg.tipo_dado == 'BOOLEAN':
+                        info_pg.valor_boolean = vlr
+                    elif arg.tipo_dado == 'DATA':
+                        info_pg.valor_data = vlr
+                    elif arg.tipo_dado == 'HORA':
+                        info_pg.valor_hora = vlr
+                    elif arg.tipo_dado == 'DATA_HORA':
+                        info_pg.valor_data_hora = vlr
 
-            locacao.save()
+                    info_pg.pagamento = pagamento
+                    info_pg.save()
+                
 
-        elif valor_restante < locacao.valor_total:
-            locacao.situacao = 'PAGA_PARCIAL'
-            vt_pago = locacao.valor_pago()
-            itens_list = ItemLocacao.objects.filter(locacao=locacao)
-
-            for i in itens_list:
-                if i.filme.is_lancamento:
-                    if vt_pago - i.valor  >= 0:
-                        i.is_pago = True
-                        i.save()
-                        vt_pago = vt_pago - i.valor
-
-            for i in itens_list:
-                if vt_pago - i.valor  >= 0:
-                    i.is_pago = True
+                for i in itens:
+                    i = ItemLocacao.objects.get(pk=i)
+                    i.pagamentos.add(pagamento)
                     i.save()
-                    vt_pago = vt_pago - i.valor
 
-            locacao.save()
 
-        pagamentos = Pagamento.objects.filter(Q(devolucao=devolucao) | Q(locacao=locacao))   
-        data['valor_pago'] = locacao.valor_pago()
-        data['valor_restante'] = valor_restante
-        data['html_pg_list'] = render_to_string('core/ajax/partial_pagamentos_list.html', {'pagamentos': pagamentos, })
-    context = {'formas_pagamento': formas_pagamento}
+                valor_restante = locacao.valor_total - locacao.valor_pago()
+                data['valor_restante'] = valor_restante
+
+                if valor_restante == 0:
+                    locacao.situacao = 'PAGA'
+                    locacao.save()
+                elif valor_restante < locacao.valor_total:
+                    locacao.situacao = 'PAGA_PARCIAL'
+                    locacao.save()
+
+                pagamentos = []
+                for i in itens_list:
+                    pgts = i.pagamentos.all()
+                    if pgts:
+                        for p in pgts:
+                            pagamentos.append(p)
+
+                data['valor_pago'] = locacao.valor_pago()
+                data['valor_restante'] = valor_restante
+                data['html_pg_list'] = render_to_string('core/ajax/partial_pagamentos_list.html', {'pagamentos': pagamentos, })
+    context = {'formas_pagamento': formas_pagamento, 'itens_list': itens_list, 'pk': locacao.pk,}
     data['html_form'] = render_to_string('core/ajax/partial_pagamento_novo.html', context, request=request,)
     return JsonResponse(data)
 
@@ -437,10 +455,26 @@ class DevolucaoDetalhe(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(DevolucaoDetalhe, self).get_context_data(**kwargs)
         print(self.object.item.id)
-        pagamentos = Pagamento.objects.filter(Q(devolucao=self.object) | Q(locacao=self.object.item.locacao))  
+
+        soma = 0
+        pagamentos = []
+        pgts = self.object.item.pagamentos.all()
+        if pgts:
+            for p in pgts:
+                soma = soma + p.valor
+                pagamentos.append(p)
+
         context['pagamentos'] = pagamentos
-        valor_restante = self.object.item.locacao.valor_total - self.object.item.locacao.valor_pago()
-        context['valor_pago'] = self.object.item.locacao.valor_pago()
+
+        if self.object.multa > 0:
+            valor_restante = (self.object.item.valor + self.object.multa) - soma
+        else:
+            valor_restante = self.object.item.valor_locacao() - soma
+
+        if self.object.item.pagamentos:
+            context['valor_pago'] = soma
+        else:
+            context['valor_pago'] = 0
         context['valor_restante'] = valor_restante
         return context
 
@@ -456,3 +490,103 @@ def carrega_item_devolucao_ajax(request):
         data['multa'] = 0
     return JsonResponse(data)
 
+
+@transaction.atomic
+def item_pagamento(request):
+    data = dict()
+    formas_pagamento = FormaPagamento.objects.all()
+    if request.method == 'POST':
+        fp_id = request.POST.get('forma_pagamento')
+        valor = request.POST.get('valor')
+        item_id = request.POST.get('item')
+        print('\n\n')
+        print(item_id)
+        item = ItemLocacao.objects.get(pk=item_id)
+        devolucao = Devolucao.objects.get(pk=item_id)
+        if devolucao.multa > 0:
+            if decimal.Decimal(valor) < item.valor :
+                if decimal.Decimal(valor) < devolucao.multa:
+                    data['form_is_valid'] = False
+                    data['message'] = 'Valor informado de R$ %s está abaixo do valor da locação (R$ %s) e da multa (R$ %s)' % (localize(decimal.Decimal(valor)), localize(item.valor), localize(devolucao.multa))
+                else:
+                    data['form_is_valid'] = False
+                    data['message'] = 'Valor informado de R$ %s está abaixo do valor da locação: R$ %s' % (localize(decimal.Decimal(valor)), localize(item.valor))
+            else:
+                pass
+        else:
+            if decimal.Decimal(valor) < item.valor_locacao():
+                data['form_is_valid'] = False
+                data['message'] = 'Valor informado de R$ %s está abaixo do valor da locação: R$ %s' % (localize(decimal.Decimal(valor)), localize(item.valor_locacao()))
+            else:
+                data['form_is_valid'] = True
+                forma_pagamento = FormaPagamento.objects.get(pk=fp_id)
+                argumentos = ArgumentoPagamento.objects.filter(forma_pagamento=forma_pagamento)
+
+                pagamento = Pagamento()
+                pagamento.forma_pagamento = forma_pagamento
+                pagamento.valor = valor
+                pagamento.save()
+                
+                campos = dict()
+                for arg in argumentos:
+                    campos[arg.slug()] = arg.pk
+
+                for k, v in campos.items():
+                    vlr = request.POST.get(k)
+                    arg = ArgumentoPagamento.objects.get(pk=v)
+                    info_pg = InformacaoPagamento()
+                    info_pg.argumento = arg
+                    if arg.tipo_dado == 'TEXTO':
+                        info_pg.valor_texto = vlr
+                    elif arg.tipo_dado == 'INTEIRO':
+                        info_pg.valor_inteiro = vlr
+                    elif arg.tipo_dado == 'DECIMAL':
+                        info_pg.valor_decimal = vlr
+                    elif arg.tipo_dado == 'BOOLEAN':
+                        info_pg.valor_boolean = vlr
+                    elif arg.tipo_dado == 'DATA':
+                        info_pg.valor_data = vlr
+                    elif arg.tipo_dado == 'HORA':
+                        info_pg.valor_hora = vlr
+                    elif arg.tipo_dado == 'DATA_HORA':
+                        info_pg.valor_data_hora = vlr
+
+                    info_pg.pagamento = pagamento
+                    info_pg.save()
+
+                item.pagamentos.add(pagamento)
+                item.save()
+
+                soma = 0
+                pagamentos = []
+                pgts = item.pagamentos.all()
+                if pgts:
+                    for p in pgts:
+                        soma = soma + p.valor
+                        pagamentos.append(p)
+
+                if devolucao.multa > 0:
+                    valor_restante = (item.valor + devolucao.multa) - soma
+                else:
+                    valor_restante = item.valor_locacao() - soma
+                if item.pagamentos:
+                    data['valor_pago'] = soma
+                else:
+                    data['valor_pago'] = 0
+                data['valor_restante'] = valor_restante
+
+                locacao = item.locacao
+                restante_locacao = locacao.valor_total - locacao.valor_pago()
+
+                if valor_restante == 0:
+                    locacao.situacao = 'PAGA'
+                    locacao.save()
+                elif valor_restante < locacao.valor_total:
+                    locacao.situacao = 'PAGA_PARCIAL'
+                    locacao.save()
+
+                data['html_pg_list'] = render_to_string('core/ajax/partial_pagamentos_list.html', {'pagamentos': pagamentos, })
+
+    context = {'formas_pagamento': formas_pagamento,}
+    data['html_form'] = render_to_string('core/ajax/partial_pagamento_item.html', context, request=request,)
+    return JsonResponse(data)

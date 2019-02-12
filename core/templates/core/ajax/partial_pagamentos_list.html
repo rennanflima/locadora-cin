@@ -9,9 +9,10 @@
             </button>
         </td>
         <td>{{ pg.data_pagamento }}</td>
+        <td>R$ {{ pg.valor }}</td>
     </tr>
 {% empty %}
     <tr class="text-center">
-        <td colspan="3">Nenhum pagamento encontrado.</td>
+        <td colspan="4">Nenhum pagamento encontrado.</td>
     </tr>
 {% endfor %}
