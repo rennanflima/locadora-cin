@@ -216,6 +216,14 @@ class Filme(models.Model):
         return ', '.join([d.nome for d in self.diretor.all()])
     diretores.short_description = "Diretores associados ao Filme"
 
+    def midias_disponiveis(self):
+        return ', '.join([i.tipo_midia.nome for i in self.itens_filme.all()])
+    midias_disponiveis.short_description = "Tipos de mídia dos itens associados ao Filme"
+
+    def atores_destaque(self):
+        return ', '.join([str(e.ator) for e in self.elenco_set.all().filter(principal=True)])
+    midias_disponiveis.short_description = "Atores principais associados ao Filme"
+
 class Elenco(models.Model):
     filme = models.ForeignKey(Filme, on_delete=models.CASCADE)
     ator =  models.ForeignKey(Artista, on_delete=models.CASCADE)

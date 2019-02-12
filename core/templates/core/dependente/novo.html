@@ -10,6 +10,12 @@
             <a href="{% url 'core:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item ">
+            <a href="{%url 'core:cliente-listar'%}">Cliente</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{%url 'core:cliente-detalhe' titular.pk %}">{{ titular }}</a>
+        </li>
+        <li class="breadcrumb-item ">
             <a href="{%url 'core:dependente-listar' pk %}">Dependentes</a>
         </li>
         <li class="breadcrumb-item active">Novo</li>
@@ -48,7 +54,7 @@
             </div>
             <div class="form-actions">
                 <hr>
-                <a href="{%url 'core:dependente-listar' pk %}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+                <a href="{%url 'core:dependente-listar' pk %}" class="btn btn-danger ml-2 mb-4 float-right">Cancelar</a>
                 <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Dependente</button>
             </div>
         </form>

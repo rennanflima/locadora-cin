@@ -291,9 +291,9 @@ def carregar_item_ajax(request):
     item = get_object_or_404(Item, pk=item_id)
 
     if item.filme.is_lancamento:
-        data['valor'] = localize(item.tipo_midia.valor * 1.5)
+        data['valor'] = localize(decimal.Decimal(item.tipo_midia.valor) * 1.5)
     else:    
-        data['valor'] = localize(item.tipo_midia.valor) 
+        data['valor'] = localize(decimal.Decimal(item.tipo_midia.valor))
     
     today = date.today()
     if item.filme.is_lancamento:
