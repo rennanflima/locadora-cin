@@ -32,7 +32,7 @@
         </div>
         <div class="form-group">
             <label class="negrito">Valor da Locação: </label>    
-            R$ {{ devolucao.item.valor_com_desconto }}
+            R$ {{ devolucao.item.valor_locacao }}
         </div>
         <div class="form-group">
             <label class="negrito">Multa: </label>    
@@ -47,15 +47,16 @@
                         <tr>
                             <th scope="col">Forma de pagamento</th>
                             <th scope="col">Data do Pagamento</th>
+                            <th scope="col">Valor</th>
                         </tr>
                     </thead>
                     <tfoot class="text-center">
                         <tr>
-                            <th class="text-right" colspan="1">Valor Pago</th>
-                            <th>R$ <span id="id_valor_restante">{{ locacao.valor_pago }}</span></th>
+                            <th class="text-right" colspan="2">Valor Pago</th>
+                            <th>R$ <span id="id_valor_pago">{{ valor_pago }}</span></th>
                         </tr>
                         <tr>
-                            <th class="text-right" colspan="1">Valor Restante</th>
+                            <th class="text-right" colspan="2">Valor Restante</th>
                             <th>R$ <span id="id_valor_restante">{{ valor_restante }}</span></th>
                         </tr>
                     </tfoot>
@@ -68,7 +69,7 @@
 
         <hr>
         <a href="{% url 'core:devolucao-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
-        <button type="button" class="btn btn-info ml-2 js-add-pagamento mb-3 float-right" data-url="{% url 'core:locacao-pagamento' %}" {% if valor_restante == 0 or locacao.situacao == 'PAGA' %}disabled="true"{% endif %}>
+        <button type="button" class="btn btn-info ml-2 js-add-pagamento mb-3 float-right" data-url="{% url 'core:item-pagamento' %}" {% if valor_restante == 0 or devolucao.item.locacao.situacao == 'PAGA' %}disabled="true"{% endif %}>
             Incluir Pagamento
         </button>  
         <a href="{% url 'core:devolucao-realizar' %}" class="btn btn-primary ml-2 float-right">Realizar outra Devolução</a>
@@ -89,8 +90,7 @@
                     $("#genericModal .modal-content").html(data.html_form);
                     $('.money2').mask("#.##0,00", {reverse: true});
                     $('.date').mask('00/00/0000');
-                    $('#id_locacao').val("{{ devolucao.pk }}");
-                    $('#id_devolucao').val("{{ devolucao.item.locacao.pk }}");
+                    $('#id_item').val("{{ devolucao.item.pk }}");
                 }
             });
         };
@@ -110,6 +110,7 @@
                         });
                         $("#pg_locacao_tb tbody").html(data.html_pg_list);
                         $("#genericModal").modal("hide");
+                        $("#id_valor_pago").text(data.valor_pago);
                         $("#id_valor_restante").text(data.valor_restante);
                         // if(data.qtd_item > 0) {
                         //     $("#id_submit_iten").prop('disabled', false);
@@ -118,6 +119,10 @@
                         // }
                     } else {
                         $("#genericModal .modal-content").html(data.html_form);
+                        runNotify({
+                            message: data.message,
+                            levelMessage: 'error'
+                        });
                     }
                 }
             });

@@ -212,6 +212,10 @@ class Filme(models.Model):
         return ', '.join([g.nome for g in self.genero.all()])
     generos.short_description = "Gêneros associados ao Filme"
 
+    def diretores(self):
+        return ', '.join([d.nome for d in self.diretor.all()])
+    diretores.short_description = "Diretores associados ao Filme"
+
 class Elenco(models.Model):
     filme = models.ForeignKey(Filme, on_delete=models.CASCADE)
     ator =  models.ForeignKey(Artista, on_delete=models.CASCADE)
@@ -254,7 +258,6 @@ class Item(models.Model):
     data_aquisicao = models.DateField('Data de Aquisição')
     tipo_midia = models.ForeignKey(Midia, on_delete=models.PROTECT, related_name='itens_midia', related_query_name='item_midia')
     filme = models.ForeignKey(Filme, on_delete=models.PROTECT, related_name='itens_filme', related_query_name='item_filme')
-    quantidade = models.PositiveIntegerField('Número de Cópias', default=1)
     is_active = models.BooleanField(
         _('active'),
         default=True,
@@ -357,6 +360,7 @@ class Reserva(models.Model):
     midia = models.ForeignKey(Midia, on_delete=models.PROTECT, related_name='reservas_midia', related_query_name='reserva', null=True, blank=True)
     data_reserva = models.DateTimeField(_('booking date'), auto_now_add=True)
     status = models.CharField('Situação da Reserva', max_length=10, choices=tipo_reserva, default='Pendente')
+    data_notificacao = models.DateTimeField('Data da Notificação', null=True, blank=True)
     # vincular a locação quando for atendida
 
     class Meta:
@@ -373,101 +377,6 @@ class Reserva(models.Model):
     def clean(self):
         if not self.status:
             self.status = 'Pendente'
-
-class Locacao(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
-    sub_total = models.DecimalField('Sub-Total da Locação', max_digits=8, decimal_places=2, default=0)
-    total_descontos = models.DecimalField('Valor Total de Descontos', max_digits=8, decimal_places=2, default=0)
-    valor_total = models.DecimalField('Valor Total da Locação', max_digits=8, decimal_places=2, default=0)
-    data_locacao = models.DateTimeField('Data de Locação', auto_now_add=True)
-    situacao = models.CharField('Situação da Locação', max_length=20, choices=tipo_locacao, default='EM_ANDAMENTO')
-
-    class Meta:
-        ordering = ['data_locacao',]
-        verbose_name = 'Locação'
-        verbose_name_plural = 'Locações'
-
-    def __str__(self):
-        return "%s - %s" % (self.cliente.user.get_full_name(), str(self.data_locacao))
-
-    def get_absolute_url(self):
-        return reverse('core:locacao-detalhe', kwargs={'pk': self.pk})
-
-    def valor_pago(self):
-        pagamentos = self.pagamento_set.all()
-        soma = 0
-        for p in pagamentos:
-            for i in p.informacoes_pagamentos.all():
-                if i.argumento.campo == 'Valor':
-                    if i.argumento.tipo_dado == 'DECIMAL':
-                        soma = soma + i.valor_decimal
-        
-        return soma
-
-    def is_editavel(self):
-        return self.situacao == 'EM_ANDAMENTO'
-
-    def save(self, *args, **kwargs):
-        self.valor_total = self.sub_total - self.total_descontos      
-        super(Locacao, self).save(*args, **kwargs)
-
-
-class ItemLocacao(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.PROTECT)
-    is_lancamento = models.BooleanField(
-        'Lançamento',
-        default=False,
-        help_text='Designa se este filme deve ser tratado como lançamento. Desmarque esta opção se não for um lançamento.',
-    )
-    valor = models.DecimalField('Valor da Locação', max_digits=8, decimal_places=2, default=0)
-    desconto = models.DecimalField('Desconto da Locação', max_digits=8, decimal_places=2, default=0)
-    data_devolucao_prevista = models.DateField('Data de Devolução Prevista', blank=True, null=True)
-    nova_data_devolucao = models.DateField('Nova Data de Devolução', blank=True, null=True)
-    locacao = models.ForeignKey(Locacao, on_delete=models.PROTECT)
-    is_pago = models.BooleanField('Pago?', default=False)
-
-    class Meta:
-        # ordering = ['data_reserva',]
-        verbose_name = 'Item de Locação'
-        verbose_name_plural = 'Itens de Locação'
-
-    def __str__(self):
-        return "%s, locado pelo cliente: %s" % (self.item, self.locacao.cliente)
-
-    def serialize(self):
-        return self.__dict__
-
-    def valor_com_desconto(self):
-        return self.valor - self.desconto    
-
-    def data_devolucao(self):
-        if self.data_devolucao_prevista == self.nova_data_devolucao:
-            return self.data_devolucao_prevista
-        elif self.data_devolucao_prevista < self.nova_data_devolucao:
-            return self.nova_data_devolucao
-
-    def calcular_multa(self, data_entrega):
-        diferenca = data_entrega - self.data_devolucao()
-        return diferenca.days * self.valor
-    
-
-class Devolucao(models.Model):
-    item = models.OneToOneField(ItemLocacao, on_delete=models.PROTECT, primary_key=True)
-    data_devolucao = models.DateTimeField('Data de Devolução', auto_now_add=True)
-    multa = models.DecimalField('Multa por Atraso', max_digits=8, decimal_places=2, default=0, blank=True, null=True)
-
-    class Meta:
-        verbose_name = 'Devolução'
-        verbose_name_plural = 'Devoluções'
-
-    def __str__(self):
-        return "%s - %s" % (self.item.item, localize(self.data_devolucao))
-
-    def get_absolute_url(self):
-        return reverse('core:devolucao-detalhe', kwargs={'pk': self.pk})
-
-    def save(self, *args, **kwargs):
-        super(Devolucao, self).save(*args, **kwargs)
 
 
 class FormaPagamento(models.Model):
@@ -505,16 +414,19 @@ class ArgumentoPagamento(models.Model):
 class Pagamento(models.Model):
     forma_pagamento = models.ForeignKey(FormaPagamento, on_delete=models.PROTECT)
     data_pagamento = models.DateTimeField('Data de Pagamento', auto_now_add=True)
-    locacao = models.ForeignKey(Locacao, on_delete=models.PROTECT, blank=True, null=True)
-    devolucao = models.ForeignKey(Devolucao, on_delete=models.PROTECT, blank=True, null=True)
+    valor = models.DecimalField('Valor do Pagamento', decimal_places=2, max_digits=10, default=0)
 
     class Meta:
         verbose_name = 'Pagamento'
         verbose_name_plural = 'Pagamentos'
 
-def pagamento_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'pagamentos/pagamento_{0}/{1}'.format(instance.pagamento.id, filename)
+    def __str__(self):
+        return '%s : R$ %s' % (self.forma_pagamento.descricao, localize(self.valor))
+
+    def itens_pago(self):
+        return ', '.join([str(p.item) for p in self.itemlocacao_set.all()])
+    itens_pago.short_description = "Itens de Locação Pagos associados ao pagamento"
+
 
 class InformacaoPagamento(models.Model):
     argumento = models.ForeignKey(ArgumentoPagamento, related_name='informacoes_argumentos', on_delete=models.PROTECT)
@@ -525,7 +437,6 @@ class InformacaoPagamento(models.Model):
     valor_hora = models.TimeField('Valor da informação em Hora', blank=True, null=True)
     valor_data_hora = models.DateTimeField('Valor da informação em Data/Hora', blank=True, null=True)
     valor_boolean = models.BooleanField('Valor da informação Verdadeiro ou Falso', blank=True, null=True)
-    valor_arquivo = models.FileField('Valor da informação em Arquivo', upload_to=pagamento_directory_path, blank=True, null=True)
     pagamento = models.ForeignKey(Pagamento, on_delete=models.PROTECT, related_name='informacoes_pagamentos')
 
     class Meta:
@@ -564,7 +475,107 @@ class InformacaoPagamento(models.Model):
         elif self.argumento.tipo_dado == 'DATA_HORA':
             return self.valor_data_hora
 
+class Locacao(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
+    sub_total = models.DecimalField('Sub-Total da Locação', max_digits=8, decimal_places=2, default=0)
+    total_descontos = models.DecimalField('Valor Total de Descontos', max_digits=8, decimal_places=2, default=0)
+    valor_total = models.DecimalField('Valor Total da Locação', max_digits=8, decimal_places=2, default=0)
+    data_locacao = models.DateTimeField('Data de Locação', auto_now_add=True)
+    situacao = models.CharField('Situação da Locação', max_length=20, choices=tipo_locacao, default='EM_ANDAMENTO')
+
+    class Meta:
+        ordering = ['data_locacao',]
+        verbose_name = 'Locação'
+        verbose_name_plural = 'Locações'
+
+    def __str__(self):
+        return "%s - %s" % (self.cliente.user.get_full_name(), str(self.data_locacao))
+
+    def get_absolute_url(self):
+        return reverse('core:locacao-detalhe', kwargs={'pk': self.pk})
+
+    def valor_pago(self):
+        itens = ItemLocacao.objects.filter(locacao=self)
+        
+        soma = 0
+        for i in itens:
+            pagamentos = i.pagamentos.all()
+            if pagamentos:
+                for p in pagamentos:
+                    soma = soma + p.valor        
+        return soma
+
+    def is_editavel(self):
+        return self.situacao == 'EM_ANDAMENTO'
+
+    def save(self, *args, **kwargs):
+        self.valor_total = self.sub_total - self.total_descontos      
+        super(Locacao, self).save(*args, **kwargs)
 
 
 
+class ItemLocacao(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.PROTECT)
+    is_lancamento = models.BooleanField(
+        'Lançamento',
+        default=False,
+        help_text='Designa se este filme deve ser tratado como lançamento. Desmarque esta opção se não for um lançamento.',
+    )
+    valor = models.DecimalField('Valor da Locação', max_digits=8, decimal_places=2, default=0)
+    desconto = models.DecimalField('Desconto da Locação', max_digits=8, decimal_places=2, default=0)
+    data_devolucao_prevista = models.DateField('Data de Devolução Prevista', blank=True, null=True)
+    nova_data_devolucao = models.DateField('Nova Data de Devolução', blank=True, null=True)
+    locacao = models.ForeignKey(Locacao, on_delete=models.PROTECT)
+    pagamentos = models.ManyToManyField(Pagamento)
+
+    class Meta:
+        # ordering = ['data_reserva',]
+        verbose_name = 'Item de Locação'
+        verbose_name_plural = 'Itens de Locação'
+
+    def __str__(self):
+        return "%s, locado pelo cliente: %s" % (self.item, self.locacao.cliente)
+
+    def clean(self):        
+        if self.nova_data_devolucao < self.locacao.data_locacao:    
+            raise ValidationError({
+                'nova_data_devolucao': _('A nova data de devolução prevista deve ser maior que a data de locação.'),
+            })
+
+        if self.data_devolucao_prevista < self.locacao.data_locacao:
+            raise ValidationError({
+                'data_devolucao_prevista': 'A data de devolução prevista deve ser maior que a data de locação.',
+            })
+
+    def valor_locacao(self):
+        return self.valor - self.desconto    
+
+
+    def data_devolucao(self):
+        if self.data_devolucao_prevista == self.nova_data_devolucao:
+            return self.data_devolucao_prevista
+        elif self.data_devolucao_prevista < self.nova_data_devolucao:
+            return self.nova_data_devolucao
+
+    def calcular_multa(self, data_entrega):
+        diferenca = data_entrega - self.data_devolucao()
+        return diferenca.days * self.valor
     
+
+class Devolucao(models.Model):
+    item = models.OneToOneField(ItemLocacao, on_delete=models.PROTECT, primary_key=True)
+    data_devolucao = models.DateTimeField('Data de Devolução', auto_now_add=True)
+    multa = models.DecimalField('Multa por Atraso', max_digits=8, decimal_places=2, default=0, blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Devolução'
+        verbose_name_plural = 'Devoluções'
+
+    def __str__(self):
+        return "%s - %s" % (self.item.item, localize(self.data_devolucao))
+
+    def get_absolute_url(self):
+        return reverse('core:devolucao-detalhe', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super(Devolucao, self).save(*args, **kwargs)

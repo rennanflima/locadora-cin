@@ -36,9 +36,7 @@
         </div> 
         <div class="form-group">
             <label class="negrito">Gênero: </label>    
-            {% for g in filme.genero.all %}
-                {{ g }}
-            {% endfor %}
+            {{ filme.generos }}
         </div> 
         <div class="form-group">
             <label class="negrito">Duração: </label>    
@@ -58,9 +56,10 @@
         </div>
         <div class="form-group">
             <label class="negrito">Diretor: </label>    
-            {% for d in filme.diretor.all %}
-                {{ d }}
-            {% endfor %}
+            {{ filme.diretores }}
+            <!-- {% for d in filme.diretor.all %} -->
+                <!-- {{ d }} -->
+            <!-- {% endfor %} -->
         </div>  
         <div class="form-group">
             <label class="negrito">Classificação Indicativa: </label>    
