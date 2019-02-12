@@ -1,0 +1,58 @@
+{% load bootstrap4 %}
+
+<form method="POST" class="form js-pagamento-add-form" action="{% url 'core:locacao-pagamento' %}">
+    {% csrf_token %}
+    <div class="modal-header">
+        <h5 class="modal-title" id="itemAddModalLabel">Adicionar Pagamento</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <input type="hidden" name="locacao" id="id_locacao">
+        <input type="hidden" name="devolucao" id="id_devolucao">
+        <div class="form-group">
+            <label for="id_forma_pagamento">Forma de Pagamento</label>
+            <select name="forma_pagamento" class="form-control" title="" required="" id="id_forma_pagamento">
+                <option value="" selected="">---------</option>
+                {% for fp in formas_pagamento %}
+                    <option value="{{ fp.pk }}">{{ fp }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div id="id_campos_pg">
+
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Adicionar Item</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+    </div>    
+</form>
+{% block javascript %}
+    <script>
+        function carregar_cidades(formaId){
+            var url =  "{% url 'core:ajax-campos-carregar' %}";
+            var formaId = formaId;
+            var dfd = $.Deferred();
+
+            $.ajax({
+                url: url,
+                data:{'forma': formaId},
+                success: function(data){
+                    $('#id_campos_pg').html(data);
+                    dfd.resolve();
+                    $('.date_time').mask('00/00/0000 00:00:00');
+                    $('.money2').mask("#.##0,00", {reverse: true});
+                }
+            });
+            return dfd.promise();
+        }
+
+        $('#id_forma_pagamento').change(function(){
+            var formaId = $(this).val();
+            carregar_cidades(formaId);
+        });
+        
+    </script>
+{% endblock javascript %}

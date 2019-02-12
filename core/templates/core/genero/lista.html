@@ -6,7 +6,7 @@
     <!-- Breadcrumbs-->
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="{% url 'admin:index'%}">Início</a>
+            <a href="{% url 'core:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item active">Gêneros</li>
     </ol>
@@ -19,9 +19,9 @@
                 Gêneros
         </div>
         <div class="card-body">
-            <div class="table-responsive">
-                <a href="{% url 'admin:genero-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
-                <form method="GET" action="{%url 'admin:genero-listar'%}">
+            <div class="table-responsive">  
+                <a href="{% url 'core:genero-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                <form method="GET" action="{%url 'core:genero-listar'%}">
                     <div class="input-group mb-3">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
                         <div class="input-group-append">
@@ -40,16 +40,16 @@
                     <tfoot class="text-center">
                         <tr>
                             <th>Nome</th>
-                            <th>Opções</th>
+                            <th>Ações</th>
                         </tr>
                     </tfoot>
                     <tbody>
                         {% for genero in object_list %}
                             <tr class="text-center">
-                                <th scope="row"><a href="{% url 'admin:genero-detalhe' genero.id %}">{{ genero.nome }}</a></th>
+                                <th scope="row"><a href="{% url 'core:genero-detalhe' genero.id %}">{{ genero.nome }}</a></th>
                                 <td>
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'admin:genero-edita' genero.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'admin:genero-deletar' genero.id %}'">Excluir</button>
+                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:genero-editar' genero.id %}'">Editar</button>
+                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:genero-deletar' genero.id %}'">Excluir</button>
                                 </td>
                             </tr>
                         {% empty %}
@@ -71,13 +71,13 @@
                                 to the URL. -->
                                 {% if not search %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'admin:genero-listar' %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                        <a class="page-link" href="{% url 'core:genero-listar' %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
                                     </li>
                                 {% else %}
                                     <!-- Append the searched query to the URL, so that on a search results page,
                                     the pagination don't revert to listing all the listview items. -->
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'admin:genero-listar' %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                        <a class="page-link" href="{% url 'core:genero-listar' %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
                                     </li>
                                 {% endif %}
                             {% else %}
@@ -86,16 +86,16 @@
                                 </li>
                             {% endif %}
                             {% for object in page_obj.paginator.page_range %}
-                                <li class="page-item"><a class="page-link" href="{% url 'admin:genero-listar' %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
-                            {% endfor %}
+                                <li class="page-item"><a class="page-link" href="{% url 'core:genero-listar' %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
+                            {% endfor %} 
                             {% if page_obj.has_next %}
                                 {% if not search %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'admin:genero-listar' %}?page={{ page_obj.next_page_number }}">Próxima página</a>
+                                        <a class="page-link" href="{% url 'core:genero-listar' %}?page={{ page_obj.next_page_number }}">Próxima página</a>
                                     </li>
                                 {% else %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'admin:genero-listar' %}?{{search}}&page={{ page_obj.next_page_number }}">Próxima página</a>
+                                        <a class="page-link" href="{% url 'core:genero-listar' %}?{{search}}&page={{ page_obj.next_page_number }}">Próxima página</a>
                                     </li>
                                 {% endif %}
                             {% else %}

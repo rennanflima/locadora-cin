@@ -1,0 +1,53 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+
+{% block conteudo %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'core:index'%}">Início</a>
+        </li>
+        <li class="breadcrumb-item ">
+            <a href="{%url 'core:item-listar'%}">Itens</a>
+        </li>
+        <li class="breadcrumb-item">Detalhar</li>
+        <li class="breadcrumb-item active">{{ item }}</li>
+    </ol>
+
+    {% bootstrap_messages %}
+
+    <div class="container-fluid">
+        <h2>Detalhar Item</h2>
+        <hr>
+        {% if item.filme.capa %}
+            <img src="{{ item.filme.capa.url }}" class="img-thumbnail col-2" style="float: right; min-width: 182px;"/>
+        {% else %}
+            <div class="col-2" style="float: right;">
+                <i class="fas fa-file-image fa-10x"></i>
+            </div>
+        {% endif %}
+        <div class="form-group">
+            <label class="negrito">Filme: </label>    
+            {{ item.filme }}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Tipo de Mídia: </label>    
+            {{ item.tipo_midia }}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Data de Aquisição: </label>    
+            {{ item.data_aquisicao }}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Número de Série: </label>    
+            {{ item.numero_serie }}
+        </div> 
+        <div class="form-group">
+            <label class="negrito">Número de Cópias: </label>    
+            {{ item.quantidade }}
+        </div>
+        <hr>
+        <a href="{% url 'core:item-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
+        <a href="{% url 'core:item-novo' %}" class="btn btn-primary ml-2 float-right">Adicionar outro Item</a>
+        <a href="{% url 'core:item-editar' item.id %}" class="btn btn-success ml-2 float-right">Editar Item</a>
+    </div>
+{% endblock conteudo %}

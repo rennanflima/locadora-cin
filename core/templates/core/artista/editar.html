@@ -4,10 +4,10 @@
 {% block conteudo %}
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="{% url 'admin:index'%}">Início</a>
+            <a href="{% url 'core:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item ">
-            <a href="{%url 'admin:artista-listar'%}">Artistas</a>
+            <a href="{%url 'core:artista-listar'%}">Artistas</a>
         </li>
         <li class="breadcrumb-item active">Editar</li>
     </ol>
@@ -20,8 +20,8 @@
             {% bootstrap_form form %}
             <hr>
             
-            <a href="{%url 'admin:filme-novo'%}" class="btn btn-primary ml-2 mb-4 float-right">Adicionar Filme</a>
-            <a href="{%url 'admin:artista-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+            <a href="{%url 'core:filme-novo'%}" class="btn btn-primary ml-2 mb-4 float-right">Adicionar Filme</a>
+            <a href="{%url 'core:artista-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
             <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Artistas</button>
                        
         </form>

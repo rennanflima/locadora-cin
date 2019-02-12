@@ -1,0 +1,24 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+
+{% block conteudo %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'core:index'%}">Início</a>
+        </li>
+        <li class="breadcrumb-item ">
+            <a href="{%url 'core:reserva-listar'%}">Reserva</a>
+        </li>
+        <li class="breadcrumb-item active">Editar</li>
+    </ol>
+
+    <div class="container-fluid">
+        <h2>Editar Reserva</h2>
+        <hr>
+        <form method="POST" class="form">
+            {% csrf_token %}
+            {% crispy form %}
+        </form>
+    </div>
+{% endblock conteudo %}

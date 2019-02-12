@@ -5,10 +5,11 @@
     <!-- Breadcrumbs-->
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="{% url 'admin:index'%}">Início</a>
+            <a href="{% url 'core:index'%}">Início</a>
         </li>
         <li class="breadcrumb-item active">Filme</li>
     </ol>
+    
     {% bootstrap_messages %}
 
     <div class="card mb-3">
@@ -18,8 +19,8 @@
         </div>   
         <div class="card-body">
             <div class="table-responsive">  
-                <a href="{% url 'admin:filme-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
-                <form method="GET" action="{%url 'admin:filme-listar'%}">
+                <a href="{% url 'core:filme-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                <form method="GET" action="{%url 'core:filme-listar'%}">
                     <div class="input-group mb-3 float-left">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
                         <div class="input-group-append">
@@ -50,7 +51,7 @@
                     <tbody>
                         {% for filme in object_list %}
                             <tr class="text-center">
-                                <td><a href="{% url 'admin:filme-detalhe' filme.id %}">{{ filme }}</a></td>
+                                <td><a href="{% url 'core:filme-detalhe' filme.id %}">{{ filme }}</a></td>
                                 <td>{{ filme.ano }}</td>
                                 <td>
                                     <ul>
@@ -61,8 +62,8 @@
                                 </td>
                                 <td>{{ filme.duracao }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'admin:filme-editar' filme.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'admin:filme-deletar' filme.id %}'">Excluir</button>
+                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:filme-editar' filme.id %}'">Editar</button>
+                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:filme-deletar' filme.id %}'">Excluir</button>
                                 </td>
                             </tr>
                         {% empty %}
@@ -84,13 +85,13 @@
                                 to the URL. -->
                                 {% if not search %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'admin:filme-listar' %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                        <a class="page-link" href="{% url 'core:filme-listar' %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
                                     </li>
                                 {% else %}
                                     <!-- Append the searched query to the URL, so that on a search results page,
                                     the pagination don't revert to listing all the listview items. -->
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'admin:filme-listar' %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                        <a class="page-link" href="{% url 'core:filme-listar' %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
                                     </li>
                                 {% endif %}
                             {% else %}
@@ -99,16 +100,16 @@
                                 </li>
                             {% endif %} 
                             {% for object in page_obj.paginator.page_range %}
-                                <li class="page-item"><a class="page-link" href="{% url 'admin:filme-listar' %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
+                                <li class="page-item"><a class="page-link" href="{% url 'core:filme-listar' %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
                             {% endfor %} 
                             {% if page_obj.has_next %}
                                 {% if not search %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'admin:filme-listar' %}?page={{ page_obj.next_page_number }}">Próxima página</a>
+                                        <a class="page-link" href="{% url 'core:filme-listar' %}?page={{ page_obj.next_page_number }}">Próxima página</a>
                                     </li>
                                 {% else %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{% url 'admin:filme-listar' %}?{{search}}&page={{ page_obj.next_page_number }}">Próxima página</a>
+                                        <a class="page-link" href="{% url 'core:filme-listar' %}?{{search}}&page={{ page_obj.next_page_number }}">Próxima página</a>
                                     </li>
                                 {% endif %}
                             {% else %}

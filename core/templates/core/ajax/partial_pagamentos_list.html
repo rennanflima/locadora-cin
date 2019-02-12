@@ -1,0 +1,17 @@
+
+{% load display_custom %}
+
+{% for pg in pagamentos %}
+    <tr>
+        <td>{{ pg.forma_pagamento }}
+            <button type="button" class="btn btn-info btn-sm js-detalhe-pagamento" data-url="{% url 'core:ajax-pagamento-detalhe' pg.pk %}">
+                <i class="fas fa-fw fa-search"></i>
+            </button>
+        </td>
+        <td>{{ pg.data_pagamento }}</td>
+    </tr>
+{% empty %}
+    <tr class="text-center">
+        <td colspan="3">Nenhum pagamento encontrado.</td>
+    </tr>
+{% endfor %}

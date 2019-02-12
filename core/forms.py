@@ -4,6 +4,9 @@ from core.models import *
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column, HTML
 from crispy_forms.bootstrap import AppendedText, PrependedText, FormActions
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from localflavor.br.forms import BRCPFField, BRCNPJField, BRZipCodeField
+from django.utils.translation import gettext_lazy as _
 
 class GeneroForm(forms.ModelForm):
     class Meta:
@@ -44,7 +47,7 @@ class FilmeForm(forms.ModelForm):
     diretor = forms.ModelMultipleChoiceField(queryset = Artista.objects.filter(tipo__icontains='Diretor'))
     class Meta:
         model = Filme
-        fields = ('titulo', 'titulo_original', 'duracao', 'diretor', 'ano', 'pais', 'classificacao', 'genero', 'sinopse',)
+        fields = ('titulo', 'titulo_original', 'duracao', 'diretor', 'ano', 'pais', 'classificacao', 'genero', 'distribuidora', 'capa','sinopse', 'is_lancamento')
     
     def __init__(self, *args, **kwargs):
         super(FilmeForm, self).__init__(*args, **kwargs)
@@ -71,10 +74,16 @@ class FilmeForm(forms.ModelForm):
                 Column('genero', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
             ),
+            Row(
+                Column('distribuidora', css_class='form-group col-md-6 mb-0'),
+                Column('capa', css_class='form-group col-md-6 mb-0'),
+                css_class='form-row'
+            ),
+            'is_lancamento',
             'sinopse',
             # HTML('<hr>'),
-            # HTML("<a href='{% url 'admin:genero-novo' %}' class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Gênero</a>"),
-            # HTML("<a href='{% url 'admin:filme-listar' %}' class='btn btn-danger ml-2 float-right'>Cancelar</a>"),
+            # HTML("<a href='{% url 'core:genero-novo' %}' class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Gênero</a>"),
+            # HTML("<a href='{% url 'core:filme-listar' %}' class='btn btn-danger ml-2 float-right'>Cancelar</a>"),
             # Submit('save_changes', 'Adicionar Filme', css_class="btn-success ml-2 mb-4 float-right"),
         )
 
@@ -94,10 +103,10 @@ class MidiaForm(forms.ModelForm):
         self.helper.layout = Layout(
             'nome',
             PrependedText('valor','R$'),
-            HTML('<hr>'),
-            HTML("<a href='{% url 'admin:filme-novo' %}' class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Filme</a>"),
-            HTML("<a href='{% url 'admin:midia-listar' %}' class='btn btn-danger ml-2 float-right'>Cancelar</a>"),
-            Submit('save_changes', 'Adicionar Tipo de Mídia', css_class="btn-success ml-2 mb-4 float-right"),
+            # HTML('<hr>'),
+            # HTML("<a href='{% url 'core:filme-novo' %}' class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Filme</a>"),
+            # HTML("<a href='{% url 'core:midia-listar' %}' class='btn btn-danger ml-2 float-right'>Cancelar</a>"),
+            # Submit('save_changes', 'Adicionar Tipo de Mídia', css_class="btn-success ml-2 mb-4 float-right"),
 
         )
 
@@ -107,9 +116,20 @@ class ElencoForm(forms.ModelForm):
     class Meta:
         model = Elenco
         fields = ('ator', 'personagem', 'principal', )
+        error_messages = {
+            NON_FIELD_ERRORS: {
+                'unique_together': "%(model_name)s's %(field_labels)s are not unique.",
+            }
+        }
     
     def __init__(self, *args, **kwargs):
         super(ElencoForm, self).__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_show_labels = False
+
+    def clean(self):
+        cleaned_data = super(ElencoForm, self).clean()
 
 class BaseElencoFormSet(BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
@@ -119,7 +139,13 @@ class BaseElencoFormSet(BaseInlineFormSet):
             form.fields['ator'].queryset = Artista.objects.filter(tipo__icontains='Ator')
             form.fields['ator'].widget.attrs['class'] = 'form-control js-ator'
 
+
     def clean(self):
+        atores = []
+        personagens = []
+        duplicates = False
+        print('BaseElencoFormSet: clean')
+
         for form in self.forms:
             if form.cleaned_data:
                 if 'ator' in form.cleaned_data:
@@ -137,24 +163,29 @@ class BaseElencoFormSet(BaseInlineFormSet):
                 else:
                     principal = None
 
-                if not ator and not personagem:
-                    form.cleaned_data['ator'] = None
-                    form.cleaned_data['personagem'] = None
-                    form.cleaned_data['principal'] = None
-                    form.cleaned_data['DELETE'] = True   
+                try:
+                    print('try BaseElencoFormSet')
+                    artistas_filme = Elenco.objects.get(filme=form.cleaned_data['filme'], ator=ator)
+                    if artistas_filme:
+                        form.add_error('ator', '%s já está listado no elenco deste filme' % ator)
+                except:
+                    pass
+                    
 
-                # print(form.prefix+' '+str(form.cleaned_data['DELETE']))
+                if ator and personagem:
+                    if ator in atores:
+                        duplicates = True    
+                    atores.append(ator)
 
-                if ator and not personagem:
-                    raise forms.ValidationError('É obrigatório informar o personagem', code='missing_personagem')
-
+                    if personagem in personagens:
+                        duplicates = True
+                    personagens.append(personagem)
+                
+                if duplicates:
+                    raise forms.ValidationError('O Elenco deve ter atores e personagem exclusivo.', code='duplicates_ator')
+        
         if any(self.errors):
             return
-
-
-
-
-    
 
 ElencoInlineFormSet = forms.inlineformset_factory(
     Filme, 
@@ -170,3 +201,186 @@ ElencoInlineFormSet = forms.inlineformset_factory(
     min_num=1,
     can_delete=True,
 )
+
+class EnderecoForm(forms.ModelForm):
+    cep = BRZipCodeField(label='CEP')
+
+    class Meta:
+        model = Endereco
+        fields = ('logradouro','numero','complemento', 'bairro', 'cep', 'estado','cidade')
+    
+    def __init__(self, *args, **kwargs):
+        super(EnderecoForm, self).__init__(*args, **kwargs)
+        self.fields['cep'].widget.attrs['class'] = 'form-control cep'
+        self.fields['cidade'].queryset = Cidade.objects.none()
+        
+        if 'estado' in self.data:
+            try:
+                estado_id = int(self.data.get('estado'))
+                print('Estado: '+str(estado_id))
+                self.fields['cidade'].queryset = Cidade.objects.filter(estado_id=estado_id).order_by('nome')
+            except (ValueError, TypeError):
+                pass
+        
+        elif self.instance.pk:
+            self.fields['cidade'].queryset = self.instance.estado.cidade_set.order_by('nome')
+
+class DistribuidoraForm(forms.ModelForm):
+    class Meta:
+        model = Distribuidora
+        fields = ('razao_social','cnpj','contato', 'telefone')
+    
+    def __init__(self, *args, **kwargs):
+        super(DistribuidoraForm, self).__init__(*args, **kwargs)
+        self.base_fields['cnpj'].widget.attrs['class'] = 'form-control cnpj'
+        self.base_fields['telefone'].widget.attrs['class'] = 'form-control phone_with_ddd'
+
+class ItemForm(forms.ModelForm):
+    class Meta:
+        model = Item
+        fields = ('filme', 'tipo_midia', 'numero_serie', 'data_aquisicao', 'quantidade',)
+    
+    def __init__(self, *args, **kwargs):
+        super(ItemForm, self).__init__(*args, **kwargs)
+        self.fields['data_aquisicao'].widget.attrs['class'] = 'form-control date'
+        
+
+class ClienteForm(forms.ModelForm):
+    first_name = forms.CharField(label='Primeiro nome')
+    last_name = forms.CharField(label='Último nome')
+    cpf = BRCPFField(label='CPF')
+    data_nascimento = forms.DateField()
+    sexo = forms.ChoiceField(label='Sexo', choices=tipo_sexo)
+    local_trabalho = forms.CharField(label='Local de Trabalho')
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email',)
+
+    def __init__(self, *args, **kwargs):
+        super(ClienteForm, self).__init__(*args, **kwargs)
+        self.fields['cpf'].widget.attrs['class'] = 'form-control cpf'
+        self.fields['data_nascimento'].widget.attrs['class'] = 'form-control date'
+
+class TelefoneForm(forms.ModelForm):
+
+    class Meta:
+        model = Telefone
+        fields = ('numero', 'tipo',)
+
+    def __init__(self, *args, **kwargs):
+        super(TelefoneForm, self).__init__(*args, **kwargs)
+        self.fields['numero'].widget.attrs['class'] = 'form-control phone_with_ddd'
+
+        self.helper = FormHelper()
+        self.helper.form_show_labels = False
+
+
+class DependenteForm(forms.ModelForm):
+    first_name = forms.CharField(label='Primeiro nome')
+    last_name = forms.CharField(label='Último nome')
+    cpf = BRCPFField(label='CPF')
+    data_nascimento = forms.DateField()
+    sexo = forms.ChoiceField(label='Sexo', choices=tipo_sexo)
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email',)
+
+    def __init__(self, *args, **kwargs):
+        super(DependenteForm, self).__init__(*args, **kwargs)
+        self.fields['cpf'].widget.attrs['class'] = 'form-control cpf'
+        self.fields['data_nascimento'].widget.attrs['class'] = 'form-control date'
+
+  
+TelefoneInlineFormSet = forms.inlineformset_factory(
+    Perfil, 
+    Telefone, 
+    form=TelefoneForm,
+    extra=2,
+    # widgets={'personagem': forms.TextInput(attrs={
+    #             'class': 'form-control',
+    #             'placeholder': 'Informe o personagem aqui'
+    #         }),
+    # },
+    min_num=1,
+)
+
+class ReservaForm(forms.ModelForm):
+    class Meta:
+        model = Reserva
+        fields = ('cliente', 'filme', 'midia')
+    
+    def __init__(self, *args, **kwargs):
+        super(ReservaForm, self).__init__(*args, **kwargs)
+
+        self.fields['midia'].queryset = Midia.objects.none()
+
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            'cliente',
+            'filme',
+            'midia',
+            HTML('<hr>'),
+            HTML("<a href='{% url 'core:reserva-listar' %}' class='btn btn-danger ml-2 float-right'>Cancelar</a>"),
+            Submit('save_changes', 'Adicionar Reserva', css_class="btn-success ml-2 mb-4 float-right"),
+        )
+
+        if 'filme' in self.data:
+            try:
+                filme_id = int(self.data.get('filme'))
+                self.fields['midia'].queryset = Midia.objects.filter(item_midia__filme_id=filme_id).order_by('nome')
+            except (ValueError, TypeError):
+                pass
+        
+        elif self.instance.pk:
+            self.fields['midia'].queryset = Midia.objects.filter(item_midia__filme_id=self.instance.filme) 
+
+
+class LocacaoForm(forms.ModelForm):
+    # valor_total = forms.DecimalField(label='Valor da Locação', max_digits=8, decimal_places=2, localize=True,)
+    class Meta:
+        model = Locacao
+        fields = ('cliente',)
+    
+    def __init__(self, *args, **kwargs):
+        super(LocacaoForm, self).__init__(*args, **kwargs)
+        # self.fields['valor_total'].widget.attrs['class'] = 'form-control money2'
+        # self.fields['valor_total'].widget.attrs['readonly'] = True
+
+
+
+class ItemLocacaoForm(forms.ModelForm):
+    item = forms.ModelChoiceField(queryset=Item.objects.filter(is_active=True))
+    valor = forms.DecimalField(label='Valor da Locação', max_digits=8, decimal_places=2, localize=True)
+    desconto = forms.DecimalField(label='Desconto', max_digits=8, decimal_places=2, localize=True, required=False)
+    locacao = forms.ModelChoiceField(queryset=Locacao.objects.all(), widget=forms.HiddenInput())
+    is_nova_data = forms.BooleanField(label='Deseja estender a data de devolução? ', required=False)
+    
+    class Meta:
+        model = ItemLocacao
+        fields = ('item', 'valor', 'desconto', 'data_devolucao_prevista', 'nova_data_devolucao', 'locacao',)
+    
+    def __init__(self, *args, **kwargs):
+        super(ItemLocacaoForm, self).__init__(*args, **kwargs)
+        self.fields['data_devolucao_prevista'].widget.attrs['class'] = 'date'
+        self.fields['valor'].widget.attrs['class'] = 'money2'
+        self.fields['valor'].widget.attrs['readonly'] = True
+        self.fields['data_devolucao_prevista'].widget.attrs['readonly'] = True
+
+
+class DevolucaoForm(forms.ModelForm):
+    item = forms.ModelChoiceField(queryset=ItemLocacao.objects.filter(devolucao=None))
+    class Meta:
+        model = Devolucao
+        fields = ('item', 'multa')
+    
+    def __init__(self, *args, **kwargs):
+        super(DevolucaoForm, self).__init__(*args, **kwargs)
+        self.fields['multa'].widget.attrs['readonly'] = True
+
+
+
+
+
+
