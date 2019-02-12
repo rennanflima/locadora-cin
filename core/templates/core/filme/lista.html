@@ -54,11 +54,7 @@
                                 <td><a href="{% url 'core:filme-detalhe' filme.id %}">{{ filme }}</a></td>
                                 <td>{{ filme.ano }}</td>
                                 <td>
-                                    <ul>
-                                        {% for g in filme.genero.all %}
-                                            <li>{{ g }}</li>
-                                        {% endfor %}
-                                    </ul>
+                                    {{ filme.generos }}
                                 </td>
                                 <td>{{ filme.duracao }}</td>
                                 <td>

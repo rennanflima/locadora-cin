@@ -650,7 +650,7 @@ def criar_dependente(request, pk):
             except Exception as e:
                 messages.error(request, e)
 
-    return render(request, 'core/dependente/novo.html', {'form': form, 'pk': pk,})
+    return render(request, 'core/dependente/novo.html', {'form': form, 'pk': pk, 'titular': titular,})
 
 def editar_dependente(request, pk, id_dep):
     titular = get_object_or_404(Cliente, pk=pk)
@@ -675,7 +675,7 @@ def editar_dependente(request, pk, id_dep):
                 messages.error(request, e)
             
 
-    context = {'form': form, 'pk': pk, 'id_dep': id_dep,}
+    context = {'form': form, 'pk': pk, 'id_dep': id_dep, 'titular': titular,}
     return render(request, 'core/dependente/editar.html', context)
 
 

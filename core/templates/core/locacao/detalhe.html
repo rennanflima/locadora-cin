@@ -61,7 +61,7 @@
                             <tr>
                                 <td>{{ i.item }}</td>
                                 <td>{{ i.data_devolucao }}</td>
-                                <td>R$ {{ i.valor_com_desconto }}</td>
+                                <td>R$ {{ i.valor_locacao }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -77,11 +77,12 @@
                         <tr>
                             <th scope="col">Forma de pagamento</th>
                             <th scope="col">Data do Pagamento</th>
+                            <th scope="col">Valor</th>
                         </tr>
                     </thead>
                     <tfoot class="text-center">
                         <tr>
-                            <th class="text-right" colspan="1">Valor Total Pago</th>
+                            <th class="text-right" colspan="2">Valor Total Pago</th>
                             <th>R$ <span id="id_valor_restante">{{ locacao.valor_pago }}</span></th>
                         </tr>
                     </tfoot>

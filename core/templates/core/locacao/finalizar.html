@@ -83,15 +83,16 @@
                         <tr>
                             <th scope="col">Forma de pagamento</th>
                             <th scope="col">Data do Pagamento</th>
+                            <th scope="col">Valor</th>
                         </tr>
                     </thead>
                     <tfoot class="text-center">
                         <tr>
-                            <th class="text-right" colspan="1">Valor Pago</th>
-                            <th>R$ <span id="id_valor_restante">{{ locacao.valor_pago }}</span></th>
+                            <th class="text-right" colspan="2">Valor Pago</th>
+                            <th>R$ <span id="id_valor_pago">{{ locacao.valor_pago }}</span></th>
                         </tr>
                         <tr>
-                            <th class="text-right" colspan="1">Valor Restante</th>
+                            <th class="text-right" colspan="2">Valor Restante</th>
                             <th>R$ <span id="id_valor_restante">{{ valor_restante }}</span></th>
                         </tr>
                     </tfoot>
@@ -106,7 +107,7 @@
         <form  method="POST" class="form" action="{% url 'core:locacao-finalizar' locacao.pk %}">
             {% csrf_token %}
             <a href="{%url 'core:locacao-listar'%}" class="btn btn-danger ml-2 mb-4 float-right">Cancelar</a>
-            <button type="button" class="btn btn-info ml-2 js-add-pagamento mb-3 float-right" data-url="{% url 'core:locacao-pagamento' %}" {% if valor_restante == 0 or locacao.situacao == 'PAGA' %}disabled="true"{% endif %}>
+            <button type="button" class="btn btn-info ml-2 js-add-pagamento mb-3 float-right" data-url="{% url 'core:locacao-pagamento' locacao.pk %}" {% if valor_restante == 0 or locacao.situacao == 'PAGA' %}disabled="true"{% endif %}>
                 Incluir Pagamento
             </button>  
             <button type="submit" class="btn btn-primary ml-2 float-right">Confirmar</button>
@@ -129,7 +130,6 @@
                     $("#genericModal .modal-content").html(data.html_form);
                     $('.money2').mask("#.##0,00", {reverse: true});
                     $('.date').mask('00/00/0000');
-                    $('#id_locacao').val("{{ locacao.pk }}");
                 }
             });
         };
@@ -149,6 +149,7 @@
                         });
                         $("#pg_locacao_tb tbody").html(data.html_pg_list);
                         $("#genericModal").modal("hide");
+                        $("#id_valor_pago").text(data.valor_pago);
                         $("#id_valor_restante").text(data.valor_restante);
                         // if(data.qtd_item > 0) {
                         //     $("#id_submit_iten").prop('disabled', false);
@@ -157,6 +158,10 @@
                         // }
                     } else {
                         $("#genericModal .modal-content").html(data.html_form);
+                        runNotify({
+                            message: data.message,
+                            levelMessage: 'error'
+                        });
                     }
                 }
             });

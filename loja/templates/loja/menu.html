@@ -1,0 +1,13 @@
+<div class="col-lg-3">
+
+    <h1 class="my-4">
+        <img class="d-block img-fluid" src="images/logo_pipocaFilme.png" alt="Green Book">
+    </h1>
+    <div class="list-group">
+        {% for genero in generos %}
+            <a href="{% url 'filme_genero' genero.slug %}" class="list-group-item">{{ genero }}</a>
+        {% endfor %}            
+    </div>
+
+</div>
+    <!-- /.col-lg-3 -->

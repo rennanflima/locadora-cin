@@ -42,9 +42,7 @@
 
                 <div class="col-lg-3 col-md-6 mb-4">
                     <div class="card h-100">
-                        {% if filme.capa %}
-                            <img class="card-img-top" src="{{ filme.capa.url }}" alt="">
-                        {% endif %}
+                        <a href="#"><img class="card-img-top" src="{{ filme.capa.url }}" alt=""></a>
                         <div class="card-body">
                             <h5 class="card-title">
                                 <a href="#">{{ filme.titulo }}</a>
@@ -54,6 +52,8 @@
                         </div>
                     </div>
                 </div>
+            {% empty %}
+                <p>Nenhum filme encontrado do genero {{genero}}.</p>
             {% endfor %}
 
             
@@ -68,13 +68,13 @@
                             to the URL. -->
                             {% if not search %}
                                 <li class="page-item">
-                                    <a class="page-link" href="{% url 'index' %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                    <a class="page-link" href="{% url 'filme_genero' genero.slug %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
                                 </li>
                             {% else %}
                                 <!-- Append the searched query to the URL, so that on a search results page,
                                 the pagination don't revert to listing all the listview items. -->
                                 <li class="page-item">
-                                    <a class="page-link" href="{% url 'index' %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                    <a class="page-link" href="{% url 'filme_genero' genero.slug %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
                                 </li>
                             {% endif %}
                         {% else %}
@@ -83,16 +83,16 @@
                             </li>
                         {% endif %} 
                         {% for object in page_obj.paginator.page_range %}
-                            <li class="page-item"><a class="page-link" href="{% url 'index' %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
+                            <li class="page-item"><a class="page-link" href="{% url 'filme_genero' genero.slug %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
                         {% endfor %} 
                         {% if page_obj.has_next %}
                             {% if not search %}
                                 <li class="page-item">
-                                    <a class="page-link" href="{% url 'index' %}?page={{ page_obj.next_page_number }}">Próxima página</a>
+                                    <a class="page-link" href="{% url 'filme_genero' genero.slug %}?page={{ page_obj.next_page_number }}">Próxima página</a>
                                 </li>
                             {% else %}
                                 <li class="page-item">
-                                    <a class="page-link" href="{% url 'index' %}?{{search}}&page={{ page_obj.next_page_number }}">Próxima página</a>
+                                    <a class="page-link" href="{% url 'filme_genero' genero.slug %}?{{search}}&page={{ page_obj.next_page_number }}">Próxima página</a>
                                 </li>
                             {% endif %}
                         {% else %}
