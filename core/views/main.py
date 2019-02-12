@@ -149,9 +149,13 @@ def realizar_locacao(request, pk = None):
             its = ItemLocacao.objects.filter(locacao__in=lcs)
 
             for i in its:
-                if i.devolucao and i.locacao.situacao != 'PAGA':
-                    messages.error(request, "O cliente '%s' está em atraso" % cliente)
-                    return render(request, 'core/locacao/buscar_cliente.html', {'form': form})
+                try:
+                    devolucao = Devolucao.objects.get(pk=i)
+                    if devolucao and i.locacao.situacao != 'PAGA':
+                        messages.error(request, "O cliente '%s' está em atraso" % cliente)
+                        return render(request, 'core/locacao/buscar_cliente.html', {'form': form})
+                except:
+                    pass
 
             locacao = form.save()
             return HttpResponseRedirect(reverse('core:locacao-realizar-itens', kwargs={'pk': locacao.pk}))    

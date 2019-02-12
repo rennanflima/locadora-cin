@@ -10,6 +10,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from core.managers import UserManager
 from datetime import date
+from datetime import datetime
 from datetime import timedelta 
 from django.conf import settings
 from django.utils.text import slugify
@@ -544,13 +545,13 @@ class ItemLocacao(models.Model):
     def __str__(self):
         return "%s, locado pelo cliente: %s" % (self.item, self.locacao.cliente)
 
-    def clean(self):        
-        if self.nova_data_devolucao < self.locacao.data_locacao:    
+    def clean(self):   
+        if self.nova_data_devolucao < self.locacao.data_locacao.date():    
             raise ValidationError({
                 'nova_data_devolucao': _('A nova data de devolução prevista deve ser maior que a data de locação.'),
             })
 
-        if self.data_devolucao_prevista < self.locacao.data_locacao:
+        if self.data_devolucao_prevista < self.locacao.data_locacao.date():
             raise ValidationError({
                 'data_devolucao_prevista': 'A data de devolução prevista deve ser maior que a data de locação.',
             })
