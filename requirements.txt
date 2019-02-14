@@ -86,7 +86,6 @@ six==1.12.0
 snowballstemmer==1.2.1
 Sphinx==1.8.3
 sphinx-bootstrap-theme==0.6.5
-sphinxcontrib-ansi==0.6.dev20161022
 sphinxcontrib-programoutput==0.13
 sphinxcontrib-websupport==1.1.0
 splinter==0.10.0
