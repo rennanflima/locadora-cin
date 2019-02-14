@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'multiselectfield',
     'crispy_forms',
     'localflavor',
-
+    'django_extensions',
     # Autenticação com Redes Sociais
     'allauth',
     'allauth.account',

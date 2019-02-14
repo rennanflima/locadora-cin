@@ -1,4 +1,5 @@
 from behave import *
+from datetime import datetime
 
 @given('que estou na página de gênero "{page}"')
 
@@ -14,7 +15,7 @@ def click_bnt(context):
 
 @when('preencher o campo nome com uma descrição')
 def insert_values_on_fields(context):
-    context.browser.find_element_by_id('id_nome').send_keys("Drama")
+    context.browser.find_element_by_id('id_nome').send_keys("Drama - {}".format(datetime.now()))
 
 
 @when('clicar no botão adicionar gênero')
