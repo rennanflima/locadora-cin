@@ -506,7 +506,6 @@ class ItemAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 # Início CRUD Cliente
-
 @login_required
 @permission_required('core.pode_add_titular')
 def criar_cliente(request):    
@@ -541,10 +540,12 @@ def criar_cliente(request):
                     cliente.codigo = '%s%s' % (str(today.year), str(user.pk))
                     cliente.local_trabalho = form.cleaned_data.get('local_trabalho')
                     cliente.user = user
+                    cliente.titular = None
                     cliente.save()
 
                     historico = HistoricoCliente()
                     historico.cliente = cliente
+                    historico.titular = None
                     historico.save()
                     
                     messages.success(request, 'Cliente adicionada com sucesso.')
