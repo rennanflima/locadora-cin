@@ -77,7 +77,7 @@
                                         <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:reserva-editar' reserva.id %}'">Editar</button>
                                     {% endif %}
                                     {% if perms.core.pode_cancelar_reserva %}
-                                        <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:reserva-cancelar' reserva.id %}'">Cancelar</button>
+                                        <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:reserva-cancelar' reserva.id %}'"{% if reserva.status == 'Expirada' %}disabled="true"{% endif %}>Cancelar</button>
                                     {% endif %}
                                 </td>
                             </tr>

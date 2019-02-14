@@ -6,6 +6,10 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
 from core.filters import *
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 class IndexView(generic.ListView):
     model = Filme
@@ -73,3 +77,19 @@ def buscar_avancada_filmes(request):
     page = request.GET.get('page')
     filmes = paginator.get_page(page)
     return render(request, 'loja/buscar_filmes_avancada.html', {'filmes': filmes, 'filter': filme_filter, 'generos': generos,})
+
+
+@login_required
+def perfil_usuario_detalhe(request):
+    user = request.user
+    return render(request, 'loja/perfil/detalhe.html', {'usuario': user})
+
+@login_required
+def alterar_senha(request):
+    form = PasswordChangeForm(request.user, request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Sua senha foi atualizada com sucesso!')
+    return render(request, 'loja/perfil/password_change.html', {'form': form })

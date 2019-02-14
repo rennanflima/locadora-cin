@@ -77,7 +77,7 @@ def redireciona_usuario(request):
         return HttpResponseRedirect(reverse_lazy('core:index'))
     else:
         if not user.perfil.cpf:
-            return HttpResponseRedirect(reverse_lazy('core:perfil-usuario'))
+            return HttpResponseRedirect(reverse_lazy('core:perfil-usuario-add'))
         else:
             return HttpResponseRedirect(reverse_lazy('index'))
 
@@ -130,8 +130,8 @@ class ReservaCriar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMi
         cliente = form.cleaned_data.get('cliente')
         filme = form.cleaned_data.get('filme')
         midia = form.cleaned_data.get('midia')
-        text_msg = "Olá, " + str(cliente) + ". \r\n\r\nInformamos que sua reserva para o filme "+ str(filme)+" ("+ str(midia) +") foi efetivada no dia " + str(localize(datetime.now())) + ". \r\n\r\nPara mais informações visite nossa loja e/ou procure um de nossos funcionários. \r\n\r\nAtenciosamente, Locadora Imperial."
-        SendMail('[Locadora Imperial] Cancelamento de reserva',text_msg, cliente.user.email).start()
+        text_msg = "Olá, " + str(cliente) + ". \r\n\r\nInformamos que sua RESERVA para o filme "+ str(filme)+" ("+ str(midia) +") foi efetivada no dia " + str(localize(datetime.now())) + ". \r\n\r\nPara mais informações visite nossa loja e/ou procure um de nossos funcionários. \r\n\r\nAtenciosamente, Locadora Imperial."
+        SendMail('[Locadora Imperial] Criação de reserva',text_msg, cliente.user.email).start()
         return super(ReservaCriar, self).form_valid(form)
 
 class ReservaDetalhe(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
@@ -161,9 +161,10 @@ def reserva_cancelar(request, pk):
     print(reserva)
     if request.method == 'POST':
         reserva.status = 'Expirada'
+        reserva.save()
 
         text_msg = "Olá, " + str(reserva.cliente) + ". \r\n\r\nInformamos que sua reserva para o filme "+ str(reserva.filme)+" ("+ str(reserva.midia) +") foi cancelada no dia " + str(localize(datetime.now())) + ". \r\n\r\nPara mais informações visite nossa loja e procure um de nossos funcionários. \r\n\r\nAtenciosamente, Locadora Imperial."
-        # SendMail('[Locadora Imperial] Cancelamento de reserva',text_msg, reserva.cliente.user.email).start()
+        SendMail('[Locadora Imperial] Cancelamento de reserva',text_msg, reserva.cliente.user.email).start()
         messages.success(request, 'Reserva cancelada com sucesso.')
         return HttpResponseRedirect(reverse_lazy('core:reserva-listar'))
     
@@ -495,6 +496,16 @@ def detalhe_pagamento(request, pk):
     data['html_form'] = render_to_string('core/ajax/partial_detalhe_pagamento.html', context, request=request,)
     return JsonResponse(data)
 
+class LocacaoDeletar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.DeleteView):
+    model = Locacao
+    template_name = "core/locacao/deletar.html"
+    success_url = reverse_lazy('core:locacao-listar')
+    success_message = "Locação excluída com sucesso."
+    permission_required = "core.delete_locacao"
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(LocacaoDeletar, self).delete(request, *args, **kwargs)
     
 # Início views devolução
 class DevolucaoCriar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.CreateView):
@@ -503,6 +514,18 @@ class DevolucaoCriar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessage
     template_name = 'core/devolucao/novo.html'
     success_message = "Devolução adicionado com sucesso."
     permission_required = "core.add_devolucao"
+
+    def form_valid(self, form):
+        item = form.cleaned_data.get('item')
+        reservas = Reserva.objects.filter(filme=item.filme, midia=item.tipo_midia)
+        
+        
+        for r in reservas:
+            r.data_notificacao = datetime.now()
+            r.save()
+            text_msg = "Olá, " + str(r.cliente) + ". \r\n\r\nInformamos que o filme "+ str(r.filme)+" ("+ str(r.midia) +") referente a sua RESERVA já está disponível para locação. A partir da data da notificação, " + str(localize(datetime.now())) + ", você tem 24h para realizar a locação, caso contrario ela será cancelada. \r\n\r\nPara mais informações visite nossa loja e procure um de nossos funcionários. \r\n\r\nAtenciosamente, Locadora Imperial."
+            SendMail('[Locadora Imperial] Disponibilidade do filme',text_msg, r.cliente.user.email).start()
+        return super().form_valid(form)
 
 class DevolucaoListar(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Devolucao
@@ -546,6 +569,7 @@ class DevolucaoDetalhe(LoginRequiredMixin, PermissionRequiredMixin, generic.Deta
         context['valor_restante'] = valor_restante
         return context
 
+
 @login_required
 def carrega_item_devolucao_ajax(request):
     data = dict()
@@ -557,6 +581,7 @@ def carrega_item_devolucao_ajax(request):
     else: 
         data['multa'] = 0
     return JsonResponse(data)
+
 
 @login_required
 @permission_required('core.add_pagamento')
@@ -671,3 +696,8 @@ def buscar_itens(request):
     filmes = paginator.get_page(page)
     return render(request, 'core/item/buscar_filmes.html', {'filmes': filmes, 'filter': filme_filter})
 
+
+@login_required
+def perfil_usuario_detalhe(request):
+    user = request.user
+    return render(request, 'core/perfil/detalhe.html', {'usuario': user})

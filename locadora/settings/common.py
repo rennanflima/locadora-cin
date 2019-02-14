@@ -168,8 +168,8 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_FORMS = {'login': 'core.forms.MyLoginForm'}
 
 
-# EMAIL_HOST = 'smtp.mailgun.org'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'postmaster@mg.locadora-cin.com'
-# EMAIL_HOST_PASSWORD = '0acb5347d07a2855b7c6ad0c6ee90afb-b9c15f4c-f973d66a'
-# EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'mrennan.lima@gmail.com   '
+EMAIL_HOST_PASSWORD = 'rennan01'
+EMAIL_USE_TLS = True

@@ -57,7 +57,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         )
 
     def __str__(self):
-        return self.get_full_name()
+        if self.get_full_name():
+            return self.get_full_name()
+        else:
+            return self.email
 
     def get_full_name(self):
         '''
@@ -81,6 +84,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def grupos(self):
         return ', '.join([g.name for g in self.groups.all()])
     grupos.short_description = "Grupos associados ao Usuário"
+
+    def permissoes(self):
+        return ', '.join([p.name for p in self.user_permissions.all()])
+    permissoes.short_description = "Permissões associados ao Usuário"
 
 class Genero(models.Model):
     nome = models.CharField('Nome', max_length=100, unique=True)
@@ -581,8 +588,6 @@ class Locacao(models.Model):
         self.valor_total = self.sub_total - self.total_descontos      
         super(Locacao, self).save(*args, **kwargs)
 
-    
-
 
 class ItemLocacao(models.Model):
     item = models.ForeignKey(Item, on_delete=models.PROTECT)
@@ -616,6 +621,13 @@ class ItemLocacao(models.Model):
             raise ValidationError({
                 'data_devolucao_prevista': 'A data de devolução prevista deve ser maior que a data de locação.',
             })
+
+        reserva = Reserva.objects.filter(filme=self.item.filme, midia=self.item.tipo_midia, status='Pendente')
+        if reserva:
+            raise ValidationError({
+                'item': 'Este item tem uma RESERVA PENDENTE, portanto não pode ser locado.',
+            })
+
 
     def valor_locacao(self):
         return self.valor - self.desconto    

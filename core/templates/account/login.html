@@ -9,6 +9,7 @@ License URL: https://www.designmaz.net/licence/
     <title>Responsive Static Login Form HTML5 Template | DesignMaz</title>
     <!-- Custom Theme files -->
 	{% load static %}
+	{% load bootstrap4 %}
 	{% load i18n %}
 	{% load account socialaccount %}
     <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" media="all"/>
@@ -33,6 +34,9 @@ License URL: https://www.designmaz.net/licence/
     </script>
 </head>
 <body>
+
+	{% bootstrap_messages %}
+
 	<div class="head">
 		<div class="logo">
 			<div class="logo-top">
@@ -51,7 +55,6 @@ License URL: https://www.designmaz.net/licence/
 				<div id="horizontalTab" style="display: block; width: 100%; margin: 0px;">
 					<ul class="resp-tabs-list">
 						<li class="resp-tab-item" aria-controls="tab_item-0" role="tab"><span>Login</span></li>
-						<li class="resp-tab-item" aria-controls="tab_item-1" role="tab"><label>/</label><span>Sign up</span></li>
 						<div class="clearfix"></div>
 					</ul>				  	 
 					<div class="resp-tabs-container">
@@ -82,35 +85,6 @@ License URL: https://www.designmaz.net/licence/
 									</div>
 								</form>
 							</div>
-						</div>
-						<div class="tab-1 resp-tab-content" aria-labelledby="tab_item-1">
-						<div class="login-top">
-								<form class="login" method="POST" action="{% url 'account_login' %}">
-									{% csrf_token %}
-									<!-- {{ form.login }}
-									{{ form.password }}
-									{{ form.remember.label }}: {{ form.remember }}
-									{% if redirect_field_value %}
-										<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-									{% endif %} -->
-								</form>
-									<div class="login-bottom">
-										<div class="submit">
-											<input type="submit" value="{% trans 'Sign In' %}"/>
-										</div>
-										<ul>
-											<li><p>Or login with</p></li>
-											<!-- <li><a href="#"><span class="fb"></span></a></li> -->
-											<!-- <li><a href="#"><span class="twit"></span></a></li> -->
-											<!-- <li><a href="#"><span class="google"></span></a></li> -->
-											{% include "socialaccount/snippets/provider_list.html" with process="login" %}
-										</ul>
-										
-										<div class="clear"></div>
-									</div>	
-								
-							</div>
-							
 						</div>							
 					</div>	
 				</div>

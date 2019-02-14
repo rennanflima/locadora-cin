@@ -7,7 +7,8 @@ app_name = 'core'
 urlpatterns = [
     path('', main.IndexView.as_view(), name='index'),
     path('redireciona/', main.redireciona_usuario, name='redireciona-usuario'),
-    path('perfil/user/', main.criar_perfil, name='perfil-usuario'),
+    path('perfil/user/add', main.criar_perfil, name='perfil-usuario-add'),
+    path('perfil/', main.perfil_usuario_detalhe, name='perfil-usuario'),
 
     path('filme/buscar/', main.buscar_itens, name="filme-buscar"),
 
@@ -28,6 +29,7 @@ urlpatterns = [
     path('locacao/realizar/<int:pk>/itens/', main.seleciona_itens_locacao, name="locacao-realizar-itens"),
     path('locacao/realizar/<int:pk>/confirmar/', main.confirmar_locacao, name="locacao-confirmar"),
     path('locacao/realizar/<int:pk>/finalizar/', main.finalizar_locacao, name="locacao-finalizar"),
+    path('locacao/<int:pk>/deletar/', main.LocacaoDeletar.as_view(), name="locacao-deletar"),
     
     path('locacao/<int:pk>/detalhe/', main.LocacaoDetalhe.as_view(), name="locacao-detalhe"),
     path('locacao/item/adicionar/', main.item_add, name='ajax-item-add'),
@@ -44,5 +46,6 @@ urlpatterns = [
     path('devolucao/<int:pk>/detalhe/', main.DevolucaoDetalhe.as_view(), name="devolucao-detalhe"),
     path('ajax/carregar/item/devolucao', main.carrega_item_devolucao_ajax, name="ajax-item-carregar-devolucao"),
     path('ajax/item/pagamento/', main.item_pagamento, name="item-pagamento"),
+
 
 ]
