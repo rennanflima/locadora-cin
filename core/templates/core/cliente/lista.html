@@ -20,8 +20,10 @@
                 Clientes
         </div>   
         <div class="card-body">
-            <div class="table-responsive">  
-                <a href="{% url 'core:cliente-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+            <div class="table-responsive">
+                {% if perms.core.pode_add_titular %}  
+                    <a href="{% url 'core:cliente-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                {% endif %}
                 <form method="GET" action="{%url 'core:cliente-listar'%}">
                     <div class="input-group mb-3">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
@@ -51,10 +53,16 @@
                         </tr>
                     </tfoot>
                     <tbody>
-                        {% for cliente in object_list %}
+                        {% for cliente in clientes %}
                             <tr class="text-center">
                                 <td>{{ cliente.codigo }}</td>
-                                <th scope="row"><a href="{% url 'core:cliente-detalhe' cliente.id %}">{{ cliente.user.get_full_name }}</a></th>
+                                <th scope="row">
+                                    {% if perms.core.pode_view_titular %}
+                                        <a href="{% url 'core:cliente-detalhe' cliente.id %}">{{ cliente.user.get_full_name }}</a>
+                                    {% else %}
+                                        {{ cliente.user.get_full_name }}
+                                    {% endif %}
+                                </th>
                                 <td>
                                     {% if cliente.is_active %}
                                         <img src="{% static '/img/icon_yes.svg' %}" width="17" height="17" alt="Sim"/>
@@ -65,12 +73,20 @@
                                 <td><button type="button" class="btn btn-primary m-2 btn-sm" onclick="window.location = '{% url 'core:dependente-listar' cliente.id %}'"><i class="fas fa-list-ul"></i></button></td>
                                 <td>
                                     {% if cliente.is_active %}
-                                        <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:cliente-desativar' cliente.id %}'">Desativar</button>
+                                        {% if perms.core.pode_desativar_titular %}
+                                            <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:cliente-desativar' cliente.id %}'">Desativar</button>
+                                        {% endif %}
                                     {% else %}
-                                        <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:cliente-ativar' cliente.id %}'">Ativar</button>
+                                        {% if perms.core.pode_ativar_titular %}
+                                            <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:cliente-ativar' cliente.id %}'">Ativar</button>
+                                        {% endif %}
                                     {% endif %}
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:cliente-editar' cliente.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:cliente-deletar' cliente.id %}'">Excluir</button>
+                                    {% if perms.core.pode_change_titular %}
+                                        <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:cliente-editar' cliente.id %}'">Editar</button>
+                                    {% endif %}
+                                    {% if perms.core.pode_delete_titular %}
+                                        <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:cliente-deletar' cliente.id %}'">Excluir</button>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% empty %}

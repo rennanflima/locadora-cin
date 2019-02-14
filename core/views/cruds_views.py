@@ -16,79 +16,93 @@ from pycep_correios.excecoes import ExcecaoPyCEPCorreios
 from core.filters import *
 from datetime import date
 from django.core.paginator import Paginator
-
+from dal import autocomplete
+from django.utils.html import format_html
+# from braces import views
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
 
 # Create your views here.
 
 # Início CRUD Gênero
-class GeneroCriar(SuccessMessageMixin, generic.CreateView):
+class GeneroCriar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.CreateView):
     model = Genero
     form_class = GeneroForm
     template_name = 'core/genero/novo.html'
     success_message = "Gênero adicionado com sucesso."
+    permission_required = "core.add_genero"
         
-class GeneroEditar(SuccessMessageMixin, generic.UpdateView):
+class GeneroEditar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.UpdateView):
     model = Genero
     form_class = GeneroForm
     template_name = 'core/genero/editar.html'
     success_message = "Gênero editado com sucesso."
+    permission_required = "core.change_genero"
 
-class GeneroListar(generic.ListView):
+class GeneroListar(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Genero
     paginate_by = 10
     template_name = 'core/genero/lista.html'    
+    permission_required = "core.view_genero"
 
     def get_queryset(self):
         nome = self.request.GET.get('nome', '')
         return self.model.objects.filter(nome__icontains = nome)
 
-class GeneroDetalhe(generic.DetailView):
+class GeneroDetalhe(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Genero
     context_object_name = 'genero'
     template_name = 'core/genero/detalhe.html'
+    permission_required = "core.view_genero"
 
 
-class GeneroDeletar(SuccessMessageMixin, generic.DeleteView):
+class GeneroDeletar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.DeleteView):
     model = Genero
     template_name = "core/genero/deletar.html"
     success_url = reverse_lazy('core:genero-listar')
     success_message = "Gênero excluído com sucesso."
+    permission_required = "core.delete_genero"
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super(GeneroDeletar, self).delete(request, *args, **kwargs)
 
 # Incício CRUD Pessoas do Filme
-class ArtistaCriar(SuccessMessageMixin, generic.CreateView):
+class ArtistaCriar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.CreateView):
     model = Artista
     form_class = ArtistaForm
     template_name = 'core/artista/novo.html'
     success_message = "Artista adicionado com sucesso."
+    permission_required = "core.add_artista"
 
-class ArtistaEditar(SuccessMessageMixin, generic.UpdateView):
+class ArtistaEditar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.UpdateView):
     model = Artista
     form_class = ArtistaForm
     template_name = 'core/artista/editar.html'
     success_message = "Artista editado com sucesso."
+    permission_required = "core.change_artista"
 
-class ArtistaListar(generic.ListView):
+class ArtistaListar(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Artista
     paginate_by = 10
-    template_name = 'core/artista/lista.html'    
+    template_name = 'core/artista/lista.html' 
+    permission_required = "core.view_artista"   
 
     def get_queryset(self):
         nome = self.request.GET.get('nome', '')
         return self.model.objects.filter(nome__icontains = nome)
 
-class ArtistaDetalhe(generic.DetailView):
+class ArtistaDetalhe(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Artista
     template_name = 'core/artista/detalhe.html'
+    permission_required = "core.view_artista"
 
-class ArtistaDeletar(generic.DeleteView):
+class ArtistaDeletar(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Artista
     template_name = "core/artista/deletar.html"
     success_url = reverse_lazy('core:artista-listar')
     success_message = "Artista excluído com sucesso."
+    permission_required = "core.delete_artista"
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
@@ -97,6 +111,8 @@ class ArtistaDeletar(generic.DeleteView):
 # Início CRUD Filme
 
 # View Criar filme com Form e Formset
+@login_required
+@permission_required('core.add_filme')
 def criar_filme(request):
     
     form = FilmeForm()
@@ -124,6 +140,8 @@ def criar_filme(request):
     return render(request, 'core/filme/novo.html', {'form': form, 'formset':elenco_forms})
              
 
+@login_required
+@permission_required('core.change_filme')
 def editar_filme(request, pk):
     filme = get_object_or_404(Filme, pk=pk)
     form = FilmeForm(instance=filme)
@@ -150,19 +168,21 @@ def editar_filme(request, pk):
             
     return render(request, 'core/filme/editar.html', {'form': form, 'formset':elenco_forms})
 
-class FilmeListar(generic.ListView):
+class FilmeListar(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Filme
     paginate_by = 10
-    template_name = 'core/filme/lista.html'    
+    template_name = 'core/filme/lista.html'
+    permission_required = "core.view_filme"
 
     def get_queryset(self):
         nome = self.request.GET.get('nome', '')
         return self.model.objects.filter(Q(titulo__icontains = nome) | Q(titulo_original__icontains=nome))
 
-class FilmeDetalhe(generic.DetailView):
+class FilmeDetalhe(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Filme
     context_object_name = 'filme'
     template_name = 'core/filme/detalhe.html'
+    permission_required = "core.view_filme"
 
     def get_context_data(self, **kwargs):
         context = super(FilmeDetalhe, self).get_context_data(**kwargs)
@@ -170,6 +190,8 @@ class FilmeDetalhe(generic.DetailView):
         return context
 
 #Formulario de diretor no modal
+@login_required
+@permission_required('core.add_diretor')
 def diretor_novo_ajax(request):
     data = dict()
     form = DiretorForm
@@ -203,6 +225,8 @@ def diretor_novo_ajax(request):
     return JsonResponse(data)
 
 #Formulario de genero no modal
+@login_required
+@permission_required('core.add_genero')
 def genero_novo_ajax(request):
     data = dict()
     form = GeneroForm
@@ -223,6 +247,8 @@ def genero_novo_ajax(request):
     return JsonResponse(data)
 
 #Formulario de ator no modal
+@login_required
+@permission_required('core.add_ator')
 def ator_novo_ajax(request):
     data = dict()
     form = AtorForm
@@ -255,47 +281,53 @@ def ator_novo_ajax(request):
 
     return JsonResponse(data)
 
-class FilmeDeletar(generic.DeleteView):
+class FilmeDeletar(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Filme
     template_name = "core/filme/deletar.html"
     success_url = reverse_lazy('core:filme-listar')
     success_message = "Filme excluído com sucesso."
+    permission_required = "core.delete_filme"
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super(FilmeDeletar, self).delete(request, *args, **kwargs)
 
 # Início CRUD Midia
-class MidiaCriar(SuccessMessageMixin, generic.CreateView):
+class MidiaCriar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.CreateView):
     model = Midia
     form_class = MidiaForm
     template_name = 'core/midia/novo.html'
     success_message = "Mídia adicionada com sucesso."
+    permission_required = "core.add_midia"
 
-class MidiaEditar(SuccessMessageMixin, generic.UpdateView):
+class MidiaEditar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.UpdateView):
     model = Midia
     form_class = MidiaForm
     template_name = 'core/midia/editar.html'
     success_message = "Mídia editada com sucesso."
+    permission_required = "core.change_midia"
 
-class MidiaListar(generic.ListView):
+class MidiaListar(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Midia
     paginate_by = 10
     template_name = 'core/midia/lista.html'    
+    permission_required = "core.view_midia"
 
     def get_queryset(self):
         nome = self.request.GET.get('nome', '')
         return self.model.objects.filter(nome__icontains = nome)
 
-class MidiaDetalhe(generic.DetailView):
+class MidiaDetalhe(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Midia
     template_name = 'core/midia/detalhe.html'
+    permission_required = "core.view_midia"
 
-class MidiaDeletar(generic.DeleteView):
+class MidiaDeletar(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Midia
     template_name = "core/midia/deletar.html"
     success_url = reverse_lazy('core:midia-listar')
     success_message = "Mídia excluída com sucesso."
+    permission_required = "core.delete_midia"
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
@@ -303,7 +335,8 @@ class MidiaDeletar(generic.DeleteView):
 
 
 # Início CRUD Distribuidora      
-# @transaction.atomic  
+@login_required
+@permission_required('core.add_distribuidora')
 def criar_distribuidora(request):    
     form = DistribuidoraForm()
     end_form = EnderecoForm()
@@ -326,6 +359,8 @@ def criar_distribuidora(request):
     return render(request, 'core/distribuidora/novo.html', {'form': form, 'end_form':end_form})
 
 
+@login_required
+@permission_required('core.change_distribuidora')
 def editar_distribuidora(request, pk):    
     distribuidora = get_object_or_404(Distribuidora, pk=pk)
     form = DistribuidoraForm(instance=distribuidora)
@@ -348,26 +383,29 @@ def editar_distribuidora(request, pk):
     
     return render(request, 'core/distribuidora/editar.html', {'form': form, 'end_form':end_form})
 
-class DistribuidoraListar(generic.ListView):
+class DistribuidoraListar(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Distribuidora
     paginate_by = 10
     template_name = 'core/distribuidora/lista.html'    
+    permission_required = "core.view_distribuidora"
 
     def get_queryset(self):
         nome = self.request.GET.get('nome', '')
         return self.model.objects.filter(razao_social__icontains = nome)
 
-class DistribuidoraDetalhe(generic.DetailView):
+class DistribuidoraDetalhe(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Distribuidora
     context_object_name = 'distribuidora' 
     template_name = 'core/distribuidora/detalhe.html'
+    permission_required = "core.view_distribuidora"
 
 
-class DistribuidoraDeletar(SuccessMessageMixin, generic.DeleteView):
+class DistribuidoraDeletar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.DeleteView):
     model = Distribuidora
     template_name = "core/distribuidora/deletar.html"
     success_url = reverse_lazy('core:distribuidora-listar')
     success_message = "Distribuidora excluída com sucesso."
+    permission_required = "core.delete_distribuidora"
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
@@ -396,42 +434,49 @@ def buscar_cep(request):
     return JsonResponse(data)
 
 # Início CRUD Item
-class ItemCriar(SuccessMessageMixin, generic.CreateView):
+class ItemCriar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.CreateView):
     model = Item
     form_class = ItemForm
     template_name = 'core/item/novo.html'
     success_message = "Item adicionado com sucesso."
+    permission_required = "core.add_item"
         
-class ItemEditar(SuccessMessageMixin, generic.UpdateView):
+class ItemEditar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.UpdateView):
     model = Item
     form_class = ItemForm
     template_name = 'core/item/editar.html'
     success_message = "Item editado com sucesso."
+    permission_required = "core.change_item"
 
-class ItemListar(generic.ListView):
+class ItemListar(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Item
     paginate_by = 10
     template_name = 'core/item/lista.html'    
+    permission_required = "core.view_item"
 
     def get_queryset(self):
         nome = self.request.GET.get('nome', '')
         return self.model.objects.filter(Q(numero_serie__icontains = nome)| Q(filme__titulo__icontains = nome) | Q(filme__titulo_original__icontains=nome))
 
-class ItemDetalhe(generic.DetailView):
+class ItemDetalhe(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Item
     context_object_name = 'item'
     template_name = 'core/item/detalhe.html'
+    permission_required = "core.view_item"
 
-class ItemDeletar(SuccessMessageMixin, generic.DeleteView):
+class ItemDeletar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.DeleteView):
     model = Item
     template_name = "core/item/deletar.html"
     success_url = reverse_lazy('core:item-listar')
     success_message = "Item excluído com sucesso."
+    permission_required = "core.delete_item"
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super(ItemDeletar, self).delete(request, *args, **kwargs)
 
+@login_required
+@permission_required('core.pode_desativar_item')
 @transaction.atomic
 def item_desativar(request, pk):
     item = get_object_or_404(Item, pk=pk)
@@ -441,6 +486,8 @@ def item_desativar(request, pk):
     messages.success(request, 'Item desativado com sucesso')
     return HttpResponseRedirect(reverse_lazy('core:item-listar'))
 
+@login_required
+@permission_required('core.pode_ativar_item')
 @transaction.atomic
 def item_ativar(request, pk):
     item = get_object_or_404(Item, pk=pk)
@@ -450,9 +497,18 @@ def item_ativar(request, pk):
     messages.success(request, 'Item ativado com sucesso')
     return HttpResponseRedirect(reverse_lazy('core:item-listar'))
 
+class ItemAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Item.objects.filter(is_active=True)
+
+        if self.q:
+            qs = qs.filter(Q(numero_serie__icontains = self.q) | Q(filme__titulo__icontains = self.q)| Q(filme__titulo_original__icontains = self.q))
+        return qs
 
 # Início CRUD Cliente
 
+@login_required
+@permission_required('core.pode_add_titular')
 def criar_cliente(request):    
     form = ClienteForm()
     end_form = EnderecoForm()
@@ -498,7 +554,8 @@ def criar_cliente(request):
     
     return render(request, 'core/cliente/novo.html', {'form': form, 'end_form': end_form, 'formset': formset})
 
-
+@login_required
+@permission_required('core.pode_change_titular')
 def editar_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
     data_init = {'cpf': cliente.user.perfil.cpf, 'data_nascimento': cliente.user.perfil.data_nascimento, 'sexo':cliente.user.perfil.sexo, 'local_trabalho': cliente.local_trabalho,}
@@ -540,31 +597,37 @@ def editar_cliente(request, pk):
     return render(request, 'core/cliente/editar.html', {'form': form, 'end_form': end_form, 'formset': formset,})
 
 
-class ClienteListar(generic.ListView):
-    model = Cliente
-    paginate_by = 10
-    template_name = 'core/cliente/lista.html'    
+@login_required
+@permission_required('core.pode_view_titular')
+def cliente_listar(request):
+    nome = request.GET.get('nome', '')
+    cliente_list = Cliente.objects.filter(Q(titular=None) & (Q(codigo__icontains = nome) | Q(user__first_name__icontains = nome) | Q(user__last_name__icontains = nome)))
+    paginator = Paginator(cliente_list, 10)
 
-    def get_queryset(self):
-        nome = self.request.GET.get('nome', '')
-        return self.model.objects.filter(Q(codigo__icontains = nome) | Q(user__first_name__icontains = nome)| Q(user__last_name__icontains = nome))
+    page = request.GET.get('page')
+    clientes = paginator.get_page(page)
+    return render(request, 'core/cliente/lista.html', {'clientes': clientes,})
 
-class ClienteDetalhe(generic.DetailView):
+class ClienteDetalhe(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Cliente
     context_object_name = 'cliente'
     template_name = 'core/cliente/detalhe.html'
+    permission_required = "core.pode_view_titular"
 
 
-class ClienteDeletar(SuccessMessageMixin, generic.DeleteView):
+class ClienteDeletar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.DeleteView):
     model = Cliente
     template_name = "core/cliente/deletar.html"
     success_url = reverse_lazy('core:cliente-listar')
     success_message = "Cliente excluído com sucesso."
+    permission_required = "core.pode_delete_titular"
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super(ClienteDeletar, self).delete(request, *args, **kwargs)
 
+@login_required
+@permission_required('core.pode_desativar_titular')
 @transaction.atomic
 def cliente_desativar(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
@@ -592,6 +655,9 @@ def cliente_desativar(request, pk):
     messages.success(request, 'Cliente desativado com sucesso')
     return HttpResponseRedirect(reverse_lazy('core:cliente-listar'))
 
+
+@login_required
+@permission_required('core.pode_ativar_titular')
 @transaction.atomic
 def cliente_ativar(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
@@ -607,8 +673,17 @@ def cliente_ativar(request, pk):
     return HttpResponseRedirect(reverse_lazy('core:cliente-listar'))
 
 
+class ClienteAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Cliente.objects.all()
+
+        if self.q:
+            qs = qs.filter(Q(codigo__icontains = self.q) | Q(user__first_name__icontains = self.q)| Q(user__last_name__icontains = self.q))
+        return qs
 
 # Inicio CRUD Dependente
+@login_required
+@permission_required('core.pode_add_dependente')
 def criar_dependente(request, pk):
     titular = get_object_or_404(Cliente, pk=pk)
 
@@ -652,6 +727,8 @@ def criar_dependente(request, pk):
 
     return render(request, 'core/dependente/novo.html', {'form': form, 'pk': pk, 'titular': titular,})
 
+@login_required
+@permission_required('core.pode_change_dependente')
 def editar_dependente(request, pk, id_dep):
     titular = get_object_or_404(Cliente, pk=pk)
     dependente = get_object_or_404(Cliente, pk=id_dep)
@@ -678,7 +755,8 @@ def editar_dependente(request, pk, id_dep):
     context = {'form': form, 'pk': pk, 'id_dep': id_dep, 'titular': titular,}
     return render(request, 'core/dependente/editar.html', context)
 
-
+@login_required
+@permission_required('core.pode_view_dependente')
 def dependente_listar(request, pk):
     titular = get_object_or_404(Cliente, pk=pk)
     nome = request.GET.get('nome', '')
@@ -690,17 +768,14 @@ def dependente_listar(request, pk):
     return render(request, 'core/dependente/lista.html', {'dependentes': dependentes, 'pk': pk, 'titular': titular,})
 
 
+@login_required
+@permission_required('core.pode_view_dependente')
 def dependente_detalhe(request, pk, id_dep):
     dependente = get_object_or_404(Cliente, pk=id_dep)
-    return render(request, 'core/dependente/detalhe.html', {'dependente': dependente, 'pk': pk, 'id_dep': id_dep,})
+    return render(request, 'core/dependente/detalhe.html', {'dependente': dependente, 'titular': dependente.titular, 'id_dep': id_dep,})
 
-
-class DependenteDetalhe(generic.DetailView):
-    model = Cliente
-    context_object_name = 'dependente'
-    template_name = 'core/dependente/detalhe.html'
-
-
+@login_required
+@permission_required('core.pode_delete_dependente')
 def dependente_deletar(request, pk, id_dep):
     dependente = get_object_or_404(Cliente, pk=id_dep)
     if request.method == 'POST':
@@ -710,6 +785,8 @@ def dependente_deletar(request, pk, id_dep):
     
     return render(request, 'core/dependente/deletar.html')
 
+@login_required
+@permission_required('core.pode_desativar_dependente')
 @transaction.atomic
 def dependente_desativar(request, pk, id_dep):
     titular = get_object_or_404(Cliente, pk=pk)
@@ -727,6 +804,9 @@ def dependente_desativar(request, pk, id_dep):
     messages.success(request, 'Dependente desativado com sucesso')
     return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))
 
+
+@login_required
+@permission_required('core.pode_ativar_dependente')
 @transaction.atomic
 def dependente_ativar(request, pk, id_dep):
     titular = get_object_or_404(Cliente, pk=pk)
@@ -743,3 +823,152 @@ def dependente_ativar(request, pk, id_dep):
     
     messages.success(request, 'Dependente ativado com sucesso')
     return HttpResponseRedirect(reverse('core:dependente-listar', kwargs={'pk': pk}))
+
+
+
+# Início CRUD Funcionário
+
+@login_required
+def buscar_funcionario(request):
+    if request.method == 'POST':
+        cpf = request.POST.get('cpf')
+        try:
+            user = User.objects.get(perfil__cpf=cpf)
+            print(user)
+            messages.success(request, 'O CPF do funcionário já estava cadastrado no sistema. Os dados foram recuperados com sucesso, por gentileza, defina o grupo deste usuário.')
+            return HttpResponseRedirect(reverse('core:funcionario-editar', kwargs={'pk': user.pk}))
+        except:
+            messages.warning(request, 'Infelizmente não conseguimos encontrar ninguém em nosso banco de dados')
+            return HttpResponseRedirect(reverse('core:funcionario-novo'))
+    return render(request, 'core/funcionario/buscar_funcionario.html')
+
+@login_required
+@permission_required('core.pode_add_funcionario')
+def criar_funcionario(request):    
+    form = FuncionarioForm()
+    end_form = EnderecoForm()
+    formset = TelefoneInlineFormSet(queryset=Telefone.objects.none())
+    if request.method == 'POST':
+        form = FuncionarioForm(request.POST)
+        end_form = EnderecoForm(request.POST)
+        formset = TelefoneInlineFormSet(request.POST, queryset=Telefone.objects.none())
+        if form.is_valid() and end_form.is_valid() and formset.is_valid():
+            cpf = form.cleaned_data.get('cpf')
+            try:
+                user = User.objects.get(perfil__cpf=cpf)
+                messages.success(request, 'O CPF do funcionário já estava cadastrado no sistema. Os dados foram recuperados com sucesso, por gentileza, defina o grupo deste usuário.')
+                return HttpResponseRedirect(reverse('core:funcionario-editar', kwargs={'pk': user.pk}))
+            except:
+                try:
+                    with transaction.atomic():
+                        user = form.save()
+                        user.refresh_from_db()
+                        user.perfil.cpf = form.cleaned_data.get('cpf')
+                        user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
+                        user.perfil.sexo = form.cleaned_data.get('sexo')
+                        
+                        endereco = end_form.save()
+                        user.perfil.endereco = endereco
+                        user.save()
+                        
+                        telefones = formset.save(commit=False)
+                        for fone in telefones:
+                            fone.perfil = user.perfil
+                            fone.save()
+                        
+                        messages.success(request, 'Funcionário adicionada com sucesso.')
+                        return HttpResponseRedirect(reverse('core:funcionario-detalhe', kwargs={'pk': user.pk}))
+                except Exception as e:
+                    messages.error(request, e)
+    
+    return render(request, 'core/funcionario/novo.html', {'form': form, 'end_form': end_form, 'formset': formset})
+
+@login_required
+@permission_required('core.pode_change_funcionario')
+def editar_funcionario(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    data_init = {'cpf': user.perfil.cpf, 'data_nascimento': user.perfil.data_nascimento, 'sexo': user.perfil.sexo,}
+    form = FuncionarioForm(instance=user, initial=data_init)
+    end_form = EnderecoForm(instance=user.perfil.endereco)
+    formset = TelefoneInlineFormSet(instance=user.perfil)
+
+    if request.method == 'POST':
+        form = FuncionarioForm(request.POST, instance=user)
+        end_form = EnderecoForm(request.POST, instance=user.perfil.endereco)
+        formset = TelefoneInlineFormSet(request.POST, instance=user.perfil)
+        if form.is_valid() and end_form.is_valid() and formset.is_valid():
+            try:
+                with transaction.atomic():
+                    user = form.save()
+                    user.refresh_from_db()
+                    user.perfil.cpf = form.cleaned_data.get('cpf')
+                    user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
+                    user.perfil.sexo = form.cleaned_data.get('sexo')
+
+                    endereco = end_form.save()
+                    user.perfil.endereco = endereco
+                    user.save()
+
+                    telefones = formset.save()
+                    for fone in telefones:
+                        if fone.perfil != user.perfil:
+                            fone.perfil = user.perfil
+                            fone.save()
+
+                    messages.success(request, 'Funcionário editado com sucesso.')
+                    return HttpResponseRedirect(reverse('core:funcionario-detalhe', kwargs={'pk': user.pk}))
+            except Exception as e:
+                messages.error(request, e)
+            
+    return render(request, 'core/funcionario/editar.html', {'form': form, 'end_form': end_form, 'formset': formset,})
+
+@login_required
+@permission_required('core.pode_view_funcionario')
+def funcionario_listar(request):
+    nome = request.GET.get('nome', '')
+    funcionario_list = User.objects.filter(Q(groups__isnull=False) & (Q(first_name__icontains = nome) | Q(last_name__icontains = nome)))
+    paginator = Paginator(funcionario_list, 10)
+
+    page = request.GET.get('page')
+    funcionarios = paginator.get_page(page)
+    return render(request, 'core/funcionario/lista.html', {'funcionarios': funcionarios,})
+
+class FuncionarioDetalhe(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
+    model = User
+    context_object_name = 'funcionario'
+    template_name = 'core/funcionario/detalhe.html'
+    permission_required = "core.pode_view_funcionario"
+
+class FuncionarioDeletar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.DeleteView):
+    model = User
+    template_name = "core/funcionario/deletar.html"
+    success_url = reverse_lazy('core:funcionario-listar')
+    success_message = "Funcionário excluído com sucesso."
+    permission_required = "core.pode_delete_funcionario"
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(FuncionarioDeletar, self).delete(request, *args, **kwargs)
+
+@login_required
+@permission_required('core.pode_desativar_funcionario')
+@transaction.atomic
+def funcionario_desativar(request, pk):
+    funcionario = get_object_or_404(User, pk=pk)
+    funcionario.is_active = False
+    funcionario.save()
+
+    messages.success(request, 'Funcionário desativado com sucesso')
+    return HttpResponseRedirect(reverse_lazy('core:funcionario-listar'))
+
+
+@login_required
+@permission_required('core.pode_ativar_funcionario')
+@transaction.atomic
+def funcionario_ativar(request, pk):
+    funcionario = get_object_or_404(User, pk=pk)
+    funcionario.is_active = True
+    funcionario.save()
+
+    messages.success(request, 'Funcionário ativado com sucesso')
+    return HttpResponseRedirect(reverse_lazy('core:funcionario-listar'))

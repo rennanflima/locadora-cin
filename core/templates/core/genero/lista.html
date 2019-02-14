@@ -20,7 +20,9 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">  
-                <a href="{% url 'core:genero-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                {% if perms.core.add_genero %}
+                    <a href="{% url 'core:genero-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                {% endif %}
                 <form method="GET" action="{%url 'core:genero-listar'%}">
                     <div class="input-group mb-3">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
@@ -46,10 +48,19 @@
                     <tbody>
                         {% for genero in object_list %}
                             <tr class="text-center">
-                                <th scope="row"><a href="{% url 'core:genero-detalhe' genero.id %}">{{ genero.nome }}</a></th>
+                                <th scope="row">
+                                    {% if perms.core.view_genero %}
+                                        <a href="{% url 'core:genero-detalhe' genero.id %}">{{ genero.nome }}</a></th>
+                                    {% else %}
+                                        {{genero.nome}}
+                                    {% endif %}
                                 <td>
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:genero-editar' genero.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:genero-deletar' genero.id %}'">Excluir</button>
+                                    {% if perms.core.change_genero %}
+                                        <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:genero-editar' genero.id %}'">Editar</button>
+                                    {% endif %}
+                                    {% if perms.core.delete_genero %}
+                                        <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:genero-deletar' genero.id %}'">Excluir</button>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% empty %}

@@ -13,7 +13,8 @@
             <a href="{%url 'core:locacao-listar'%}">Locações</a>
         </li>
         <li class="breadcrumb-item"><a href="{%url 'core:locacao-realizar'%}">Novo</a></li>
-        <li class="breadcrumb-item active">{{ locacao.cliente }}</li>
+        <li class="breadcrumb-item">{{ locacao.cliente }}</li>
+        <li class="breadcrumb-item active">Itens</li>
     </ol>
     
     {% bootstrap_messages %}

@@ -6,6 +6,10 @@ from core.views import main
 app_name = 'core'
 urlpatterns = [
     path('', main.IndexView.as_view(), name='index'),
+    path('redireciona/', main.redireciona_usuario, name='redireciona-usuario'),
+    path('perfil/user/', main.criar_perfil, name='perfil-usuario'),
+
+    path('filme/buscar/', main.buscar_itens, name="filme-buscar"),
 
     path('reserva/', main.ReservaListar.as_view(), name="reserva-listar"),
     path('reserva/novo/', main.ReservaCriar.as_view(), name="reserva-novo"),

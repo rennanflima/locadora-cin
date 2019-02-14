@@ -18,6 +18,8 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'dal' , 
+    'dal_select2' , 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -153,14 +155,21 @@ BOOTSTRAP4 = {
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
+LOGIN_REDIRECT_URL = 'core:redireciona-usuario'
+LOGOUT_REDIRECT_URL = 'index'
+
 # `allauth`
 SITE_ID = 1
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_FORMS = {'login': 'core.forms.MyLoginForm'}
 
 
-EMAIL_HOST = 'smtp.mailgun.org'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'postmaster@mg.locadora-cin.com'
-EMAIL_HOST_PASSWORD = '0acb5347d07a2855b7c6ad0c6ee90afb-b9c15f4c-f973d66a'
-EMAIL_USE_TLS = True
+# EMAIL_HOST = 'smtp.mailgun.org'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'postmaster@mg.locadora-cin.com'
+# EMAIL_HOST_PASSWORD = '0acb5347d07a2855b7c6ad0c6ee90afb-b9c15f4c-f973d66a'
+# EMAIL_USE_TLS = True

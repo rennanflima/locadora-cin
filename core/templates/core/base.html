@@ -12,6 +12,7 @@
         <title>Painel de Administração</title>
         {% load static %}
         {% load bootstrap4 %}
+        {% load i18n %}
 
         <link rel="shortcut icon" type="image/png" href="{% static '/img/coroa.png' %}"/>
 
@@ -32,6 +33,10 @@
         <link href="{% static 'css/jquery-ui.css' %}" rel="stylesheet">
         <link href="{% static 'vendor/bootstrap-toggle/css/bootstrap-toggle.min.css' %}" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'vendor/notifyMessage/css/notifyMessage.css' %}">
+
+        <link href="{% static 'admin/css/vendor/select2/select2.css' %}" type="text/css" media="screen" rel="stylesheet">
+        <link href="{% static 'admin/css/autocomplete.css' %}" type="text/css" media="screen" rel="stylesheet">
+        <link href="{% static 'autocomplete_light/select2.css' %}" type="text/css" media="screen" rel="stylesheet">
     </head>
 
     <body id="page-top">
@@ -44,20 +49,8 @@
                 <i class="fas fa-bars"></i>
             </button>
 
-            <!-- Navbar Search -->
-            <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Pesquisar por..." aria-label="Search" aria-describedby="basic-addon2">
-                    <div class="input-group-append">
-                        <button class="btn btn-primary" type="button">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
-
             <!-- Navbar -->
-            <ul class="navbar-nav ml-auto ml-md-0">
+            <ul class="navbar-nav ml-auto mr-0 mr-md-3 my-2 my-md-0">
                 <li class="nav-item dropdown no-arrow mx-1">
                     <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-bell fa-fw"></i>
@@ -112,31 +105,54 @@
                         <span>Cadastro</span>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-                        <a class="dropdown-item" href="{% url 'core:genero-listar' %}"><i class="fas fa-fw fa-venus-mars"></i> Gênero</a>
-                        <a class="dropdown-item" href="{% url 'core:midia-listar' %}"><i class="fas fa-compact-disc"></i> Mídia</a>
-                        <a class="dropdown-item" href="{% url 'core:distribuidora-listar' %}"><i class="fas fa-city"></i></i> Distribuidora</a>
-                        <a class="dropdown-item" href="{% url 'core:filme-listar' %}"><i class="fas fa-fw fa-film"></i> Filmes</a>
-                        <a class="dropdown-item" href="{% url 'core:item-listar' %}"><i class="fas fa-file"></i> Item</a>
-                        <a class="dropdown-item" href="{% url 'core:cliente-listar' %}"><i class="fas fa-fw fa-user-plus"></i> Cliente</a>
+                        {% if perms.core.view_genero %}
+                            <a class="dropdown-item" href="{% url 'core:genero-listar' %}"><i class="fas fa-fw fa-venus-mars"></i> Gênero</a>
+                        {% endif %}
+                        {% if perms.core.view_midia %}
+                            <a class="dropdown-item" href="{% url 'core:midia-listar' %}"><i class="fas fa-compact-disc"></i> Mídia</a>
+                        {% endif %}
+                        {% if perms.core.view_distribuidora %}
+                            <a class="dropdown-item" href="{% url 'core:distribuidora-listar' %}"><i class="fas fa-city"></i></i> Distribuidora</a>
+                        {% endif %}
+                        {% if perms.core.view_filme %}
+                            <a class="dropdown-item" href="{% url 'core:filme-listar' %}"><i class="fas fa-fw fa-film"></i> Filmes</a>
+                        {% endif %}
+                        {% if perms.core.view_item %}
+                            <a class="dropdown-item" href="{% url 'core:item-listar' %}"><i class="fas fa-file"></i> Item</a>
+                        {% endif %}
+                        {% if perms.core.pode_view_titular %}
+                            <a class="dropdown-item" href="{% url 'core:cliente-listar' %}"><i class="fas fa-fw fa-user-plus"></i> Cliente</a>
+                        {% endif %}
+                        {% if perms.core.pode_view_funcionario %}
+                            <a class="dropdown-item" href="{% url 'core:funcionario-listar' %}"><i class="fas fa-fw fa-user-tie"></i> Funcionário</a>
+                        {% endif %}
                     </div>
                 </li> 
                 <li class="nav-item">
-                    <a class="nav-link" href="{%url 'core:filme-listar'%}">
-                        <i class="fas fa-fw fa-film"></i>
-                        <span>Filmes</span>
-                    </a>
-                    <a class="nav-link" href="{%url 'core:reserva-listar'%}">
-                        <i class="fas fa-fw fa-calendar-check"></i>
-                        <span>Reservas</span>
-                    </a>
-                    <a class="nav-link" href="{%url 'core:locacao-listar'%}">
-                        <i class="fas fa-fw fa-level-down-alt"></i>
-                        <span>Locações</span>
-                    </a>
-                    <a class="nav-link" href="{%url 'core:devolucao-listar'%}">
-                        <i class="fas fa-fw fa-level-up-alt"></i>
-                        <span>Devoluções</span>
-                    </a>
+                    {% if perms.core.view_filme %}
+                        <a class="nav-link" href="{%url 'core:filme-buscar' %}">
+                            <i class="fas fa-fw fa-film"></i>
+                            <span>Catalogo</span>
+                        </a>
+                    {% endif %}
+                    {% if perms.core.view_reserva %}
+                        <a class="nav-link" href="{%url 'core:reserva-listar'%}">
+                            <i class="fas fa-fw fa-calendar-check"></i>
+                            <span>Reservas</span>
+                        </a>
+                    {% endif %}
+                    {% if perms.core.view_locacao %}
+                        <a class="nav-link" href="{%url 'core:locacao-listar'%}">
+                            <i class="fas fa-fw fa-level-down-alt"></i>
+                            <span>Locações</span>
+                        </a>
+                    {% endif %}
+                    {% if perms.core.view_devolucao %}
+                        <a class="nav-link" href="{%url 'core:devolucao-listar'%}">
+                            <i class="fas fa-fw fa-level-up-alt"></i>
+                            <span>Devoluções</span>
+                        </a>
+                    {% endif %}
                 </li>        
             </ul>
 
@@ -175,17 +191,25 @@
         <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                        <a class="btn btn-primary" href="login.html">Logout</a>
-                    </div>
+                    <form method="post" action="{% url 'account_logout' %}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">{% trans "Sign Out" %}</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            {% trans 'Are you sure you want to sign out?' %}
+                            {% if redirect_field_value %}
+                                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-danger">{% trans "Sign Out" %}</button>
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -273,6 +297,15 @@
         {% block javascript %}
 
         {% endblock javascript%}
+
+        <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+        <script type="text/javascript" src="{% static 'autocomplete_light/jquery.init.js' %}"></script>
+        <script type="text/javascript" src="{% static 'admin/js/vendor/select2/select2.full.js' %}"></script>
+        <script type="text/javascript" src="{% static 'admin/js/vendor/select2/i18n/pt-BR.js' %}"></script>
+        <script type="text/javascript" src="{% static 'autocomplete_light/autocomplete.init.js' %}"></script>
+        <script type="text/javascript" src="{% static 'autocomplete_light/forward.js' %}"></script>
+        <script type="text/javascript" src="{% static 'autocomplete_light/select2.js' %}"></script>
+        <script type="text/javascript" src="{% static 'autocomplete_light/jquery.post-setup.js' %}"></script>
     </body>
 
 </html>

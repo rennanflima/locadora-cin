@@ -21,7 +21,9 @@
         </div>   
         <div class="card-body">
             <div class="table-responsive">  
-                <a href="{% url 'core:midia-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                {% if perms.core.add_midia %}
+                    <a href="{% url 'core:midia-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                {% endif %}
                 <form method="GET" action="{%url 'core:midia-listar'%}">
                     <div class="input-group mb-3 float-left">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
@@ -49,11 +51,21 @@
                     <tbody>
                         {% for midia in object_list %}
                             <tr class="text-center">
-                                <th scope="row"><a href="{% url 'core:midia-detalhe' midia.id %}">{{ midia.nome }}</a></th>
+                                <th scope="row">
+                                    {% if perms.core.view_midia %}
+                                        <a href="{% url 'core:midia-detalhe' midia.id %}">{{ midia.nome }}</a>
+                                    {% else %}
+                                        {{ midia.nome }}
+                                    {% endif%}
+                                </th>
                                 <td>R$ {{ midia.valor }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:midia-editar' midia.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:midia-deletar' midia.id %}'">Excluir</button>
+                                    {% if perms.core.change_midia %}
+                                        <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:midia-editar' midia.id %}'">Editar</button>
+                                    {% endif %}
+                                    {% if perms.core.delete_midia %}
+                                        <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:midia-deletar' midia.id %}'">Excluir</button>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% empty %}

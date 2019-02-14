@@ -28,7 +28,9 @@
         <div class="card-body">
             <p style="font-size: 18px;"><b>Titular:</b> {{ titular.user.get_full_name }}</p>
             <div class="table-responsive">  
+                {% if perms.core.pode_add_dependente %}
                     <a href="{% url 'core:dependente-novo' pk %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                {% endif %}
                 <form method="GET" action="{%url 'core:dependente-listar' pk %}">
                     <div class="input-group mb-3">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
@@ -59,7 +61,13 @@
                         {% for dependente in dependentes %}
                             <tr class="text-center">
                                 <td>{{ dependente.codigo }}</td>
-                                <th scope="row"><a href="{% url 'core:dependente-detalhe' pk dependente.id %}">{{ dependente.user.get_full_name }}</a></th>
+                                <th scope="row">
+                                    {% if perms.core.pode_view_dependente %}
+                                        <a href="{% url 'core:dependente-detalhe' pk dependente.id %}">{{ dependente.user.get_full_name }}</a>
+                                    {% else %}
+                                        {{ dependente.user.get_full_name }}
+                                    {% endif %}
+                                </th>
                                 <td>
                                     {% if dependente.is_active %}
                                         <img src="{% static '/img/icon_yes.svg' %}" width="17" height="17" alt="Sim"/>
@@ -69,12 +77,20 @@
                                 </td>
                                 <td>
                                     {% if dependente.is_active %}
-                                        <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:dependente-desativar' pk dependente.id %}'">Desativar</button>
+                                        {% if perms.core.pode_desativar_dependente %}
+                                            <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:dependente-desativar' pk dependente.id %}'">Desativar</button>
+                                        {% endif %}    
                                     {% else %}
-                                        <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:dependente-ativar' pk dependente.id %}'">Ativar</button>
+                                        {% if perms.core.pode_ativar_dependente %}
+                                            <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:dependente-ativar' pk dependente.id %}'">Ativar</button>
+                                        {% endif %}
                                     {% endif %}
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:dependente-editar' pk dependente.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:dependente-deletar' pk dependente.id %}'">Excluir</button>
+                                    {% if perms.core.pode_change_dependente %}
+                                        <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:dependente-editar' pk dependente.id %}'">Editar</button>
+                                    {% endif %}
+                                    {% if perms.core.pode_delete_dependente %}
+                                        <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:dependente-deletar' pk dependente.id %}'">Excluir</button>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% empty %}

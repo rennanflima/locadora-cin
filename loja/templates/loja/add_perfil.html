@@ -1,0 +1,66 @@
+<!--
+Author: DesignMaz
+Author URL: https://www.designmaz.net
+License URL: https://www.designmaz.net/licence/
+-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Responsive Static Login Form HTML5 Template | DesignMaz</title>
+    <!-- Custom Theme files -->
+	{% load static %}
+	{% load bootstrap4 %}
+	{% load i18n %}
+	{% bootstrap_css %}
+	{% bootstrap_javascript jquery='full' %}
+	{% load account socialaccount %}
+    <!-- <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" media="all"/> -->
+    <!-- Custom Theme files -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+    <meta name="keywords" content="Static Login Form Responsive, Login form web template, Sign up Web Templates, Flat Web Templates, Login signup Responsive web template, Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
+    <!--script-->
+    
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/easyResponsiveTabs.js' %}" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#horizontalTab').easyResponsiveTabs({
+                type: 'default', //Types: default, vertical, accordion           
+                width: 'auto', //auto or any width like 600px
+                fit: true   // 100% fit in a container
+            });
+        });
+                    
+    </script>
+</head>
+<body style="background-color: #6c757d!important;">
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<div class="card mt-5" style="margin: 0 auto; width: 60%;">
+					<div class="card-header">
+						<h3>Perfil</h3>
+					</div>
+					<div class="card-body">
+						<!-- <h3 class="card-title">Perfil</h3> -->
+						<!-- <hr> -->
+						<form method="POST">
+							{% csrf_token %}
+							{% bootstrap_form form %}
+							<hr>
+							{% bootstrap_button "Salvar" button_type="submit" button_class="btn-primary btn-block" %}
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="{% static 'vendor/jquery-mask/jquery.mask.js' %}"></script>
+	<script type="application/javascript">
+		$('.cpf').mask('000.000.000-00', {reverse: true});
+		$('.date').mask('00/00/0000');
+	</script>
+</body>
+</html>

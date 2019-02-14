@@ -20,7 +20,9 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">  
-                <a href="{% url 'core:devolucao-realizar' %}" class="btn btn-primary float-right mb-3">Realizar</a>
+                {% if perms.core.add_devolucao %}
+                    <a href="{% url 'core:devolucao-realizar' %}" class="btn btn-primary float-right mb-3">Realizar</a>
+                {% endif %}
                 <form method="GET" action="{%url 'core:devolucao-listar'%}">
                     <div class="input-group mb-3">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
@@ -50,7 +52,12 @@
                     <tbody>
                         {% for devolucao in object_list %}
                             <tr class="text-center">
-                                <th scope="row"><a href="{% url 'core:devolucao-detalhe' devolucao.pk %}">{{ devolucao.item.item }}</a></th>
+                                <th scope="row">
+                                    {% if perms.core.view_devolucao %}
+                                        <a href="{% url 'core:devolucao-detalhe' devolucao.pk %}">{{ devolucao.item.item }}</a></th>
+                                    {% else %}
+                                        {{ devolucao.item.item }}
+                                    {% endif%}
                                 <td>{{ devolucao.item.locacao.cliente }}</td>
                                 <td>{{ devolucao.data_devolucao }}</td>
                                 <td></td>

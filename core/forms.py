@@ -7,6 +7,8 @@ from crispy_forms.bootstrap import AppendedText, PrependedText, FormActions
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from localflavor.br.forms import BRCPFField, BRCNPJField, BRZipCodeField
 from django.utils.translation import gettext_lazy as _
+from dal import autocomplete
+from allauth.account.forms import LoginForm
 
 class GeneroForm(forms.ModelForm):
     class Meta:
@@ -338,10 +340,17 @@ class ReservaForm(forms.ModelForm):
 
 
 class LocacaoForm(forms.ModelForm):
-    # valor_total = forms.DecimalField(label='Valor da Locação', max_digits=8, decimal_places=2, localize=True,)
+    cliente = forms.ModelChoiceField(
+        queryset=Cliente.objects.all(),
+        widget=autocomplete.ModelSelect2(url='core:cliente-autocomplete')
+    )
+
     class Meta:
         model = Locacao
         fields = ('cliente',)
+        # widgets = {
+        #     'cliente': autocomplete.ModelSelect2(url='core:cliente-autocomplete')
+        # }
     
     def __init__(self, *args, **kwargs):
         super(LocacaoForm, self).__init__(*args, **kwargs)
@@ -351,7 +360,6 @@ class LocacaoForm(forms.ModelForm):
 
 
 class ItemLocacaoForm(forms.ModelForm):
-    item = forms.ModelChoiceField(queryset=Item.objects.filter(is_active=True))
     valor = forms.DecimalField(label='Valor da Locação', max_digits=8, decimal_places=2, localize=True)
     desconto = forms.DecimalField(label='Desconto', max_digits=8, decimal_places=2, localize=True, required=False)
     locacao = forms.ModelChoiceField(queryset=Locacao.objects.all(), widget=forms.HiddenInput())
@@ -365,6 +373,7 @@ class ItemLocacaoForm(forms.ModelForm):
         super(ItemLocacaoForm, self).__init__(*args, **kwargs)
         self.fields['data_devolucao_prevista'].widget.attrs['class'] = 'date'
         self.fields['valor'].widget.attrs['class'] = 'money2'
+        self.fields['item'].widget.attrs['class'] = 'form-control'
         self.fields['valor'].widget.attrs['readonly'] = True
         self.fields['data_devolucao_prevista'].widget.attrs['readonly'] = True
 
@@ -380,7 +389,44 @@ class DevolucaoForm(forms.ModelForm):
         self.fields['multa'].widget.attrs['readonly'] = True
 
 
+class FuncionarioForm(forms.ModelForm):
+    first_name = forms.CharField(label='Primeiro nome')
+    last_name = forms.CharField(label='Último nome')
+    cpf = BRCPFField(label='CPF')
+    data_nascimento = forms.DateField()
+    sexo = forms.ChoiceField(label='Sexo', choices=tipo_sexo)
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', 'groups',)
+
+    def __init__(self, *args, **kwargs):
+        super(FuncionarioForm, self).__init__(*args, **kwargs)
+        self.fields['cpf'].widget.attrs['class'] = 'form-control cpf'
+        self.fields['data_nascimento'].widget.attrs['class'] = 'form-control date'
 
 
 
+class PerfilForm(forms.ModelForm):
+    first_name = forms.CharField(label='Primeiro nome')
+    last_name = forms.CharField(label='Último nome')
+    cpf = BRCPFField(label='CPF')
+    data_nascimento = forms.DateField()
+    sexo = forms.ChoiceField(label='Sexo', choices=tipo_sexo)
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email',)
+
+    def __init__(self, *args, **kwargs):
+        super(PerfilForm, self).__init__(*args, **kwargs)
+        self.fields['cpf'].widget.attrs['class'] = 'form-control cpf'
+        self.fields['data_nascimento'].widget.attrs['class'] = 'form-control date'
+
+
+class MyLoginForm(LoginForm):
+    def __init__(self, *args, **kwargs):
+        super(MyLoginForm, self).__init__(*args, **kwargs)
+        self.fields['login'].widget.attrs['class'] = 'email'
+        self.fields['password'].widget.attrs['class'] = 'password'
 

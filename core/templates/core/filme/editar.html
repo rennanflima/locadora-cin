@@ -50,7 +50,9 @@
             </div>
             <hr>
             <div class="form-actions">
-                <a href="{%url 'core:filme-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+                {% if perms.core.view_filme %}
+                    <a href="{%url 'core:filme-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+                {% endif %}
                 <input type="submit" name="save_changes" value="Salvar alterações" class="btn btn-primary btn-success ml-2 mb-4 float-right" id="submit-id-save_changes">                       
             </div>
         </form>

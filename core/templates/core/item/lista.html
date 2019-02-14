@@ -21,7 +21,9 @@
         </div>   
         <div class="card-body">
             <div class="table-responsive">  
-                <a href="{% url 'core:item-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                {% if perms.core.add_item %}
+                    <a href="{% url 'core:item-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                {% endif %}
                 <form method="GET" action="{%url 'core:item-listar'%}">
                     <div class="input-group mb-3">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
@@ -51,7 +53,12 @@
                     <tbody>
                         {% for item in object_list %}
                             <tr class="text-center">
-                                <th scope="row"><a href="{% url 'core:item-detalhe' item.id %}">{{ item.filme }}</a></th>
+                                <th scope="row">
+                                    {% if perms.core.view_item %}
+                                        <a href="{% url 'core:item-detalhe' item.id %}">{{ item.filme }}</a></th>
+                                    {% else %}
+                                        {{ item.filme }}
+                                    {% endif %}
                                 <td>{{ item.tipo_midia }}</td>
                                 <td>
                                     {% if item.is_active %}
@@ -62,12 +69,20 @@
                                 </td>
                                 <td>
                                     {% if item.is_active %}
-                                        <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:item-desativar' item.id %}'">Desativar</button>
+                                        {% if perms.core.pode_desativar_item %}
+                                            <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:item-desativar' item.id %}'">Desativar</button>
+                                        {% endif %}
                                     {% else %}
-                                        <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:item-ativar' item.id %}'">Ativar</button>
+                                        {% if perms.core.pode_ativar_item %}
+                                            <button type="button" class="btn btn-sm btn-info" onclick="window.location = '{% url 'core:item-ativar' item.id %}'">Ativar</button>
+                                        {% endif %}
                                     {% endif %}
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:item-editar' item.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:item-deletar' item.id %}'">Excluir</button>
+                                    {% if perms.core.change_item %}
+                                        <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:item-editar' item.id %}'">Editar</button>
+                                    {% endif %}
+                                    {% if perms.core.delete_item %}
+                                        <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:item-deletar' item.id %}'">Excluir</button>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% empty %}

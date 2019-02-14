@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path, re_path, include
 from core.views import cruds_views
 
 urlpatterns = [
@@ -55,13 +55,14 @@ urlpatterns = [
     path('item/<int:pk>/desativar/', cruds_views.item_desativar, name="item-desativar"),
 
     # Início URL CRUD Cliente
-    path('cliente/', cruds_views.ClienteListar.as_view(), name="cliente-listar"),
+    path('cliente/', cruds_views.cliente_listar, name="cliente-listar"),
     path('cliente/novo/', cruds_views.criar_cliente, name="cliente-novo"),
     path('cliente/<int:pk>/editar/', cruds_views.editar_cliente, name="cliente-editar"),
     path('cliente/<int:pk>/deletar/', cruds_views.ClienteDeletar.as_view(), name="cliente-deletar"),
     path('cliente/<int:pk>/detalhe/', cruds_views.ClienteDetalhe.as_view(), name="cliente-detalhe"),
     path('cliente/<int:pk>/ativar/', cruds_views.cliente_ativar, name="cliente-ativar"),
     path('cliente/<int:pk>/desativar/', cruds_views.cliente_desativar, name="cliente-desativar"),
+    re_path(r'^cliente-autocomplete/$', cruds_views.ClienteAutocomplete.as_view(), name="cliente-autocomplete"),
 
     # Início URL CRUD Dependente
     path('cliente/<int:pk>/dependentes/', cruds_views.dependente_listar, name="dependente-listar"),
@@ -71,4 +72,15 @@ urlpatterns = [
     path('cliente/<int:pk>/dependente/<int:id_dep>/deletar/', cruds_views.dependente_deletar, name="dependente-deletar"),
     path('cliente/<int:pk>/dependente/<int:id_dep>/ativar/', cruds_views.dependente_ativar, name="dependente-ativar"),
     path('cliente/<int:pk>/dependente/<int:id_dep>/desativar/', cruds_views.dependente_desativar, name="dependente-desativar"),
+
+
+    # Início URL CRUD Funcionário
+    path('funcionario/buscar/', cruds_views.buscar_funcionario, name="funcionario-buscar"),
+    path('funcionario/', cruds_views.funcionario_listar, name="funcionario-listar"),
+    path('funcionario/novo/', cruds_views.criar_funcionario, name="funcionario-novo"),
+    path('funcionario/<int:pk>/editar/', cruds_views.editar_funcionario, name="funcionario-editar"),
+    path('funcionario/<int:pk>/deletar/', cruds_views.FuncionarioDeletar.as_view(), name="funcionario-deletar"),
+    path('funcionario/<int:pk>/detalhe/', cruds_views.FuncionarioDetalhe.as_view(), name="funcionario-detalhe"),
+    path('funcionario/<int:pk>/ativar/', cruds_views.funcionario_ativar, name="funcionario-ativar"),
+    path('funcionario/<int:pk>/desativar/', cruds_views.funcionario_desativar, name="funcionario-desativar"),
 ]

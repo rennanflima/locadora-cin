@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+
+{% block conteudo %}
+
+    {% bootstrap_messages %}
+
+    <div class="container-fluid">
+        <h2>Buscar Usuário</h2>
+        <hr>
+        <form method="POST" class="form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_cpf_modal">CPF</label>
+                <input type="text" class="form-control cpf" id="id_cpf" name="cpf" placeholder="CPF">
+            </div>
+            <hr>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+    </div>
+{% endblock conteudo %}

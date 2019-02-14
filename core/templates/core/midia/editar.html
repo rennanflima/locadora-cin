@@ -23,8 +23,9 @@
             {{ form.valor|as_crispy_field }}
             <div class="form-actions">
                 <hr>
-                <a href="{% url 'core:filme-novo' %}" class='btn btn-primary ml-2 mb-4 float-right'>Adicionar Filme</a>
-                <a href="{% url 'core:midia-listar' %}" class='btn btn-danger ml-2 float-right'>Cancelar</a>
+                {% if perms.core.view_midia %}
+                    <a href="{% url 'core:midia-listar' %}" class='btn btn-danger ml-2 float-right'>Cancelar</a>
+                {% endif %}
                 <input type="submit" name="save_changes" value="Salvar Tipo de Mídia" class="btn btn-success ml-2 mb-4 float-right" id="submit-id-save_changes"/>
             </div>
         </form>

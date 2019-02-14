@@ -19,7 +19,9 @@
         </div>   
         <div class="card-body">
             <div class="table-responsive">  
-                <a href="{% url 'core:filme-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                {% if perms.core.add_filme %}
+                    <a href="{% url 'core:filme-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                {% endif%}
                 <form method="GET" action="{%url 'core:filme-listar'%}">
                     <div class="input-group mb-3 float-left">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
@@ -51,15 +53,25 @@
                     <tbody>
                         {% for filme in object_list %}
                             <tr class="text-center">
-                                <td><a href="{% url 'core:filme-detalhe' filme.id %}">{{ filme }}</a></td>
+                                <td>
+                                    {% if perms.core.view_filme %}
+                                        <a href="{% url 'core:filme-detalhe' filme.id %}">{{ filme }}</a>
+                                    {% else %}
+                                        {{ filme }}
+                                    {% endif %}
+                                </td>
                                 <td>{{ filme.ano }}</td>
                                 <td>
                                     {{ filme.generos }}
                                 </td>
                                 <td>{{ filme.duracao }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:filme-editar' filme.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:filme-deletar' filme.id %}'">Excluir</button>
+                                    {% if perms.core.change_filme %}
+                                        <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:filme-editar' filme.id %}'">Editar</button>
+                                    {% endif %}
+                                    {% if perms.core.delete_filme %}
+                                        <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:filme-deletar' filme.id %}'">Excluir</button>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% empty %}

@@ -20,7 +20,9 @@
         </div>   
         <div class="card-body">
             <div class="table-responsive">  
+                {% if perms.core.add_reserva %}
                 <a href="{% url 'core:reserva-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                {% endif %}
                 <form method="GET" action="{%url 'core:reserva-listar'%}">
                     <div class="input-group mb-3">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
@@ -52,7 +54,13 @@
                     <tbody>
                         {% for reserva in object_list %}
                             <tr class="text-center">
-                                <th scope="row"><a href="{% url 'core:reserva-detalhe' reserva.id %}">{{ reserva.cliente }}</a></th>
+                                <th scope="row">
+                                    {% if perms.core.add_reserva %}
+                                        <a href="{% url 'core:reserva-detalhe' reserva.id %}">{{ reserva.cliente }}</a>
+                                    {% else %}
+                                        {{ reserva.cliente }}
+                                    {% endif %}
+                                </th>
                                 <td>{{ reserva.filme.titulo }}</td>
                                 <td>{{ reserva.data_reserva }}</td>
                                 <td>
@@ -65,8 +73,12 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:reserva-editar' reserva.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:reserva-cancelar' reserva.id %}'">Cancelar</button>
+                                    {% if perms.core.change_reserva %}
+                                        <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:reserva-editar' reserva.id %}'">Editar</button>
+                                    {% endif %}
+                                    {% if perms.core.pode_cancelar_reserva %}
+                                        <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:reserva-cancelar' reserva.id %}'">Cancelar</button>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% empty %}
