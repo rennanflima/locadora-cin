@@ -12,6 +12,7 @@ License URL: https://www.designmaz.net/licence/
 	{% load bootstrap4 %}
 	{% load i18n %}
 	{% load account socialaccount %}
+	{% bootstrap_css %}
     <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" media="all"/>
     <!-- Custom Theme files -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -76,7 +77,11 @@ License URL: https://www.designmaz.net/licence/
 										</div>
 										<ul>
 											<li><p>Ou faça login com</p></li>
-											{% include "socialaccount/snippets/provider_list.html" with process="login" %}
+											{% get_providers as socialaccount_providers %}
+
+											{% for provider in socialaccount_providers %}
+												<li><a href="{% provider_login_url provider.id openid=brand.openid_url process='login' %}"><span class="{{provider.id}}"></span></a></li>
+											{% endfor %}
 											<!-- <li><a href="#"><span class="fb"></span></a></li> -->
 											<!-- <li><a href="#"><span class="twit"></span></a></li> -->
 											<!-- <li><a href="#"><span class="google"></span></a></li> -->

@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, render_to_response
 from django.views import generic
 from django.contrib.messages.views import SuccessMessageMixin
 from core.models import *
@@ -20,6 +20,8 @@ import decimal
 from django.core.paginator import Paginator
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required, permission_required
+from django.template import RequestContext
+from django.core.exceptions import PermissionDenied
 # Email com template html
 from django.template.loader import get_template
 from django.core.mail import send_mail, EmailMessage
@@ -101,10 +103,18 @@ def criar_perfil(request):
 class IndexView(LoginRequiredMixin, generic.TemplateView):
     template_name = "core/index.html"
 
-    def get_context_data(self, **kwargs):
-        context = super(IndexView, self).get_context_data(**kwargs)
-        user = self.request.user
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super(IndexView, self).get_context_data(**kwargs)
+    #     user = self.request.user
+    #     if user.get_all_permissions() != set():
+    #         return HttpResponseRedirect(reverse_lazy('core:index'))
+    #     return context
+    
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if user.get_all_permissions() == set():
+            raise PermissionDenied
+        return render(request, self.template_name)
 
 # Início das views de Reserva de filme
 
@@ -701,3 +711,11 @@ def buscar_itens(request):
 def perfil_usuario_detalhe(request):
     user = request.user
     return render(request, 'core/perfil/detalhe.html', {'usuario': user})
+
+
+
+
+def permission_denied(request):
+    response = render_to_response('404.html',context_instance=RequestContext(request))
+    response.status_code = 404
+    return response

@@ -1,7 +1,7 @@
 from locadora.settings.common import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = ')6g95h^0k@gjw5p!e9(b2u*j0@2spcb^9$eu2ht7ya@zud5y36'

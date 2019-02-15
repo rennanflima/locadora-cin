@@ -1,5 +1,6 @@
 {% extends 'loja/base.html' %}
 {% load bootstrap4 %}
+{% load account socialaccount %}
 
 
 {% block conteudo %}
@@ -72,6 +73,22 @@
                 <label class="negrito">Permissões: </label>    
                 {{ usuario.permissoes }}
             </div> 
+            {% endif %}
+        </fieldset>
+        <fieldset>
+            <legend>Redes Sociais<hr></legend>
+            {% get_social_accounts usuario as accounts %}
+            <ul>
+                {% for k, v in accounts.items %}
+                    <li>{{ k }}: {{ v.SocialAccount}}</li>
+                {% endfor %}
+            </ul>
+
+            {% if not accounts.google %}
+                <a href="{% provider_login_url "google" process="connect" %}">
+                    <i class="fab fa-google">
+                    </i><span> Conecte-se a uma conta do Google</span>
+                </a>
             {% endif %}
         </fieldset>
     </div>

@@ -49,3 +49,4 @@ urlpatterns = [
 
 
 ]
+handler404 = 'core.views.main.permission_denied'

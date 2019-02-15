@@ -102,36 +102,42 @@
                         <span>Início</span>
                     </a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-fw fa-folder"></i>
-                        <span>Cadastro</span>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-                        {% if perms.core.view_genero %}
-                            <a class="dropdown-item" href="{% url 'core:genero-listar' %}"><i class="fas fa-fw fa-venus-mars"></i> Gênero</a>
-                        {% endif %}
-                        {% if perms.core.view_midia %}
-                            <a class="dropdown-item" href="{% url 'core:midia-listar' %}"><i class="fas fa-compact-disc"></i> Mídia</a>
-                        {% endif %}
-                        {% if perms.core.view_distribuidora %}
-                            <a class="dropdown-item" href="{% url 'core:distribuidora-listar' %}"><i class="fas fa-city"></i></i> Distribuidora</a>
-                        {% endif %}
-                        {% if perms.core.view_filme %}
-                            <a class="dropdown-item" href="{% url 'core:filme-listar' %}"><i class="fas fa-fw fa-film"></i> Filmes</a>
-                        {% endif %}
-                        {% if perms.core.view_item %}
-                            <a class="dropdown-item" href="{% url 'core:item-listar' %}"><i class="fas fa-file"></i> Item</a>
-                        {% endif %}
-                        {% if perms.core.pode_view_titular %}
-                            <a class="dropdown-item" href="{% url 'core:cliente-listar' %}"><i class="fas fa-fw fa-user-plus"></i> Cliente</a>
-                        {% endif %}
-                        {% if perms.core.pode_view_funcionario %}
-                            <a class="dropdown-item" href="{% url 'core:funcionario-listar' %}"><i class="fas fa-fw fa-user-tie"></i> Funcionário</a>
-                        {% endif %}
-                    </div>
-                </li> 
+                {% if perms.core %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-fw fa-folder"></i>
+                            <span>Cadastro</span>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="pagesDropdown">
+                            {% if perms.core.view_genero %}
+                                <a class="dropdown-item" href="{% url 'core:genero-listar' %}"><i class="fas fa-fw fa-venus-mars"></i> Gênero</a>
+                            {% endif %}
+                            {% if perms.core.view_midia %}
+                                <a class="dropdown-item" href="{% url 'core:midia-listar' %}"><i class="fas fa-compact-disc"></i> Mídia</a>
+                            {% endif %}
+                            {% if perms.core.view_distribuidora %}
+                                <a class="dropdown-item" href="{% url 'core:distribuidora-listar' %}"><i class="fas fa-city"></i></i> Distribuidora</a>
+                            {% endif %}
+                            {% if perms.core.view_filme %}
+                                <a class="dropdown-item" href="{% url 'core:filme-listar' %}"><i class="fas fa-fw fa-film"></i> Filmes</a>
+                            {% endif %}
+                            {% if perms.core.view_item %}
+                                <a class="dropdown-item" href="{% url 'core:item-listar' %}"><i class="fas fa-file"></i> Item</a>
+                            {% endif %}
+                            {% if perms.core.pode_view_titular %}
+                                <a class="dropdown-item" href="{% url 'core:cliente-listar' %}"><i class="fas fa-fw fa-user-plus"></i> Cliente</a>
+                            {% endif %}
+                            {% if perms.core.pode_view_funcionario %}
+                                <a class="dropdown-item" href="{% url 'core:funcionario-listar' %}"><i class="fas fa-fw fa-user-tie"></i> Funcionário</a>
+                            {% endif %}
+                        </div>
+                    </li> 
+                {%endif%}
                 <li class="nav-item">
+                    <a class="nav-link" href="{%url 'index' %}">
+                        <i class="fas fa-fw fa-globe"></i>
+                        <span>Site</span>
+                    </a>
                     {% if perms.core.view_filme %}
                         <a class="nav-link" href="{%url 'core:filme-buscar' %}">
                             <i class="fas fa-fw fa-film"></i>

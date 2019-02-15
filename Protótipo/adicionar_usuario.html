@@ -91,7 +91,7 @@
 
       <!-- Sidebar -->
       <ul class="sidebar navbar-nav">
-        <li class="nav-item active">
+        <li class="nav-item">
           <a class="nav-link" href="index.html">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Início</span>
@@ -102,39 +102,41 @@
             <i class="fas fa-fw fa-folder"></i>
             <span>Cadastro</span>
           </a>
-           <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-          <a class="dropdown-item" href="adicionar_filme.html"><i class="fas fa-fw fa-film"></i> Filmes</a>
+          <div class="dropdown-menu" aria-labelledby="pagesDropdown">
+   <a class="dropdown-item" href="adicionar.html"><i class="fas fa-fw fa-film"></i> Filmes</a>
             <a class="dropdown-item" href="adicionar_genero.html"><i class="fas fa-fw fa-venus-mars"></i> Gênero</a>
             <a class="dropdown-item" href="adicionar_usuario.html"><i class="fas fa-fw fa-user-plus"></i> Usuário</a>
-            <a class="dropdown-item" href="adicionar_midia.html"><i class="fas fa-compact-disc"></i> Mídia</a>
+          
            
           </div>
-        </li> 
-           <li class="nav-item">
-          <a class="nav-link" href="crudFilmes.html">
-            <i class="fas fa-fw fa-film"></i>
+        </li>
+        
+        <li class="nav-item active">
+          <a class="nav-link" href="tables.html">
+            <i class="fas fa-fw fa-table"></i>
             <span>Filmes</span></a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="crudUsuarios.html">
+		<li class="nav-item">
+          <a class="nav-link" href="usuario.html">
             <i class="fas fa-fw fa-users"></i>
             <span>Usuários</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="crudMidias.html">
-            <i class="fas fa-compact-disc"></i>
-            <span>Mídias</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="crudGeneros.html">
-            <i class="fas fa-fw fa-venus-mars"></i>
-            <span>Gênero</span></a>
         </li>
       </ul>
 
       <div id="content-wrapper">
 
         <div class="container-fluid">
+
+          <!-- Breadcrumbs-->
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+             <a href="index.html">Início</a>
+            </li>
+			<li class="breadcrumb-item">
+              <a href="usuario.html">Usuários</a>
+            </li>
+            <li class="breadcrumb-item active">Adicionar Usuário</li>
+          </ol>
 		  
 		  <!--Adicionar filme-->
 		<div class="container">
@@ -142,29 +144,29 @@
 	  <hr>
 	  <h5 class="text-secondary">Dados pessoais</h5>
 	  <form  action="/action_page.php">
-	  <div class="form-row ">
-		<div class="form-group col-md-3  ">
+	  <div class="row mx-auto text-center ">
+		<div class="form-group mr-2  ">
       <label for="email">Nome:</label>
       <input type="email" class="form-control " id="email" placeholder="Nome" name="email">
     </div>
 	
-	<div class="form-group col-md-6">
+	<div class="form-group mr-2">
       <label for="email">Sobrenome:</label>
       <input type="email" class="form-control" id="email" placeholder="Sobrenome" name="email">
     </div>
-	<div class="form-group col-md-3">
+	<div class="form-group mr-2">
       <label for="email">Data de nascimento:</label>
       <input type="date" class="form-control" id="email" placeholder="" name="email">
     </div>
-	<div class="form-group col-md-2">
+	<div class="form-group mr-2">
       <label  for="email">Cpf:</label>
       <input type="cpf" class="form-control" type="date"  id="email" placeholder="Cpf" name="email">
     </div>
-	<div class="form-group col-md-4">
+	<div class="form-group mr-2">
       <label  for="email">E-mail:</label>
       <input type="email" class="form-control" type="date"  id="email" placeholder="E-mail" name="email">
     </div>
-	<div class="form-group col-md-2">
+	<div class="form-group mr-2">
 	<label for="email ">Sexo:</label>
 	<select name="cars" class="custom-select mb-3">
       <option selected>Selecione</option>
@@ -172,11 +174,11 @@
       <option value="fiat">Feminino</option>
     </select>
 	</div>
-	<div class="form-group col-md-2">
+	<div class="form-group mr-2">
       <label  for="email">Telefone 01:</label>
       <input type="tel" class="form-control" type="date"  id="email" placeholder="Número" name="email">
     </div>
-	<div class="form-group col-md-2">
+	<div class="form-group mr-2">
       <label  for="email">Telefone 02:</label>
       <input type="email" class="form-control" type="date"  id="email" placeholder="Número" name="email">
     </div>
@@ -187,24 +189,24 @@
 	<div class="container">
 	<hr>
 		<h5 class="text-secondary">Endereço</h5>
-	<div class="form-row  ">
-	 <div class="form-group col-md-2">
+	<div class="row mx-auto text-center ">
+	 <div class="form-group mr-2">
       <label  for="email">Estado:</label>
       <input type="" class="form-control" type="date"  id="email" placeholder="Estado" name="email">
     </div>
-	 <div class="form-group col-md-2">
+	 <div class="form-group mr-2">
       <label  for="email">Cidade:</label>
       <input type="email" class="form-control" type="date"  id="email" placeholder="Cidade" name="email">
     </div>
-	 <div class="form-group col-md-2">
+	 <div class="form-group mr-2">
       <label  for="email">Bairro:</label>
       <input type="email" class="form-control" type="date"  id="email" placeholder="bairro" name="email">
     </div>
-	 <div class="form-group col-md-4">
+	 <div class="form-group mr-2">
       <label  for="email">Logradouro:</label>
       <input type="email" class="form-control" type="date"  id="email" placeholder="Logradouro" name="email">
     </div>
-	 <div class="form-group col-md-2">
+	 <div class="form-group mr-2">
       <label  for="email">Número:</label>
       <input type="number" class="form-control" type="date"  id="email" placeholder="Número" name="email">
     </div>

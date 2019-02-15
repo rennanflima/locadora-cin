@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 {% load bootstrap4 %}
-
+{% load account socialaccount %}
 
 {% block conteudo %}
     <ol class="breadcrumb">
@@ -80,6 +80,10 @@
                 {{ usuario.permissoes }}
             </div> 
             {% endif %}
+        </fieldset>
+        <fieldset>
+            <legend>Redes Sociais<hr></legend>
+            <a href="{% provider_login_url "google" process="connect" %}">Connect a Google account</a>
         </fieldset>
     </div>
 {% endblock conteudo %}

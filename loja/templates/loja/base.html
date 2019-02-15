@@ -51,6 +51,9 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <a class="dropdown-item" href="{% url 'meu-perfil' %}">Perfil</a>
                             <a class="dropdown-item" href="{% url 'alterar-senha' %}">Alterar senha</a>
+                            {% if perms.core %}
+                                <a class="dropdown-item" href="{% url 'core:index' %}">Administração</a>
+                            {% endif %}
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Sair</a>
                         </div>
                     </li>
