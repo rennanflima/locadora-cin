@@ -50,6 +50,8 @@
             {% include "socialaccount/snippets/provider_list.html" with process="connect" %}
         </ul>
     </fieldset>
+
+    <center><a href="{% url 'core:perfil-usuario' %}"><< Voltar ao Meu Perfil</a></center>
     {% include "socialaccount/snippets/login_extra.html" %}
 
 </div>

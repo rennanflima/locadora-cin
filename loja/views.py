@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from core.models import Genero, Filme
+from core.models import Genero, Filme, Reserva
 from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponseRedirect
 from django.db.models import Q
@@ -10,6 +10,10 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from core.views.main import SendMail
+from datetime import date
+from datetime import datetime
+from datetime import timedelta 
 
 class IndexView(generic.ListView):
     model = Filme
@@ -20,7 +24,19 @@ class IndexView(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
         context['generos'] = Genero.objects.all()
+        today = date.today()
+        reservas = Reserva.objects.filter(status='Pendente', data_notificacao__isnull=False)
+        for r in reservas:
+            data_expiracao = (r.data_notificacao + timedelta(days=1)).date()   
+            if today > data_expiracao:
+                r.status = 'Expirada'
+                r.save()
+                text_msg = "Olá, " + str(r.cliente) + ". \r\n\r\nInformamos que sua RESERVA para o filme "+ str(r.filme)+" ("+ str(r.midia) +") EXPIROU no dia " + str(localize(datetime.combine(data_expiracao, datetime.max.time()))) + ". \r\n\r\nPara mais informações visite nossa loja e procure um de nossos funcionários. \r\n\r\nAtenciosamente, Locadora Imperial."
+                SendMail('[Locadora Imperial] Reserva Expirada',text_msg, r.cliente.user.email).start()
         return context
+
+
+
     
 class BuscaFilme(generic.ListView):
     model = Filme
@@ -83,6 +99,18 @@ def buscar_avancada_filmes(request):
 def perfil_usuario_detalhe(request):
     user = request.user
     return render(request, 'loja/perfil/detalhe.html', {'usuario': user})
+
+
+@login_required
+def alterar_senha(request):
+    form = PasswordChangeForm(request.user, request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Sua senha foi atualizada com sucesso!')
+    return render(request, 'loja/perfil/password_change.html', {'form': form })
+
 
 @login_required
 def alterar_senha(request):

@@ -168,9 +168,10 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_FORMS = {'login': 'core.forms.MyLoginForm'}
 
-
+# Configuração de E-mail
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'mrennan.lima@gmail.com   '
-EMAIL_HOST_PASSWORD = 'rennan01'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'Não Responda <nao-responda@gmail.com>'

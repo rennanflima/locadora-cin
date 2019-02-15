@@ -75,6 +75,15 @@ class SendMail(threading.Thread):
 @login_required
 def redireciona_usuario(request):
     user = request.user
+    today = date.today()
+    reservas = Reserva.objects.filter(status='Pendente', data_notificacao__isnull=False)
+    for r in reservas:
+        data_expiracao = (r.data_notificacao + timedelta(days=1)).date()   
+        if today > data_expiracao:
+            r.status = 'Expirada'
+            r.save()
+            text_msg = "Olá, " + str(r.cliente) + ". \r\n\r\nInformamos que sua RESERVA para o filme "+ str(r.filme)+" ("+ str(r.midia) +") EXPIROU no dia " + str(localize(datetime.combine(data_expiracao, datetime.max.time()))) + ". \r\n\r\nPara mais informações visite nossa loja e procure um de nossos funcionários. \r\n\r\nAtenciosamente, Locadora Imperial."
+            SendMail('[Locadora Imperial] Reserva Expirada',text_msg, r.cliente.user.email).start()
     if user.get_all_permissions() != set():
         return HttpResponseRedirect(reverse_lazy('core:index'))
     else:
@@ -603,8 +612,6 @@ def item_pagamento(request):
         fp_id = request.POST.get('forma_pagamento')
         valor = request.POST.get('valor')
         item_id = request.POST.get('item')
-        print('\n\n')
-        print(item_id)
         item = ItemLocacao.objects.get(pk=item_id)
         devolucao = Devolucao.objects.get(pk=item_id)
         if devolucao.multa > 0:

@@ -1,5 +1,6 @@
 from django.urls import path, include
 from loja import views
+from allauth.socialaccount.views import ConnectionsView
 
 urlpatterns = [
     path('', views.IndexView.as_view(), name="index"),
@@ -9,4 +10,6 @@ urlpatterns = [
     path('filme/<int:pk>/detalhe/', views.FilmeDetalhe.as_view(), name="filme-detalhe"),
     path('meu-perfil/', views.perfil_usuario_detalhe, name="meu-perfil"),
     path('meu-perfil/alterar/senha/', views.alterar_senha, name="alterar-senha"),
+    path('meu-perfil/social/connections/', ConnectionsView.as_view(template_name="loja/perfil/connections_social.html"), name="meu-perfil-connections"),
+
 ]

@@ -5,11 +5,12 @@
 
 {% block conteudo %}
 
-    {% bootstrap_messages %}
-
     <div class="container mt-4">
         <h2>Detalhar Usuario</h2>
         <hr>
+
+        {% bootstrap_messages %}
+
         <div class="form-group">
             <label class="negrito">Nome: </label>    
             {{ usuario.get_full_name }}
@@ -48,48 +49,41 @@
                 {{ usuario.perfil.endereco }}
             </div> 
         {% endif %}
-        <fieldset>
-            <legend>Permissão<hr></legend>
-            {% if usuario.is_superuser %}
+        {% if usuario.is_superuser or usuario.is_staff or usuario.groups.all or usuario.user_permissions.all %}
+            <fieldset>
+                <legend>Permissão<hr></legend>
+                {% if usuario.is_superuser %}
+                    <div class="form-group">
+                        <label class="negrito">Superusuário: </label>    
+                        {{ usuario.is_superuser|yesno:"Sim, Não" }}
+                    </div> 
+                {% endif %}
+                {% if usuario.is_staff %}
+                    <div class="form-group">
+                        <label class="negrito">Membro da equipe: </label>    
+                        {{ usuario.is_staff|yesno:"Sim, Não" }}
+                    </div> 
+                {% endif %}
+                {% if usuario.groups.all %}
+                    <div class="form-group">
+                        <label class="negrito">Grupos: </label>    
+                        {{ usuario.grupos }}
+                    </div>
+                {% endif %}
+                {% if usuario.user_permissions.all %}
                 <div class="form-group">
-                    <label class="negrito">Superusuário: </label>    
-                    {{ usuario.is_superuser|yesno:"Sim, Não" }}
+                    <label class="negrito">Permissões: </label>    
+                    {{ usuario.permissoes }}
                 </div> 
-            {% endif %}
-            {% if usuario.is_staff %}
-                <div class="form-group">
-                    <label class="negrito">Membro da equipe: </label>    
-                    {{ usuario.is_staff|yesno:"Sim, Não" }}
-                </div> 
-            {% endif %}
-            {% if usuario.groups.all %}
-                <div class="form-group">
-                    <label class="negrito">Grupos: </label>    
-                    {{ usuario.grupos }}
-                </div>
-            {% endif %}
-            {% if usuario.user_permissions.all %}
-            <div class="form-group">
-                <label class="negrito">Permissões: </label>    
-                {{ usuario.permissoes }}
-            </div> 
-            {% endif %}
-        </fieldset>
+                {% endif %}
+            </fieldset>
+        {% endif %}
         <fieldset>
             <legend>Redes Sociais<hr></legend>
-            {% get_social_accounts usuario as accounts %}
-            <ul>
-                {% for k, v in accounts.items %}
-                    <li>{{ k }}: {{ v.SocialAccount}}</li>
-                {% endfor %}
-            </ul>
-
-            {% if not accounts.google %}
-                <a href="{% provider_login_url "google" process="connect" %}">
-                    <i class="fab fa-google">
-                    </i><span> Conecte-se a uma conta do Google</span>
-                </a>
-            {% endif %}
+            <a href="{% url 'meu-perfil-connections' %}">
+                <i class="fa fa-sign-in-alt"></i>  
+                </i><span> Conecte-se a Redes Sociais</span>
+            </a>
         </fieldset>
     </div>
 {% endblock conteudo %}
