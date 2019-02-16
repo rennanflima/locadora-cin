@@ -1,0 +1,76 @@
+{% extends 'loja/base.html' %}
+{% load bootstrap4 %}
+{% load static %} 
+
+{% block conteudo %}
+
+{% include 'loja/menu.html' %}
+
+
+    <div class="col-lg-9 mt-4">
+        <div class="d-flex flex-row mb-4 border-bottom">
+            <div class="p-2 flex-grow-1 bd-highlight"><h2>Detalhar Filme</h2></div>
+            <div class="p-2 align-self-center"><a href="#" onclick="window.history.back(); return false;"><< Voltar</a></div>
+        </div>
+        
+        {% if filme.capa %}
+            <img src="{{ filme.capa.url }}" class="img-thumbnail col-2" style="float: right; min-width: 182px;"/>
+        {% else %}
+            <div class="col-2" style="float: right;">
+                <i class="fas fa-file-image fa-10x"></i>
+            </div>
+        {% endif %}
+        <div class="form-group">
+            <label class="negrito">Título: </label>    
+            {{filme.titulo }}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Título Original: </label>    
+            {{filme.titulo_original }}
+        </div> 
+        <div class="form-group">
+            <label class="negrito">Gênero: </label>    
+            {{ filme.generos }}
+        </div> 
+        <div class="form-group">
+            <label class="negrito">Duração: </label>    
+            {{filme.duracao }}
+        </div> 
+        <div class="form-group">
+            <label class="negrito">Lançamento ?: </label>    
+            {{filme.is_lancamento|yesno:"Sim, Não" }}
+        </div> 
+        <div class="form-group">
+            <label class="negrito">Ano de Lançamento: </label>    
+            {{filme.ano }}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Nacionalidade: </label>    
+            {{filme.pais}}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Diretor: </label>    
+            {{ filme.diretores }}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Classificação Indicativa: </label>    
+            {{filme.get_classificacao_display }}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Distribuidora: </label>    
+            {{ filme.distribuidora }}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Estrelando: </label>    
+            {{ filme.atores_destaque }}
+        </div>
+        <div class="form-group">
+            <label class="negrito">Tipos de Mídias Disponíveis: </label>    
+            {{ filme.midias_disponiveis }}
+        </div> 
+        <div class="form-group">
+            <label class="negrito">Sinopse: </label><br/>   
+            {{filme.sinopse }}
+        </div>
+    </div>
+{% endblock conteudo %}

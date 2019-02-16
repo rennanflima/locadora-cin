@@ -100,8 +100,14 @@
             </div>
         </fieldset>
         <hr>
-        <a href="{% url 'core:filme-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
-        <a href="{% url 'core:filme-novo' %}" class="btn btn-primary ml-2 float-right">Adicionar outro Filme</a>
-        <a href="{% url 'core:filme-editar' filme.pk %}" class="btn btn-success ml-2 mb-4 float-right">Editar Filme</a>
+        {% if perms.core.view_filme %}
+            <a href="{% url 'core:filme-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
+        {% endif %}
+        {% if perms.core.add_filme %}
+            <a href="{% url 'core:filme-novo' %}" class="btn btn-primary ml-2 float-right">Adicionar outro Filme</a>
+        {% endif %}
+        {% if perms.core.change_filme %}
+            <a href="{% url 'core:filme-editar' filme.pk %}" class="btn btn-success ml-2 mb-4 float-right">Editar Filme</a>
+        {% endif %}
     </div>
 {% endblock conteudo %}

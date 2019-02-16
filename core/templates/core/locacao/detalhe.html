@@ -94,9 +94,15 @@
         </fieldset>
 
         <hr>
-        <a href="{% url 'core:locacao-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
-        <a href="{% url 'core:locacao-realizar' %}" class="btn btn-primary ml-2 float-right">Realizar outra Locação</a>
-        <a href="{% url 'core:locacao-realizar-itens' locacao.pk %}" class="btn btn-success ml-2 float-right {% if not locacao.is_editavel %}disabled{% endif %}" {% if not locacao.is_editavel %}tabindex="-1" role="button" aria-disabled="true"{% endif %}>Editar Locação</a>
+        {% if perms.core.view_locacao %}
+            <a href="{% url 'core:locacao-listar' %}" class="btn btn-info ml-2 mb-4 float-right">Voltar para a Listagem</a>
+        {% endif %}
+        {% if perms.core.add_locacao %}
+            <a href="{% url 'core:locacao-realizar' %}" class="btn btn-primary ml-2 float-right">Realizar outra Locação</a>
+        {% endif %}
+        {% if perms.core.change_locacao %}
+            <a href="{% url 'core:locacao-realizar-itens' locacao.pk %}" class="btn btn-success ml-2 float-right {% if not locacao.is_editavel %}disabled{% endif %}" {% if not locacao.is_editavel %}tabindex="-1" role="button" aria-disabled="true"{% endif %}>Editar Locação</a>
+        {% endif %}
     </div>
 {% endblock conteudo %}
 {% block javascript %}

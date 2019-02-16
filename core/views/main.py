@@ -1,8 +1,9 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, render_to_response
 from django.views import generic
 from django.contrib.messages.views import SuccessMessageMixin
 from core.models import *
 from core.forms import *
+from core.filters import *
 from django.db.models import Q
 from django.template.loader import render_to_string
 from django.contrib import messages
@@ -16,6 +17,11 @@ from django.core.serializers import serialize
 from django.db import transaction
 import json
 import decimal
+from django.core.paginator import Paginator
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.template import RequestContext
+from django.core.exceptions import PermissionDenied
 # Email com template html
 from django.template.loader import get_template
 from django.core.mail import send_mail, EmailMessage
@@ -66,59 +72,118 @@ class SendMail(threading.Thread):
 # 			mensagem = get_template('gerencia/email.html').render(ctx)
 # 			resposta = SendMailPublicacao("Informativo eletrônico %d" % informativo.numero, mensagem, arquivos, email.valor).start()
 
-class IndexView(generic.TemplateView):
+@login_required
+def redireciona_usuario(request):
+    user = request.user
+    today = date.today()
+    reservas = Reserva.objects.filter(status='Pendente', data_notificacao__isnull=False)
+    for r in reservas:
+        data_expiracao = (r.data_notificacao + timedelta(days=1)).date()   
+        if today > data_expiracao:
+            r.status = 'Expirada'
+            r.save()
+            text_msg = "Olá, " + str(r.cliente) + ". \r\n\r\nInformamos que sua RESERVA para o filme "+ str(r.filme)+" ("+ str(r.midia) +") EXPIROU no dia " + str(localize(datetime.combine(data_expiracao, datetime.max.time()))) + ". \r\n\r\nPara mais informações visite nossa loja e procure um de nossos funcionários. \r\n\r\nAtenciosamente, Locadora Imperial."
+            SendMail('[Locadora Imperial] Reserva Expirada',text_msg, r.cliente.user.email).start()
+    if user.get_all_permissions() != set():
+        return HttpResponseRedirect(reverse_lazy('core:index'))
+    else:
+        if not user.perfil.cpf:
+            return HttpResponseRedirect(reverse_lazy('core:perfil-usuario-add'))
+        else:
+            return HttpResponseRedirect(reverse_lazy('index'))
+
+
+@login_required
+def criar_perfil(request):
+    user = request.user
+    data_init = {'cpf': user.perfil.cpf, 'data_nascimento': user.perfil.data_nascimento, 'sexo': user.perfil.sexo,}
+    form = PerfilForm(request.POST or None, instance=user, initial=data_init)
+    if request.method == 'POST':
+        if form.is_valid():
+            user = form.save()
+            user.refresh_from_db()
+            user.perfil.cpf = form.cleaned_data.get('cpf')
+            user.perfil.data_nascimento = form.cleaned_data.get('data_nascimento')
+            user.perfil.sexo = form.cleaned_data.get('sexo')
+            user.save()
+            return HttpResponseRedirect(reverse_lazy('index'))
+    return render(request, 'loja/add_perfil.html', {'form': form, })
+
+class IndexView(LoginRequiredMixin, generic.TemplateView):
     template_name = "core/index.html"
+
+    # def get_context_data(self, **kwargs):
+    #     context = super(IndexView, self).get_context_data(**kwargs)
+    #     user = self.request.user
+    #     if user.get_all_permissions() != set():
+    #         return HttpResponseRedirect(reverse_lazy('core:index'))
+    #     return context
+    
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if user.get_all_permissions() == set():
+            raise PermissionDenied
+        return render(request, self.template_name)
 
 # Início das views de Reserva de filme
 
-class ReservaListar(generic.ListView):
+class ReservaListar(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Reserva
     paginate_by = 10
     template_name = 'core/reserva/lista.html'    
+    permission_required = "core.view_reserva"
 
     def get_queryset(self):
         nome = self.request.GET.get('nome', '')
         return self.model.objects.filter(Q(filme__titulo__icontains = nome) | Q(filme__titulo_original__icontains=nome) | Q(cliente__user__first_name__icontains = nome) | Q(cliente__user__last_name__icontains = nome))
             # Q(cliente__codigo__icontains = nome) | 
 
-class ReservaCriar(SuccessMessageMixin, generic.CreateView):
+class ReservaCriar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.CreateView):
     model = Reserva
     form_class = ReservaForm
     template_name = 'core/reserva/novo.html'
     success_message = "Reserva adicionada com sucesso."
+    permission_required = "core.add_reserva"
 
     def form_valid(self, form):
         cliente = form.cleaned_data.get('cliente')
         filme = form.cleaned_data.get('filme')
         midia = form.cleaned_data.get('midia')
-        text_msg = "Olá, " + str(cliente) + ". \r\n\r\nInformamos que sua reserva para o filme "+ str(filme)+" ("+ str(midia) +") foi efetivada no dia " + str(localize(datetime.now())) + ". \r\n\r\nPara mais informações visite nossa loja e/ou procure um de nossos funcionários. \r\n\r\nAtenciosamente, Locadora Imperial."
-        SendMail('[Locadora Imperial] Cancelamento de reserva',text_msg, cliente.user.email).start()
+        text_msg = "Olá, " + str(cliente) + ". \r\n\r\nInformamos que sua RESERVA para o filme "+ str(filme)+" ("+ str(midia) +") foi efetivada no dia " + str(localize(datetime.now())) + ". \r\n\r\nPara mais informações visite nossa loja e/ou procure um de nossos funcionários. \r\n\r\nAtenciosamente, Locadora Imperial."
+        SendMail('[Locadora Imperial] Criação de reserva',text_msg, cliente.user.email).start()
         return super(ReservaCriar, self).form_valid(form)
 
-class ReservaDetalhe(generic.DetailView):
+class ReservaDetalhe(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Reserva
     context_object_name = 'reserva'
     template_name = 'core/reserva/detalhe.html'
+    permission_required = "core.view_reserva"
 
-class ReservaEditar(SuccessMessageMixin, generic.UpdateView):
+class ReservaEditar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.UpdateView):
     model = Reserva
     form_class = ReservaForm
     template_name = 'core/reserva/editar.html'
     success_message = "Reserva editada com sucesso."
+    permission_required = "core.change_reserva"
 
+@login_required
 def carregar_tipo_midia(request):
     filme_id = request.GET.get('filme')
     midias = Midia.objects.filter(item_midia__filme_id=filme_id)    
     return render(request, 'core/ajax/partial_select_midia.html', {'midias': midias})
 
+
+@login_required
+@permission_required('core.pode_cancelar_reserva')
 def reserva_cancelar(request, pk):
     reserva = get_object_or_404(Reserva, pk=pk)
     print(reserva)
     if request.method == 'POST':
         reserva.status = 'Expirada'
+        reserva.save()
 
         text_msg = "Olá, " + str(reserva.cliente) + ". \r\n\r\nInformamos que sua reserva para o filme "+ str(reserva.filme)+" ("+ str(reserva.midia) +") foi cancelada no dia " + str(localize(datetime.now())) + ". \r\n\r\nPara mais informações visite nossa loja e procure um de nossos funcionários. \r\n\r\nAtenciosamente, Locadora Imperial."
-        # SendMail('[Locadora Imperial] Cancelamento de reserva',text_msg, reserva.cliente.user.email).start()
+        SendMail('[Locadora Imperial] Cancelamento de reserva',text_msg, reserva.cliente.user.email).start()
         messages.success(request, 'Reserva cancelada com sucesso.')
         return HttpResponseRedirect(reverse_lazy('core:reserva-listar'))
     
@@ -126,13 +191,15 @@ def reserva_cancelar(request, pk):
 
 
 # Início das views de Locação
-
-class LocacaoListar(generic.ListView):
+class LocacaoListar(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Locacao
     paginate_by = 10
-    template_name = 'core/locacao/lista.html'   
+    template_name = 'core/locacao/lista.html'
+    permission_required = "core.view_locacao"   
 
 # Step 1 - Locação
+@login_required
+@permission_required('core.add_locacao')
 def realizar_locacao(request, pk = None):
     if pk:
         locacao = get_object_or_404(Locacao, pk=pk)
@@ -162,6 +229,8 @@ def realizar_locacao(request, pk = None):
     return render(request, 'core/locacao/buscar_cliente.html', {'form': form})
 
 # Step 2 - Locação
+@login_required
+@permission_required('core.add_locacao')
 def seleciona_itens_locacao(request, pk):
     locacao = get_object_or_404(Locacao, pk=pk)
     if not locacao.is_editavel:
@@ -176,6 +245,8 @@ def seleciona_itens_locacao(request, pk):
     return render(request, 'core/locacao/itens_locacao.html', {'itens_list': itens, 'locacao': locacao,})
 
 # Step 3 - Locação
+@login_required
+@permission_required('core.add_locacao')
 def confirmar_locacao(request, pk):
     locacao = get_object_or_404(Locacao, pk=pk)
     if not locacao.is_editavel:
@@ -190,6 +261,8 @@ def confirmar_locacao(request, pk):
     return render(request, 'core/locacao/confirma.html', {'item_list': itens, 'locacao': locacao,})
 
 # Step 4 - Locação
+@login_required
+@permission_required('core.add_locacao')
 def finalizar_locacao(request, pk):
     locacao = get_object_or_404(Locacao, pk=pk)
     if not locacao.is_editavel:
@@ -213,7 +286,7 @@ def finalizar_locacao(request, pk):
         return HttpResponseRedirect(reverse_lazy('core:locacao-listar'))
     return render(request, 'core/locacao/finalizar.html', {'item_list': itens, 'locacao': locacao, 'pagamentos': pagamentos, 'valor_restante': valor_restante,})
 
-
+@login_required
 @transaction.atomic
 def save_item_form(request, form, template_name, mensagem):
     data = dict()
@@ -247,17 +320,22 @@ def save_item_form(request, form, template_name, mensagem):
     data['html_form'] = render_to_string(template_name, context, request=request,)
     return JsonResponse(data)
 
+@login_required
+@permission_required('core.add_locacao')
 def item_add(request):
     form = ItemLocacaoForm(request.POST or None)
     return save_item_form(request, form, 'core/ajax/partial_item_add.html', 'Item adicionado com sucesso')
 
-
+@login_required
+@permission_required('core.add_locacao')
 def item_edit(request, pk):
     item = get_object_or_404(ItemLocacao, pk=pk)
     form = ItemLocacaoForm(request.POST or None, instance=item)
     return save_item_form(request, form, 'core/ajax/partial_item_update.html', 'Item alterado com sucesso')
 
 
+@login_required
+@permission_required('core.add_locacao')
 @transaction.atomic
 def item_delete(request, pk):
     item = get_object_or_404(ItemLocacao, pk=pk)
@@ -288,7 +366,7 @@ def item_delete(request, pk):
         data['html_form'] = render_to_string('core/ajax/partial_item_delete.html', context, request=request,)
     return JsonResponse(data)
 
-
+@login_required
 def carregar_item_ajax(request):
     data = dict()
     item_id = request.GET.get('item')
@@ -307,10 +385,11 @@ def carregar_item_ajax(request):
     return JsonResponse(data)
 
 
-class LocacaoDetalhe(generic.DetailView):
+class LocacaoDetalhe(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Locacao
     context_object_name = 'locacao'
     template_name = 'core/locacao/detalhe.html'
+    permission_required = "core.view_locacao"
 
     def get_context_data(self, **kwargs):
         context = super(LocacaoDetalhe, self).get_context_data(**kwargs)
@@ -327,6 +406,8 @@ class LocacaoDetalhe(generic.DetailView):
         return context
 
 
+@login_required
+@permission_required('core.add_pagamento')
 @transaction.atomic
 def pagamento_locacao(request, pk):
     data = dict()
@@ -419,13 +500,14 @@ def pagamento_locacao(request, pk):
     data['html_form'] = render_to_string('core/ajax/partial_pagamento_novo.html', context, request=request,)
     return JsonResponse(data)
 
-
+@login_required
 def carregar_argumento_forma_pagamento(request):
     forma_pagamento_id = request.GET.get('forma')
     argumentos = ArgumentoPagamento.objects.filter(forma_pagamento__id=forma_pagamento_id)
     return render(request, 'core/ajax/partial_campos_pagamento.html', {'argumentos': argumentos})
 
-
+@login_required
+@permission_required('core.view_pagamento')
 def detalhe_pagamento(request, pk):
     pagamento = get_object_or_404(Pagamento, pk=pk)
     data = dict()
@@ -433,28 +515,52 @@ def detalhe_pagamento(request, pk):
     data['html_form'] = render_to_string('core/ajax/partial_detalhe_pagamento.html', context, request=request,)
     return JsonResponse(data)
 
+class LocacaoDeletar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.DeleteView):
+    model = Locacao
+    template_name = "core/locacao/deletar.html"
+    success_url = reverse_lazy('core:locacao-listar')
+    success_message = "Locação excluída com sucesso."
+    permission_required = "core.delete_locacao"
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(LocacaoDeletar, self).delete(request, *args, **kwargs)
     
 # Início views devolução
-
-class DevolucaoCriar(SuccessMessageMixin, generic.CreateView):
+class DevolucaoCriar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.CreateView):
     model = Devolucao
     form_class = DevolucaoForm
     template_name = 'core/devolucao/novo.html'
     success_message = "Devolução adicionado com sucesso."
+    permission_required = "core.add_devolucao"
 
-class DevolucaoListar(generic.ListView):
+    def form_valid(self, form):
+        item = form.cleaned_data.get('item')
+        reservas = Reserva.objects.filter(filme=item.filme, midia=item.tipo_midia)
+        
+        
+        for r in reservas:
+            r.data_notificacao = datetime.now()
+            r.save()
+            text_msg = "Olá, " + str(r.cliente) + ". \r\n\r\nInformamos que o filme "+ str(r.filme)+" ("+ str(r.midia) +") referente a sua RESERVA já está disponível para locação. A partir da data da notificação, " + str(localize(datetime.now())) + ", você tem 24h para realizar a locação, caso contrario ela será cancelada. \r\n\r\nPara mais informações visite nossa loja e procure um de nossos funcionários. \r\n\r\nAtenciosamente, Locadora Imperial."
+            SendMail('[Locadora Imperial] Disponibilidade do filme',text_msg, r.cliente.user.email).start()
+        return super().form_valid(form)
+
+class DevolucaoListar(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Devolucao
     paginate_by = 10
-    template_name = 'core/devolucao/lista.html'    
+    template_name = 'core/devolucao/lista.html'
+    permission_required = "core.view_devolucao"    
 
     # def get_queryset(self):
     #     nome = self.request.GET.get('nome', '')
     #     return self.model.objects.filter(nome__icontains = nome)
 
-class DevolucaoDetalhe(generic.DetailView):
+class DevolucaoDetalhe(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Devolucao
     context_object_name = 'devolucao'
     template_name = 'core/devolucao/detalhe.html'
+    permission_required = "core.view_devolucao"
 
     def get_context_data(self, **kwargs):
         context = super(DevolucaoDetalhe, self).get_context_data(**kwargs)
@@ -483,6 +589,7 @@ class DevolucaoDetalhe(generic.DetailView):
         return context
 
 
+@login_required
 def carrega_item_devolucao_ajax(request):
     data = dict()
     item_id = request.GET.get('item')
@@ -495,6 +602,8 @@ def carrega_item_devolucao_ajax(request):
     return JsonResponse(data)
 
 
+@login_required
+@permission_required('core.add_pagamento')
 @transaction.atomic
 def item_pagamento(request):
     data = dict()
@@ -503,8 +612,6 @@ def item_pagamento(request):
         fp_id = request.POST.get('forma_pagamento')
         valor = request.POST.get('valor')
         item_id = request.POST.get('item')
-        print('\n\n')
-        print(item_id)
         item = ItemLocacao.objects.get(pk=item_id)
         devolucao = Devolucao.objects.get(pk=item_id)
         if devolucao.multa > 0:
@@ -594,3 +701,28 @@ def item_pagamento(request):
     context = {'formas_pagamento': formas_pagamento,}
     data['html_form'] = render_to_string('core/ajax/partial_pagamento_item.html', context, request=request,)
     return JsonResponse(data)
+
+
+@login_required
+def buscar_itens(request):
+    filmes_list = Filme.objects.all()
+    filme_filter = FilmeFilter(request.GET, queryset=filmes_list)
+    paginator = Paginator(filme_filter.qs, 10)
+
+    page = request.GET.get('page')
+    filmes = paginator.get_page(page)
+    return render(request, 'core/item/buscar_filmes.html', {'filmes': filmes, 'filter': filme_filter})
+
+
+@login_required
+def perfil_usuario_detalhe(request):
+    user = request.user
+    return render(request, 'core/perfil/detalhe.html', {'usuario': user})
+
+
+
+
+def permission_denied(request):
+    response = render_to_response('404.html',context_instance=RequestContext(request))
+    response.status_code = 404
+    return response

@@ -12,12 +12,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'dal' , 
+    'dal_select2' , 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'locadora.urls'
@@ -56,7 +59,7 @@ ROOT_URLCONF = 'locadora.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, "core", "templates"), os.path.join(BASE_DIR, 'templates'), os.path.join(BASE_DIR, "loja", "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -153,14 +156,22 @@ BOOTSTRAP4 = {
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
+LOGIN_REDIRECT_URL = 'core:redireciona-usuario'
+LOGOUT_REDIRECT_URL = 'index'
+
 # `allauth`
 SITE_ID = 1
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_FORMS = {'login': 'core.forms.MyLoginForm'}
 
-
-EMAIL_HOST = 'smtp.mailgun.org'
+# Configuração de E-mail
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'postmaster@mg.locadora-cin.com'
-EMAIL_HOST_PASSWORD = '0acb5347d07a2855b7c6ad0c6ee90afb-b9c15f4c-f973d66a'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'Não Responda <nao-responda@gmail.com>'

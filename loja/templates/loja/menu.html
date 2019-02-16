@@ -1,11 +1,18 @@
+{% load static %}
 <div class="col-lg-3">
 
     <h1 class="my-4">
-        <img class="d-block img-fluid" src="images/logo_pipocaFilme.png" alt="Green Book">
+        <img class="d-block img-fluid" src="{% static 'img/logo_pipocaFilme.png' %}" alt="Catologo de Filmes">
     </h1>
     <div class="list-group">
-        {% for genero in generos %}
-            <a href="{% url 'filme_genero' genero.slug %}" class="list-group-item">{{ genero }}</a>
+        
+        {% for g in generos %}
+            {% if genero %}    
+                <a href="{% url 'filme_genero' g.slug %}" class="list-group-item {% ifequal genero.slug g.slug %}active{% endifequal %}">{{ g }}</a>
+                     
+            {% else %}
+                <a href="{% url 'filme_genero' g.slug %}" class="list-group-item">{{ g }}</a>
+            {% endif %}
         {% endfor %}            
     </div>
 

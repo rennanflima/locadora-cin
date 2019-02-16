@@ -47,9 +47,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
+        permissions = (
+            ('pode_add_funcionario', 'Pode adicionar funcionários'),
+            ('pode_change_funcionario', 'Pode editar funcionários'),
+            ('pode_delete_funcionario', 'Pode excluir funcionários'),
+            ('pode_view_funcionario', 'Pode visualizar funcionários'),
+            ('pode_ativar_funcionario', 'Pode ativar funcionários'),
+            ('pode_desativar_funcionario', 'Pode desativar funcionários'),
+        )
 
     def __str__(self):
-        return self.get_full_name()
+        if self.get_full_name():
+            return self.get_full_name()
+        else:
+            return self.email
 
     def get_full_name(self):
         '''
@@ -69,6 +80,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         Sends an email to this User.
         '''
         send_mail(subject, message, from_email, [self.email], **kwargs)
+    
+    def grupos(self):
+        return ', '.join([g.name for g in self.groups.all()])
+    grupos.short_description = "Grupos associados ao Usuário"
+
+    def permissoes(self):
+        return ', '.join([p.name for p in self.user_permissions.all()])
+    permissoes.short_description = "Permissões associados ao Usuário"
 
 class Genero(models.Model):
     nome = models.CharField('Nome', max_length=100, unique=True)
@@ -95,6 +114,16 @@ class Artista(models.Model):
         ordering = ['nome',]
         verbose_name = 'Artista'
         verbose_name_plural = 'Artistas'
+        permissions = (
+            ('add_diretor', 'Pode adicionar diretores'),
+            ('change_diretor', 'Pode editar diretores'),
+            ('delete_diretor', 'Pode excluir diretores'),
+            ('view_diretor', 'Pode visualizar diretores'),
+            ('add_ator', 'Pode adicionar atores'),
+            ('change_ator', 'Pode editar atores'),
+            ('delete_ator', 'Pode excluir atores'),
+            ('view_ator', 'Pode visualizar atores'),
+        )
 
     def __str__(self):
         return "%s" % self.nome 
@@ -190,7 +219,7 @@ class Filme(models.Model):
     distribuidora = models.ForeignKey(Distribuidora, on_delete=models.PROTECT)
     capa = models.ImageField('Capa do Filme', upload_to = 'capas/', blank=True, null=True)
     is_lancamento = models.BooleanField(
-        'Lançamento',
+        'Lançamento?',
         default=False,
         help_text='Designa se este filme deve ser tratado como lançamento. Desmarque esta opção se não for um lançamento.',
     )
@@ -199,6 +228,7 @@ class Filme(models.Model):
         ordering = ['titulo',]
         verbose_name = 'Filme'
         verbose_name_plural = 'Filmes'
+        
 
     def __str__(self):
         if self.titulo.strip() != self.titulo_original.strip():
@@ -280,6 +310,10 @@ class Item(models.Model):
         ordering = ['data_aquisicao',]
         verbose_name = 'Item'
         verbose_name_plural = 'Itens'
+        permissions = (
+            ('pode_ativar_item', 'Pode ativar um item'),
+            ('pode_desativar_item', 'Pode desativar um item'),
+        )
 
     def __str__(self):
         return "%s (%s)" % (self.filme, self.tipo_midia)
@@ -298,6 +332,14 @@ class Perfil(models.Model):
         # ordering = ['data_aquisicao',]
         verbose_name = 'Perfil'
         verbose_name_plural = 'Perfis'
+
+    def idade(self):
+        today = date.today()
+        diff = today - self.data_nascimento
+        days = diff.days
+        years, days = days // 365, days % 365
+        months, days = days // 30, days % 30
+        return "{} anos, {} meses e {} dias".format(years, months, days)
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
@@ -333,9 +375,23 @@ class Cliente(models.Model):
     titular = models.ForeignKey('self', on_delete=models.PROTECT, related_name='clientes', blank=True, null=True)
 
     class Meta:
-        # ordering = ['data_aquisicao',]
+        ordering = ['user__first_name',]
         verbose_name = 'Cliente'
         verbose_name_plural = 'Clientes'
+        permissions = (
+            ('pode_add_titular', 'Pode adicionar clientes titulares'),
+            ('pode_change_titular', 'Pode editar clientes titulares'),
+            ('pode_delete_titular', 'Pode excluir clientes titulares'),
+            ('pode_view_titular', 'Pode visualizar clientes titulares'),
+            ('pode_ativar_titular', 'Pode ativar clientes titulares'),
+            ('pode_desativar_titular', 'Pode desativar clientes titulares'),
+            ('pode_add_dependente', 'Pode adicionar dependentes'),
+            ('pode_change_dependente', 'Pode editar dependentes'),
+            ('pode_delete_dependente', 'Pode excluir dependentes'),
+            ('pode_view_dependente', 'Pode visualizar dependentes'),
+            ('pode_ativar_dependente', 'Pode ativar dependentes'),
+            ('pode_desativar_dependente', 'Pode desativar dependentes'),
+        )
 
     def __str__(self):
         return "%s" % (self.user.get_full_name())
@@ -346,6 +402,14 @@ class Cliente(models.Model):
     def quantidade_dependentes(self):
         return Cliente.objects.filter(titular=self, is_active=True).count()
         
+    def clean(self):
+        if not self.titular:
+            today = date.today()
+            diff = today - self.data_nascimento
+            days = diff.days
+            years, days = days // 365, days % 365
+            if years < 18:
+                raise ValidationError(_('O titular deve ter no mínimo 18 anos.'))
 
 
 class HistoricoCliente(models.Model):
@@ -376,6 +440,9 @@ class Reserva(models.Model):
         ordering = ['data_reserva',]
         verbose_name = 'Reserva'
         verbose_name_plural = 'Reserva'
+        permissions = (
+            ('pode_cancelar_reserva', 'Pode cancelar reservas'),
+        )
 
     def __str__(self):
         return "%s - %s (%s)" % (self.cliente.user.get_full_name(), self.filme, self.midia)
@@ -522,7 +589,6 @@ class Locacao(models.Model):
         super(Locacao, self).save(*args, **kwargs)
 
 
-
 class ItemLocacao(models.Model):
     item = models.ForeignKey(Item, on_delete=models.PROTECT)
     is_lancamento = models.BooleanField(
@@ -555,6 +621,13 @@ class ItemLocacao(models.Model):
             raise ValidationError({
                 'data_devolucao_prevista': 'A data de devolução prevista deve ser maior que a data de locação.',
             })
+
+        reserva = Reserva.objects.filter(filme=self.item.filme, midia=self.item.tipo_midia, status='Pendente')
+        if reserva:
+            raise ValidationError({
+                'item': 'Este item tem uma RESERVA PENDENTE, portanto não pode ser locado.',
+            })
+
 
     def valor_locacao(self):
         return self.valor - self.desconto    

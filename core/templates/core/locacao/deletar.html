@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+
+{% block conteudo %}
+    <div class="container-fluid">
+        <h2>Deletar Locação</h2>
+        <hr>
+        <form method="post">
+            {% csrf_token %}
+            <p id="pergunta_delete">Você tem certeza que quer apagar a Locação "{{ object }}"?</p>
+            <input type="submit" class="btn btn-danger" value="Sim, tenho certeza" id="btn_confirm_delete">
+            <a href="#" class="btn btn-secondary" onclick="window.history.back(); return false;" class="button cancel-link">Não, me leve de volta</a>
+        </form>
+    </div>
+{% endblock conteudo %}
