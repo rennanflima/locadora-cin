@@ -24,7 +24,9 @@
             {% csrf_token %}
             {% bootstrap_form form %}
             <hr>
-            <a href="{% url 'core:devolucao-listar' %}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+            {% if perms.core.view_devolucao %}
+                <a href="{% url 'core:devolucao-listar' %}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+            {% endif %}
             <button id="id_submit_devolucao" type="submit" class="btn btn-success ml-2 float-right">Devolver item</button>
             
         </form>

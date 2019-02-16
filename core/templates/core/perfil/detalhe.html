@@ -1,0 +1,94 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+{% load account socialaccount %}
+
+{% block conteudo %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'core:index'%}">Início</a>
+        </li>
+        <li class="breadcrumb-item">Perfil</li>
+        <li class="breadcrumb-item active">{{ usuario }}</li>
+    </ol>
+
+    {% bootstrap_messages %}
+
+    <div class="container-fluid">
+        <h2>Detalhar Usuario</h2>
+        <hr>
+        <div class="form-group">
+            <label class="negrito">Nome: </label>    
+            {{ usuario.get_full_name }}
+        </div> 
+        {% if usuario.perfil.cpf %}
+            <div class="form-group">
+                <label class="negrito">CPF: </label>    
+                {{ usuario.perfil.cpf }}
+            </div>
+        {% endif %}
+        {% if usuario.perfil.data_nascimento %}
+            <div class="form-group">
+                <label class="negrito">Data de Nascimento: </label>    
+                {{ usuario.perfil.data_nascimento }}
+            </div>
+        {% endif %}
+        {% if usuario.perfil.data_nascimento %}
+            <div class="form-group">
+                <label class="negrito">Idade: </label>    
+                {{ usuario.perfil.idade }}
+            </div>
+        {% endif %}
+        {% if usuario.perfil.sexo %}
+            <div class="form-group">
+                <label class="negrito">Sexo: </label>    
+                {{ usuario.perfil.get_sexo_display }}
+            </div>
+        {% endif %}
+        <div class="form-group">
+            <label class="negrito">E-mail: </label>    
+            {{ usuario.email }}
+        </div>
+        {% if usuario.perfil.endereco %}
+            <div class="form-group">
+                <label class="negrito">Endereço: </label>    
+                {{ usuario.perfil.endereco }}
+            </div> 
+        {% endif %}
+        {% if usuario.is_superuser or usuario.is_staff or usuario.groups.all or usuario.user_permissions.all %}
+            <fieldset>
+                <legend>Permissão<hr></legend>
+                {% if usuario.is_superuser %}
+                    <div class="form-group">
+                        <label class="negrito">Superusuário: </label>    
+                        {{ usuario.is_superuser|yesno:"Sim, Não" }}
+                    </div> 
+                {% endif %}
+                {% if usuario.is_staff %}
+                    <div class="form-group">
+                        <label class="negrito">Membro da equipe: </label>    
+                        {{ usuario.is_staff|yesno:"Sim, Não" }}
+                    </div> 
+                {% endif %}
+                {% if usuario.groups.all %}
+                    <div class="form-group">
+                        <label class="negrito">Grupos: </label>    
+                        {{ usuario.grupos }}
+                    </div>
+                {% endif %}
+                {% if usuario.user_permissions.all %}
+                <div class="form-group">
+                    <label class="negrito">Permissões: </label>    
+                    {{ usuario.permissoes }}
+                </div> 
+                {% endif %}
+            </fieldset>
+        {% endif %}
+        <fieldset class="mb-4">
+            <legend>Redes Sociais<hr></legend>
+            <a href="{% url 'socialaccount_connections' %}">
+                <i class="fa fa-sign-in-alt"></i>  
+                </i><span> Conecte-se a Redes Sociais</span>
+            </a>
+        </fieldset>
+    </div>
+{% endblock conteudo %}

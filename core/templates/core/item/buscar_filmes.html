@@ -1,0 +1,164 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+
+{% block conteudo %}
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'core:index'%}">Início</a>
+        </li>
+        <li class="breadcrumb-item active">Filme</li>
+    </ol>
+    
+    {% bootstrap_messages %}
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+                Busca de Filmes
+        </div>   
+        <div class="card-body">
+            <form method="GET">
+                <div class="jumbotron">
+                    <h4 style="margin-top: 0">Filtro</h4>
+                    <div class="row">
+                        <div class="form-group col-sm-4 col-md-4">
+                            {% bootstrap_field filter.form.titulo %}
+                        </div>
+                        <div class="form-group col-sm-4 col-md-4">
+                            {% bootstrap_field filter.form.titulo_original %}
+                        </div>
+                        <div class="form-group col-sm-4 col-md-4">
+                            {{ filter.form.genero.label_tag }}
+                            <div>
+                                {% for choice in filter.form.genero %}
+                                <label class="checkbox-inline">
+                                    {{ choice.tag }} {{ choice.choice_label }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group col-sm-4 col-md-4">
+                            {% bootstrap_field filter.form.pais %}
+                        </div>
+                        <div class="form-group col-sm-4 col-md-4">
+                            {% bootstrap_field filter.form.diretor %}
+                        </div>
+                        <div class="form-group col-sm-4 col-md-4">
+                            {% bootstrap_field filter.form.tipo_midia %}
+                        </div>
+                        <div class="form-group col-sm-4 col-md-4">
+                            {% bootstrap_field filter.form.ator %}
+                        </div>
+                        <div class="form-group col-sm-4 col-md-4">
+                            {% bootstrap_field filter.form.is_lancamento %}
+                        </div>
+                    </div>
+                    <a href="{% url 'core:filme-buscar' %}" class="btn btn-danger float-right ml-2">Limpar</a>
+                    <button type="submit" class="btn btn-primary float-right ml-2">
+                        <span class="fa fa-search"></span> Buscar
+                    </button>
+                </div>
+            </form>
+                <!-- {% bootstrap_form filter.form %} -->
+                <!-- <button class="btn btn-primary" type="submit" id="button-addon2">Buscar</button> -->
+                <!-- <a class="btn btn-secondary" href="{% url 'core:filme-buscar' %}">Limpar</a> -->
+            <!-- </form> -->
+            <div class="table-responsive">  
+                <table class="table table-striped table-bordered" cellspacing="0">
+                    <thead class="text-center">
+                        <tr>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Ano</th>
+                            <th scope="col">Gênero</th>
+                            <th scope="col">Duração</th>
+                            <th scope="col">Ações</th>
+                        </tr>
+                    </thead>
+                    <tfoot class="text-center">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Ano</th>
+                            <th>Gênero</th>
+                            <th>Duração</th>
+                            <th>Ações</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        {% for filme in filmes %}
+                            <tr class="text-center">
+                                <td><a href="{% url 'core:filme-detalhe' filme.id %}">{{ filme }}</a></td>
+                                <td>{{ filme.ano }}</td>
+                                <td>
+                                    {{ filme.generos }}
+                                </td>
+                                <td>{{ filme.duracao }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:filme-editar' filme.id %}'">Editar</button>
+                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:filme-deletar' filme.id %}'">Excluir</button>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr class="text-center">
+                                <td colspan="5">Nenhum filme encontrado.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>   
+                
+                {% if is_paginated %}
+                    <hr>
+                    <span class="float-left">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.</span>
+                        
+                    <nav aria-label="Páginação do filme" class="float-right">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <!-- If it ain't a search result display, don't append the search query
+                                to the URL. -->
+                                {% if not search %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{% url 'core:filme-listar' %}?page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                    </li>
+                                {% else %}
+                                    <!-- Append the searched query to the URL, so that on a search results page,
+                                    the pagination don't revert to listing all the listview items. -->
+                                    <li class="page-item">
+                                        <a class="page-link" href="{% url 'core:filme-listar' %}?{{search}}&page={{ page_obj.previous_page_number }}" tabindex="-1">Página anterior</a>
+                                    </li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1">Página anterior</a>
+                                </li>
+                            {% endif %} 
+                            {% for object in page_obj.paginator.page_range %}
+                                <li class="page-item"><a class="page-link" href="{% url 'core:filme-listar' %}?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
+                            {% endfor %} 
+                            {% if page_obj.has_next %}
+                                {% if not search %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{% url 'core:filme-listar' %}?page={{ page_obj.next_page_number }}">Próxima página</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{% url 'core:filme-listar' %}?{{search}}&page={{ page_obj.next_page_number }}">Próxima página</a>
+                                    </li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">Próxima página</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    
+                {% endif %}
+                
+            </div>
+        </div>
+        <div class="card-footer small text-muted">Atualizado as 12:54 PM</div>
+    </div>
+
+
+{% endblock conteudo %}

@@ -12,6 +12,8 @@
 
         {% load static %}
         {% load bootstrap4 %}
+        {% load i18n %}
+        {% load account %}
 
         <link rel="shortcut icon" type="image/png" href="{% static '/img/coroa.png' %}"/>
 
@@ -38,9 +40,35 @@
     </head>
 
     <body>
-
+        <nav class="navbar navbar-expand-sm navbar-light bg-light fixed-top">
+            <div class="collapse navbar-collapse d-flex flex-row-reverse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    {% if not user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_login' %}">Entrar</a>
+                        </li>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Olá {% user_display user %}!
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <a class="dropdown-item" href="{% url 'meu-perfil' %}">Perfil</a>
+                                <a class="dropdown-item" href="{% url 'alterar-senha' %}">Alterar senha</a>
+                                {% if perms.core %}
+                                    <a class="dropdown-item" href="{% url 'core:index' %}">Administração</a>
+                                {% endif %}
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Sair</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+        
         <!-- Navigation -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand" href="{% url 'index' %}">Locadora Imperial</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,12 +84,18 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#">Sobre</a>
                         </li>
+                        <!-- {% if not user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Login</a>
+                            <a class="nav-link" href="{% url 'account_login' %}">Login</a>
                         </li>
-                        <li class="nav-item">
+                        {% endif %} -->
+                        <li class="nav-item mr-3">
                             <a class="nav-link" href="#">Contato</a>
                         </li>
+                        <form class="form-inline" method="GET" action="{% url 'buscar-filmes' %}">
+                            <input class="form-control mr-sm-2" name="nome" type="search" placeholder="Busca" aria-label="Busca">
+                            <button class="btn btn-default my-2 my-sm-0" type="submit">Buscar</button>
+                        </form>
                     </ul>
                 </div>
             </div>
@@ -82,6 +116,33 @@
         </div>
         <!-- /.container -->
 
+
+        <!-- Logout Modal-->
+        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form method="post" action="{% url 'account_logout' %}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">{% trans "Sign Out" %}</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            {% trans 'Are you sure you want to sign out?' %}
+                            {% if redirect_field_value %}
+                                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-danger">{% trans "Sign Out" %}</button>
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <!-- Footer -->
         <footer class="py-5 bg-dark">
             <div class="container">
@@ -90,9 +151,6 @@
         <!-- /.container -->
         </footer>
 
-        <!-- Bootstrap core JavaScript -->
-        <script src="vendor/jquery/jquery.min.js"></script>
-        <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
     </body>
 

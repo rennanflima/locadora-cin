@@ -54,7 +54,9 @@
             </div>
             <div class="form-actions">
                 <hr>
-                <a href="{%url 'core:dependente-listar' pk %}" class="btn btn-danger ml-2 mb-4 float-right">Cancelar</a>
+                {% if perms.core.pode_view_dependente %}
+                    <a href="{%url 'core:dependente-listar' pk %}" class="btn btn-danger ml-2 mb-4 float-right">Cancelar</a>
+                {% endif %}
                 <button type="submit" class="btn btn-success ml-2 float-right">Adicionar Dependente</button>
             </div>
         </form>

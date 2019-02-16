@@ -5,11 +5,9 @@ from selenium.webdriver.support.ui import Select
 def step_impl(context, page):
     context.browser.get(page)
 
-
 @when(u'clicar no botão Realizar Locação')
 def step_impl(context):
     context.browser.find_element_by_link_text('Realizar Locação').click()
-
 
 @when(u'selecionar o cliente da locação')
 def step_impl(context):

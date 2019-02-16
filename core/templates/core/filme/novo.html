@@ -55,7 +55,9 @@
             </div>
             <div class="form-actions">
                 <hr>
-                <a href="{% url 'core:midia-listar' %}" class="btn btn-danger ml-2 mb-4 float-right">Cancelar</a>
+                {% if perms.core.view_filme %}
+                    <a href="{% url 'core:filme-listar' %}" class="btn btn-danger ml-2 mb-4 float-right">Cancelar</a>
+                {% endif %}
                 <input type="submit" name="save_changes" value="Adicionar Filme" class="btn btn-success ml-2 mb-4 float-right" id="submit-id-save_changes">
             </div>
         </form>
@@ -79,7 +81,7 @@
                 type: 'get',
                 dataType: 'json',
                 beforeSend: function () {
-                        $("#genericModal").modal("show");
+                    $("#genericModal").modal("show");
                 },
                 success: function (data) {
                     $("#genericModal .modal-content").empty();

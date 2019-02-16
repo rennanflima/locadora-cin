@@ -16,4 +16,5 @@ def before_all(context):
     context.browser.implicitly_wait(20)
 
 def after_all(context):
+    context.browser.get('http://127.0.0.1:8000/accounts/logout')
     context.browser.quit()

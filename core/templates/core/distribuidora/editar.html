@@ -55,7 +55,9 @@
             </fieldset>
             <div class="form-actions">
                 <hr>
-                <a href="{%url 'core:distribuidora-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+                {% if perms.core.view_distribuidora %}
+                    <a href="{% url 'core:distribuidora-listar' %}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+                {% endif %}
                 <input type="submit" name="save_changes" value="Salvar Distribuidora" class="btn btn-primary btn-success ml-2 mb-4 float-right" id="submit-id-save_changes">
             </div>
         </form>

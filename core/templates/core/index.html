@@ -1,7 +1,11 @@
 {% extends 'core/base.html' %}
+{% load bootstrap4 %}
+
 {% block conteudo %}
     <!-- Breadcrumbs-->
     <ol class="breadcrumb">
         <li class="breadcrumb-item active">Início</li>
     </ol>
+
+    {% bootstrap_messages %}
 {% endblock conteudo %}

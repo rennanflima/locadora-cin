@@ -20,7 +20,9 @@
         </div>   
         <div class="card-body">
             <div class="table-responsive">  
-                <a href="{% url 'core:locacao-realizar' %}" class="btn btn-primary float-right mb-3">Realizar Locação</a>
+                {% if perms.core.add_locacao %}
+                    <a href="{% url 'core:locacao-realizar' %}" class="btn btn-primary float-right mb-3">Realizar Locação</a>
+                {% endif %}
                 <form method="GET" action="{%url 'core:locacao-listar'%}">
                     <div class="input-group mb-3">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
@@ -52,12 +54,25 @@
                     <tbody>
                         {% for locacao in object_list %}
                             <tr class="text-center">
-                                <th scope="row"><a href="{% url 'core:locacao-detalhe' locacao.id %}">{{ locacao.cliente }}</a></th>
+                                <th scope="row">
+                                    {% if perms.core.view_locacao %}
+                                        <a href="{% url 'core:locacao-detalhe' locacao.id %}">{{ locacao.cliente }}</a>
+                                    {% else %}
+                                        {{ locacao.cliente }}
+                                    {% endif %}
+                                </th>  
                                 <td>{{ locacao.data_locacao }}</td>
                                 <td>R$ {{ locacao.valor_total }}</td>
                                 <td>{{ locacao.get_situacao_display }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:locacao-realizar-itens' locacao.id %}'" {% if not locacao.is_editavel %}disabled="true"{% endif %} >Editar</button>
+                                    {% if perms.core.change_locacao %}
+                                        <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:locacao-realizar-itens' locacao.id %}'" {% if not locacao.is_editavel %}disabled="true"{% endif %} >Editar</button>
+                                    {% endif %}
+                                    {% if locacao.situacao == 'EM_ADAMENTO' %}
+                                        {% if perms.core.delete_locacao %}
+                                            <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:locacao-deletar' locacao.id %}'">Excluir</button>
+                                        {% endif %}
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% empty %}

@@ -24,8 +24,9 @@
             {% csrf_token %}
             {% bootstrap_form form %}
             <hr>
-            <a href="{%url 'core:filme-novo'%}" class="btn btn-primary ml-2 mb-4 float-right">Adicionar Filme</a>
-            <a href="{%url 'core:genero-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+            {% if perms.core.view_genero %}
+                <a href="{%url 'core:genero-listar'%}" class="btn btn-danger ml-2 float-right">Cancelar</a>
+            {% endif %}
             <button id="id_submit_genero" type="submit" class="btn btn-success ml-2 float-right">Adicionar Gênero</button>
             
         </form>

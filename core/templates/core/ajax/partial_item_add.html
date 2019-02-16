@@ -10,15 +10,7 @@
         </button>
     </div>
     <div class="modal-body">
-        <!-- <input type="hidden" id="id_locacao_pk"/> -->
         {% bootstrap_form form %}
-        <!-- {{ form.locacao|as_crispy_field }}
-        {{ form.item|as_crispy_field }}
-        {{ form.valor|as_crispy_field }}
-        {{ form.desconto|as_crispy_field }}
-        {{ form.data_devolucao_prevista|as_crispy_field }}
-        {{ form.is_nova_data|as_crispy_field }}
-        {{ form.nova_data_devolucao|as_crispy_field }} -->
     </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Adicionar Item</button>
@@ -55,4 +47,5 @@
         });
         
     </script>
+    {{ form.media }}
 {% endblock javascript %}

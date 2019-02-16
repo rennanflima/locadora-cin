@@ -19,8 +19,10 @@
                 Distribuidoras
         </div>   
         <div class="card-body">
-            <div class="table-responsive">  
-                <a href="{% url 'core:distribuidora-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+            <div class="table-responsive"> 
+                {% if perms.core.add_distribuidora %} 
+                    <a href="{% url 'core:distribuidora-novo' %}" class="btn btn-primary float-right mb-3">Adicionar</a>
+                {% endif %}
                 <form method="GET" action="{%url 'core:distribuidora-listar'%}">
                     <div class="input-group mb-3">
                         <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome" aria-label="Pesquisar por nome" aria-describedby="button-addon2">
@@ -48,11 +50,21 @@
                     <tbody>
                         {% for distribuidora in object_list %}
                             <tr class="text-center">
-                                <th scope="row"><a href="{% url 'core:distribuidora-detalhe' distribuidora.id %}">{{ distribuidora.razao_social }}</a></th>
+                                <th scope="row">
+                                    {% if perms.core.view_distribuidora %}
+                                        <a href="{% url 'core:distribuidora-detalhe' distribuidora.id %}">{{ distribuidora.razao_social }}</a>
+                                    {% else %}
+                                        {{ distribuidora.razao_social }}
+                                    {% endif %}
+                                </th>
                                 <td>{{ distribuidora.contato }} - {{distribuidora.telefone}}</td>
                                 <td>
-                                    <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:distribuidora-editar' distribuidora.id %}'">Editar</button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:distribuidora-deletar' distribuidora.id %}'">Excluir</button>
+                                    {% if perms.core.change_distribuidora %}
+                                        <button type="button" class="btn btn-success m-2  btn-sm"  onclick="window.location = '{% url 'core:distribuidora-editar' distribuidora.id %}'">Editar</button>
+                                    {% endif %}
+                                    {% if perms.core.delete_distribuidora %}
+                                        <button type="button" class="btn btn-danger btn-sm btn-group" onclick="window.location = '{% url 'core:distribuidora-deletar' distribuidora.id %}'">Excluir</button>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% empty %}

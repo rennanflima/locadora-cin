@@ -1,17 +1,20 @@
 from behave import *
 from datetime import datetime
 
+@given('que estou logado')
+def step_impl(context):
+    context.browser.get('http://127.0.0.1:8000/accounts/login')
+    context.browser.find_element_by_id("id_login").send_keys("teste@bdd.com")
+    context.browser.find_element_by_id("id_password").send_keys("123456")
+    context.browser.find_element_by_id('id_btn_login').click()
+
 @given('que estou na página de gênero "{page}"')
-
 def open_page(context, page):
-        # context.browser = webdriver.Chrome()
-        context.browser.get(page)
-
+    context.browser.get(page)
 
 @when(u'clicar no botão adicionar')
 def click_bnt(context):
     context.browser.find_element_by_link_text('Adicionar').click()
-
 
 @when('preencher o campo nome com uma descrição')
 def insert_values_on_fields(context):

@@ -12,3 +12,4 @@ venv/
 _public/
 */htmlcov/*
 geckodriver.log
+media/
