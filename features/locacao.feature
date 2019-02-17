@@ -8,7 +8,7 @@ Funcionalidade: Nova locação
     E clicar no botão Próximo
     E clicar no botão Adicionar Item
     E selecionar um item
-    E clicar em Adicionar Item     
-    Então clicar no botão Próximo
+    E clicar em Adicionar Item
+    Então clicar no botão Próximo 
     E clicar no botão Concluir
     E Locação concluída com sucesso.
