@@ -33,10 +33,10 @@ before_script:
 script:
   - whereis google-chrome-stable
   - whereis chromedriver
-  - tox
-  - coverage run -m pytest
+  # - tox
+  # - coverage run -m pytest
   - behave
-  - coverage report -m
+  # - coverage report -m
 # after_script:
 #   - "sh -e /etc/init.d/xvfb stop"
 after_success:

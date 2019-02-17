@@ -14,7 +14,7 @@ class GeneroForm(forms.ModelForm):
     class Meta:
         model = Genero
         fields = ('nome',)
-    
+
     def __init__(self, *args, **kwargs):
         super(GeneroForm, self).__init__(*args, **kwargs)
 
@@ -22,7 +22,7 @@ class ArtistaForm(forms.ModelForm):
     class Meta:
         model = Artista
         fields = ('nome', 'tipo',)
-    
+
     def __init__(self, *args, **kwargs):
         super(ArtistaForm, self).__init__(*args, **kwargs)
 
@@ -31,7 +31,7 @@ class DiretorForm(forms.ModelForm):
     class Meta:
         model = Artista
         fields = ('nome',)
-    
+
     def __init__(self, *args, **kwargs):
         super(DiretorForm, self).__init__(*args, **kwargs)
 
@@ -40,7 +40,7 @@ class AtorForm(forms.ModelForm):
     class Meta:
         model = Artista
         fields = ('nome',)
-    
+
     def __init__(self, *args, **kwargs):
         super(AtorForm, self).__init__(*args, **kwargs)
 
@@ -50,12 +50,12 @@ class FilmeForm(forms.ModelForm):
     class Meta:
         model = Filme
         fields = ('titulo', 'titulo_original', 'duracao', 'diretor', 'ano', 'pais', 'classificacao', 'genero', 'distribuidora', 'capa','sinopse', 'is_lancamento')
-    
+
     def __init__(self, *args, **kwargs):
         super(FilmeForm, self).__init__(*args, **kwargs)
 
         self.base_fields['duracao'].widget.attrs['class'] = 'time'
-        
+
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
@@ -94,13 +94,13 @@ class MidiaForm(forms.ModelForm):
     class Meta:
         model = Midia
         fields = ('nome','valor',)
-    
+
     def __init__(self, *args, **kwargs):
         super(MidiaForm, self).__init__(*args, **kwargs)
         self.base_fields['valor'].localize = True
         self.base_fields['valor'].widget.is_localized = True
         self.base_fields['valor'].widget.attrs['class'] = 'form-control money2'
-        
+
         self.helper = FormHelper()
         self.helper.layout = Layout(
             'nome',
@@ -123,7 +123,7 @@ class ElencoForm(forms.ModelForm):
                 'unique_together': "%(model_name)s's %(field_labels)s are not unique.",
             }
         }
-    
+
     def __init__(self, *args, **kwargs):
         super(ElencoForm, self).__init__(*args, **kwargs)
 
@@ -154,7 +154,7 @@ class BaseElencoFormSet(BaseInlineFormSet):
                     ator = form.cleaned_data['ator']
                 else:
                     ator = None
-                
+
                 if 'personagem' in form.cleaned_data:
                     personagem = form.cleaned_data['personagem']
                 else:
@@ -172,26 +172,26 @@ class BaseElencoFormSet(BaseInlineFormSet):
                         form.add_error('ator', '%s já está listado no elenco deste filme' % ator)
                 except:
                     pass
-                    
+
 
                 if ator and personagem:
                     if ator in atores:
-                        duplicates = True    
+                        duplicates = True
                     atores.append(ator)
 
                     if personagem in personagens:
                         duplicates = True
                     personagens.append(personagem)
-                
+
                 if duplicates:
                     raise forms.ValidationError('O Elenco deve ter atores e personagem exclusivo.', code='duplicates_ator')
-        
+
         if any(self.errors):
             return
 
 ElencoInlineFormSet = forms.inlineformset_factory(
-    Filme, 
-    Elenco, 
+    Filme,
+    Elenco,
     form=ElencoForm,
     extra=1,
     formset=BaseElencoFormSet,
@@ -210,12 +210,12 @@ class EnderecoForm(forms.ModelForm):
     class Meta:
         model = Endereco
         fields = ('logradouro','numero','complemento', 'bairro', 'cep', 'estado','cidade')
-    
+
     def __init__(self, *args, **kwargs):
         super(EnderecoForm, self).__init__(*args, **kwargs)
         self.fields['cep'].widget.attrs['class'] = 'form-control cep'
         self.fields['cidade'].queryset = Cidade.objects.none()
-        
+
         if 'estado' in self.data:
             try:
                 estado_id = int(self.data.get('estado'))
@@ -223,7 +223,7 @@ class EnderecoForm(forms.ModelForm):
                 self.fields['cidade'].queryset = Cidade.objects.filter(estado_id=estado_id).order_by('nome')
             except (ValueError, TypeError):
                 pass
-        
+
         elif self.instance.pk:
             self.fields['cidade'].queryset = self.instance.estado.cidade_set.order_by('nome')
 
@@ -231,7 +231,7 @@ class DistribuidoraForm(forms.ModelForm):
     class Meta:
         model = Distribuidora
         fields = ('razao_social','cnpj','contato', 'telefone')
-    
+
     def __init__(self, *args, **kwargs):
         super(DistribuidoraForm, self).__init__(*args, **kwargs)
         self.base_fields['cnpj'].widget.attrs['class'] = 'form-control cnpj'
@@ -241,11 +241,11 @@ class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
         fields = ('filme', 'tipo_midia', 'numero_serie', 'data_aquisicao', )
-    
+
     def __init__(self, *args, **kwargs):
         super(ItemForm, self).__init__(*args, **kwargs)
         self.fields['data_aquisicao'].widget.attrs['class'] = 'form-control date'
-        
+
 
 class ClienteForm(forms.ModelForm):
     first_name = forms.CharField(label='Primeiro nome')
@@ -294,10 +294,10 @@ class DependenteForm(forms.ModelForm):
         self.fields['cpf'].widget.attrs['class'] = 'form-control cpf'
         self.fields['data_nascimento'].widget.attrs['class'] = 'form-control date'
 
-  
+
 TelefoneInlineFormSet = forms.inlineformset_factory(
-    Perfil, 
-    Telefone, 
+    Perfil,
+    Telefone,
     form=TelefoneForm,
     extra=2,
     # widgets={'personagem': forms.TextInput(attrs={
@@ -312,7 +312,7 @@ class ReservaForm(forms.ModelForm):
     class Meta:
         model = Reserva
         fields = ('cliente', 'filme', 'midia')
-    
+
     def __init__(self, *args, **kwargs):
         super(ReservaForm, self).__init__(*args, **kwargs)
 
@@ -334,15 +334,15 @@ class ReservaForm(forms.ModelForm):
                 self.fields['midia'].queryset = Midia.objects.filter(item_midia__filme_id=filme_id).order_by('nome')
             except (ValueError, TypeError):
                 pass
-        
+
         elif self.instance.pk:
-            self.fields['midia'].queryset = Midia.objects.filter(item_midia__filme_id=self.instance.filme) 
+            self.fields['midia'].queryset = Midia.objects.filter(item_midia__filme_id=self.instance.filme)
 
 
 class LocacaoForm(forms.ModelForm):
     cliente = forms.ModelChoiceField(
         queryset=Cliente.objects.all(),
-        widget=autocomplete.ModelSelect2(url='core:cliente-autocomplete')
+        # widget=autocomplete.ModelSelect2(url='core:cliente-autocomplete')
     )
 
     class Meta:
@@ -351,7 +351,7 @@ class LocacaoForm(forms.ModelForm):
         # widgets = {
         #     'cliente': autocomplete.ModelSelect2(url='core:cliente-autocomplete')
         # }
-    
+
     def __init__(self, *args, **kwargs):
         super(LocacaoForm, self).__init__(*args, **kwargs)
         # self.fields['valor_total'].widget.attrs['class'] = 'form-control money2'
@@ -364,11 +364,11 @@ class ItemLocacaoForm(forms.ModelForm):
     desconto = forms.DecimalField(label='Desconto', max_digits=8, decimal_places=2, localize=True, required=False)
     locacao = forms.ModelChoiceField(queryset=Locacao.objects.all(), widget=forms.HiddenInput())
     is_nova_data = forms.BooleanField(label='Deseja estender a data de devolução? ', required=False)
-    
+
     class Meta:
         model = ItemLocacao
         fields = ('item', 'valor', 'desconto', 'data_devolucao_prevista', 'nova_data_devolucao', 'locacao',)
-    
+
     def __init__(self, *args, **kwargs):
         super(ItemLocacaoForm, self).__init__(*args, **kwargs)
         self.fields['data_devolucao_prevista'].widget.attrs['class'] = 'date'
@@ -383,7 +383,7 @@ class DevolucaoForm(forms.ModelForm):
     class Meta:
         model = Devolucao
         fields = ('item', 'multa')
-    
+
     def __init__(self, *args, **kwargs):
         super(DevolucaoForm, self).__init__(*args, **kwargs)
         self.fields['multa'].widget.attrs['readonly'] = True
@@ -429,4 +429,3 @@ class MyLoginForm(LoginForm):
         super(MyLoginForm, self).__init__(*args, **kwargs)
         self.fields['login'].widget.attrs['class'] = 'email'
         self.fields['password'].widget.attrs['class'] = 'password'
-

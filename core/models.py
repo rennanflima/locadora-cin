@@ -11,7 +11,7 @@ from django.dispatch import receiver
 from core.managers import UserManager
 from datetime import date
 from datetime import datetime
-from datetime import timedelta 
+from datetime import timedelta
 from django.conf import settings
 from django.utils.text import slugify
 from django.template.defaultfilters import slugify as slug_template
@@ -80,7 +80,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         Sends an email to this User.
         '''
         send_mail(subject, message, from_email, [self.email], **kwargs)
-    
+
     def grupos(self):
         return ', '.join([g.name for g in self.groups.all()])
     grupos.short_description = "Grupos associados ao Usuário"
@@ -98,7 +98,7 @@ class Genero(models.Model):
         verbose_name_plural = 'Gêneros'
 
     def __str__(self):
-        return "%s" % self.nome 
+        return "%s" % self.nome
 
     def get_absolute_url(self):
         return reverse('core:genero-detalhe', kwargs={'pk': self.pk})
@@ -126,7 +126,7 @@ class Artista(models.Model):
         )
 
     def __str__(self):
-        return "%s" % self.nome 
+        return "%s" % self.nome
 
     def get_absolute_url(self):
         return reverse('core:artista-detalhe', kwargs={'pk': self.pk})
@@ -146,7 +146,7 @@ class Estado(models.Model):
 
     def get_absolute_url(self):
         return reverse('core:estado-detalhe', kwargs={'pk': self.pk})
-    
+
     def clean(self):
         self.nome = self.nome.lower().title()
         self.sigla = self.sigla.upper()
@@ -207,7 +207,7 @@ class Distribuidora(models.Model):
         return reverse('core:distribuidora-detalhe', kwargs={'pk': self.pk})
 
 class Filme(models.Model):
-    titulo = models.CharField('Título em Português', max_length=150) 
+    titulo = models.CharField('Título em Português', max_length=150)
     titulo_original = models.CharField('Título Original', max_length=150)
     sinopse = models.TextField('Sinopse')
     classificacao = models.CharField('Classificação Indicativa', max_length=2, choices=tipo_classificacao)
@@ -228,14 +228,14 @@ class Filme(models.Model):
         ordering = ['titulo',]
         verbose_name = 'Filme'
         verbose_name_plural = 'Filmes'
-        
+
 
     def __str__(self):
         if self.titulo.strip() != self.titulo_original.strip():
             return "%s (%s)" % (self.titulo, self.titulo_original)
         else:
             return "%s" % self.titulo
-    
+
     def get_absolute_url(self):
         return reverse('core:filme-detalhe', kwargs={'pk': self.pk})
 
@@ -401,7 +401,7 @@ class Cliente(models.Model):
 
     def quantidade_dependentes(self):
         return Cliente.objects.filter(titular=self, is_active=True).count()
-        
+
     def clean(self):
         if not self.titular:
             today = date.today()
@@ -425,7 +425,7 @@ class HistoricoCliente(models.Model):
 
     def __str__(self):
         return "%s - Titular: %s (%s)" % (self.cliente.user.get_full_name(), self.titular if self.titular else 'Não tem titular', str(self.data_alteracao))
-    
+
 
 class Reserva(models.Model):
     cliente = models.OneToOneField(Cliente, on_delete=models.PROTECT)
@@ -471,7 +471,7 @@ class ArgumentoPagamento(models.Model):
     is_requerido = models.BooleanField('Campo obrigatório?', default=False)
     tipo_dado = models.CharField('Tipo de dado do campo', max_length=20, choices=tipo_dado)
     forma_pagamento = models.ManyToManyField(FormaPagamento)
-    
+
     class Meta:
         verbose_name = 'Argumento do Pagamento'
         verbose_name_plural = 'Argumentos dos Pagamentos'
@@ -534,7 +534,7 @@ class InformacaoPagamento(models.Model):
             return '%s: %d' % (self.argumento, str(self.valor_hora))
         elif self.argumento.tipo_dado == 'DATA_HORA':
             return '%s: %s' % (self.argumento, str(self.valor_data_hora))
-    
+
     def valor_argumento(self):
         if self.argumento.tipo_dado == 'TEXTO':
             return self.valor_texto
@@ -572,20 +572,20 @@ class Locacao(models.Model):
 
     def valor_pago(self):
         itens = ItemLocacao.objects.filter(locacao=self)
-        
+
         soma = 0
         for i in itens:
             pagamentos = i.pagamentos.all()
             if pagamentos:
                 for p in pagamentos:
-                    soma = soma + p.valor        
+                    soma = soma + p.valor
         return soma
 
     def is_editavel(self):
         return self.situacao == 'EM_ANDAMENTO'
 
     def save(self, *args, **kwargs):
-        self.valor_total = self.sub_total - self.total_descontos      
+        self.valor_total = self.sub_total - self.total_descontos
         super(Locacao, self).save(*args, **kwargs)
 
 
@@ -611,8 +611,8 @@ class ItemLocacao(models.Model):
     def __str__(self):
         return "%s, locado pelo cliente: %s" % (self.item, self.locacao.cliente)
 
-    def clean(self):   
-        if self.nova_data_devolucao < self.locacao.data_locacao.date():    
+    def clean(self):
+        if self.nova_data_devolucao < self.locacao.data_locacao.date():
             raise ValidationError({
                 'nova_data_devolucao': _('A nova data de devolução prevista deve ser maior que a data de locação.'),
             })
@@ -630,7 +630,7 @@ class ItemLocacao(models.Model):
 
 
     def valor_locacao(self):
-        return self.valor - self.desconto    
+        return self.valor - self.desconto
 
 
     def data_devolucao(self):
@@ -642,7 +642,7 @@ class ItemLocacao(models.Model):
     def calcular_multa(self, data_entrega):
         diferenca = data_entrega - self.data_devolucao()
         return diferenca.days * self.valor
-    
+
 
 class Devolucao(models.Model):
     item = models.OneToOneField(ItemLocacao, on_delete=models.PROTECT, primary_key=True)

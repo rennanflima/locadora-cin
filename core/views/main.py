@@ -11,7 +11,7 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from datetime import date
 from datetime import datetime
-from datetime import timedelta 
+from datetime import timedelta
 from django.utils.formats import localize
 from django.core.serializers import serialize
 from django.db import transaction
@@ -78,7 +78,7 @@ def redireciona_usuario(request):
     today = date.today()
     reservas = Reserva.objects.filter(status='Pendente', data_notificacao__isnull=False)
     for r in reservas:
-        data_expiracao = (r.data_notificacao + timedelta(days=1)).date()   
+        data_expiracao = (r.data_notificacao + timedelta(days=1)).date()
         if today > data_expiracao:
             r.status = 'Expirada'
             r.save()
@@ -118,7 +118,7 @@ class IndexView(LoginRequiredMixin, generic.TemplateView):
     #     if user.get_all_permissions() != set():
     #         return HttpResponseRedirect(reverse_lazy('core:index'))
     #     return context
-    
+
     def get(self, request, *args, **kwargs):
         user = request.user
         if user.get_all_permissions() == set():
@@ -130,13 +130,13 @@ class IndexView(LoginRequiredMixin, generic.TemplateView):
 class ReservaListar(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Reserva
     paginate_by = 10
-    template_name = 'core/reserva/lista.html'    
+    template_name = 'core/reserva/lista.html'
     permission_required = "core.view_reserva"
 
     def get_queryset(self):
         nome = self.request.GET.get('nome', '')
         return self.model.objects.filter(Q(filme__titulo__icontains = nome) | Q(filme__titulo_original__icontains=nome) | Q(cliente__user__first_name__icontains = nome) | Q(cliente__user__last_name__icontains = nome))
-            # Q(cliente__codigo__icontains = nome) | 
+            # Q(cliente__codigo__icontains = nome) |
 
 class ReservaCriar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.CreateView):
     model = Reserva
@@ -169,7 +169,7 @@ class ReservaEditar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageM
 @login_required
 def carregar_tipo_midia(request):
     filme_id = request.GET.get('filme')
-    midias = Midia.objects.filter(item_midia__filme_id=filme_id)    
+    midias = Midia.objects.filter(item_midia__filme_id=filme_id)
     return render(request, 'core/ajax/partial_select_midia.html', {'midias': midias})
 
 
@@ -186,7 +186,7 @@ def reserva_cancelar(request, pk):
         SendMail('[Locadora Imperial] Cancelamento de reserva',text_msg, reserva.cliente.user.email).start()
         messages.success(request, 'Reserva cancelada com sucesso.')
         return HttpResponseRedirect(reverse_lazy('core:reserva-listar'))
-    
+
     return render(request, 'core/reserva/cancelar.html', {'reserva': reserva})
 
 
@@ -195,7 +195,7 @@ class LocacaoListar(LoginRequiredMixin, PermissionRequiredMixin, generic.ListVie
     model = Locacao
     paginate_by = 10
     template_name = 'core/locacao/lista.html'
-    permission_required = "core.view_locacao"   
+    permission_required = "core.view_locacao"
 
 # Step 1 - Locação
 @login_required
@@ -225,7 +225,7 @@ def realizar_locacao(request, pk = None):
                     pass
 
             locacao = form.save()
-            return HttpResponseRedirect(reverse('core:locacao-realizar-itens', kwargs={'pk': locacao.pk}))    
+            return HttpResponseRedirect(reverse('core:locacao-realizar-itens', kwargs={'pk': locacao.pk}))
     return render(request, 'core/locacao/buscar_cliente.html', {'form': form})
 
 # Step 2 - Locação
@@ -297,7 +297,7 @@ def save_item_form(request, form, template_name, mensagem):
             locacao = form.cleaned_data.get('locacao')
 
             itens_list = ItemLocacao.objects.filter(locacao=locacao)
-            
+
             soma = 0
             desconto = 0
             for i in itens_list:
@@ -373,13 +373,13 @@ def carregar_item_ajax(request):
     item = get_object_or_404(Item, pk=item_id)
 
     if item.filme.is_lancamento:
-        data['valor'] = localize(decimal.Decimal(item.tipo_midia.valor) * 1.5)
-    else:    
+        data['valor'] = "%0.2f" % ((item.tipo_midia.valor * decimal.Decimal(1.5)), )
+    else:
         data['valor'] = localize(decimal.Decimal(item.tipo_midia.valor))
-    
+
     today = date.today()
     if item.filme.is_lancamento:
-        data['data_devolucao'] = (today + timedelta(days=1)).strftime("%d/%m/%Y")   
+        data['data_devolucao'] = (today + timedelta(days=1)).strftime("%d/%m/%Y")
     else:
         data['data_devolucao'] = (today + timedelta(days=3)).strftime("%d/%m/%Y")
     return JsonResponse(data)
@@ -441,7 +441,7 @@ def pagamento_locacao(request, pk):
                 pagamento.forma_pagamento = forma_pagamento
                 pagamento.valor = valor
                 pagamento.save()
-                
+
                 campos = dict()
                 for arg in argumentos:
                     campos[arg.slug()] = arg.pk
@@ -468,7 +468,7 @@ def pagamento_locacao(request, pk):
 
                     info_pg.pagamento = pagamento
                     info_pg.save()
-                
+
 
                 for i in itens:
                     i = ItemLocacao.objects.get(pk=i)
@@ -525,7 +525,7 @@ class LocacaoDeletar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessage
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super(LocacaoDeletar, self).delete(request, *args, **kwargs)
-    
+
 # Início views devolução
 class DevolucaoCriar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.CreateView):
     model = Devolucao
@@ -537,8 +537,8 @@ class DevolucaoCriar(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessage
     def form_valid(self, form):
         item = form.cleaned_data.get('item')
         reservas = Reserva.objects.filter(filme=item.filme, midia=item.tipo_midia)
-        
-        
+
+
         for r in reservas:
             r.data_notificacao = datetime.now()
             r.save()
@@ -550,7 +550,7 @@ class DevolucaoListar(LoginRequiredMixin, PermissionRequiredMixin, generic.ListV
     model = Devolucao
     paginate_by = 10
     template_name = 'core/devolucao/lista.html'
-    permission_required = "core.view_devolucao"    
+    permission_required = "core.view_devolucao"
 
     # def get_queryset(self):
     #     nome = self.request.GET.get('nome', '')
@@ -597,7 +597,7 @@ def carrega_item_devolucao_ajax(request):
     today = date.today()
     if today > item.data_devolucao():
         data['multa'] = item.calcular_multa(today)
-    else: 
+    else:
         data['multa'] = 0
     return JsonResponse(data)
 
@@ -637,7 +637,7 @@ def item_pagamento(request):
                 pagamento.forma_pagamento = forma_pagamento
                 pagamento.valor = valor
                 pagamento.save()
-                
+
                 campos = dict()
                 for arg in argumentos:
                     campos[arg.slug()] = arg.pk

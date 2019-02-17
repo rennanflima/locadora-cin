@@ -18,8 +18,8 @@ ALLOWED_HOSTS = ['127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
-    'dal' , 
-    'dal_select2' , 
+    'dal' ,
+    'dal_select2' ,
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'multiselectfield',
     'crispy_forms',
     'localflavor',
-
+    'django_extensions',
     # Autenticação com Redes Sociais
     'allauth',
     'allauth.account',
@@ -171,7 +171,6 @@ ACCOUNT_FORMS = {'login': 'core.forms.MyLoginForm'}
 # Configuração de E-mail
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = 'postmaster@mg.locadora-cin.com'
+EMAIL_HOST_PASSWORD = '0acb5347d07a2855b7c6ad0c6ee90afb-b9c15f4c-f973d66a'
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'Não Responda <nao-responda@gmail.com>'
