@@ -25,15 +25,15 @@
         <h2>Confirmar Locação</h2>
         <hr>
         <div class="form-group">
-            <label class="negrito">Cliente: </label>    
+            <label class="negrito">Cliente: </label>
             {{ locacao.cliente }}
         </div>
         <div class="form-group">
-            <label class="negrito">Data da Locação: </label>    
+            <label class="negrito">Data da Locação: </label>
             {{ locacao.data_locacao }}
         </div>
         <div class="form-group">
-            <label class="negrito">Situação: </label>    
+            <label class="negrito">Situação: </label>
             {{ locacao.get_situacao_display }}
         </div>
 
@@ -75,7 +75,7 @@
             </div>
         </fieldset>
         <hr>
-        <form  method="POST" class="form" action="{% url 'core:locacao-confirmar' locacao.pk %}">
+        <form  method="POST" class="form" action="{% url 'core:locacao-confirmar' locacao.pk %}" id="form-concluir-locacao">
             {% csrf_token %}
             <a href="{%url 'core:locacao-listar'%}" class="btn btn-danger ml-2 mb-4 float-right">Cancelar</a>
             <button id="id_submit_concluir" type="submit" class="btn btn-success ml-2 float-right">Concluir</button>
@@ -83,4 +83,3 @@
         </form>
     </div>
 {% endblock conteudo %}
-
