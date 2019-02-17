@@ -38,8 +38,7 @@ def step_impl(context):
 
 @then(u'clicar no botão Concluir')
 def step_impl(context):
-    form = context.browser.find_element_by_xpath("//form[@id='form-concluir-locacao']").submit()
-    # form.find_element_by_id('id_submit_concluir').click()
+    context.browser.find_element_by_xpath("//form[@id='form-concluir-locacao']").submit()
 
 @then(u'Locação concluída com sucesso.')
 def step_impl(context):
