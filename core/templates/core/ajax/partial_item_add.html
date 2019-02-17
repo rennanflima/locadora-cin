@@ -13,9 +13,9 @@
         {% bootstrap_form form %}
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Adicionar Item</button>
+        <button type="submit" class="btn btn-primary" id="add-item-modal">Adicionar Item</button>
         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-    </div>    
+    </div>
 </form>
 {% block javascript %}
     <script>
@@ -45,7 +45,7 @@
                 });
             });
         });
-        
+
     </script>
     {{ form.media }}
 {% endblock javascript %}

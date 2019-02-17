@@ -29,15 +29,12 @@ def step_impl(context):
 
 @when(u'clicar em Adicionar Item')
 def step_impl(context):
-    context.browser.find_element_by_xpath(u'//button[text()="Adicionar Item"]').click()
-
-@then(u'receber a mensagem Item salvo com sucesso!')
-def step_impl(context):
-    context.browser.find_element_by_class_name("alert-success")
+    # context.browser.find_element_by_xpath(u'//button[text()="Adicionar Item"]').click()
+    context.browser.find_element_by_id("add-item-modal").click()
 
 @then(u'clicar no botão Próximo')
 def step_impl(context):
-    context.browser.find_element_by_xpath(u'//button[text()="Próximo"]').click()
+    context.browser.find_element_by_id("id_submit_item").click()
 
 @then(u'clicar no botão Concluir')
 def step_impl(context):

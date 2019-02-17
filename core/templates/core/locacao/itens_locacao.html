@@ -64,7 +64,7 @@
         <form  method="POST" class="form" action="{% url 'core:locacao-realizar-itens' locacao.pk %}">
             {% csrf_token %}
             <a href="{%url 'core:locacao-listar'%}" class="btn btn-danger ml-2 mb-4 float-right">Cancelar</a>
-            <button id="id_submit_iten" type="submit" class="btn btn-success ml-2 float-right">Próximo</button>
+            <button id="id_submit_item" type="submit" class="btn btn-success ml-2 float-right">Próximo</button>
             <a href="{%url 'core:locacao-realizar' locacao.pk %}" class="btn btn-secondary ml-2 mb-4 float-right">Anterior</a>
         </form>
     </div>
