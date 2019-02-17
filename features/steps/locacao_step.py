@@ -24,7 +24,11 @@ def step_impl(context):
 
 @when(u'selecionar um item')
 def step_impl(context):
-    select = Select(context.browser.find_element_by_id('id_item'))
+    # context.browser.find_element_by_xpath(u'//select/option[@value="1"]]').click()
+    form = context.browser.find_element_by_xpath("//form[@id='form-item-add']")
+    select = Select(form.find_element_by_id('id_item'))
+    # context.browser.find_element_by_id('id_item').click()
+    # select = Select(context.browser.find_element_by_id('id_item'))
     select.select_by_index(1)
 
 @when(u'clicar em Adicionar Item')
@@ -38,7 +42,9 @@ def step_impl(context):
 
 @then(u'clicar no botão Concluir')
 def step_impl(context):
-    context.browser.find_element_by_xpath(u'//button[text()="Concluir"]').click()
+    element = context.browser.find_element_by_xpath(u'//button[text()="Concluir"]')
+    print(element)
+    element.click()
 
 @then(u'Locação concluída com sucesso.')
 def step_impl(context):
