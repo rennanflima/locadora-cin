@@ -28,8 +28,6 @@ install:
   - pip install -r requirements.txt
 before_script:
   - python manage.py migrate
-  - ls
-  - python create_user_test.py
   - python manage.py runserver &
   - sleep 3 # give django server time to bind to sockets
 script:
