@@ -14,7 +14,7 @@ def open_page(context, page):
 
 @when(u'clicar no botão adicionar')
 def click_bnt(context):
-    context.browser.find_element_by_link_text('Adicionar').click()
+    context.browser.find_element_by_id("id_add_genero").click()
 
 @when('preencher o campo nome com uma descrição')
 def insert_values_on_fields(context):
