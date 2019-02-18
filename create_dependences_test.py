@@ -1,21 +1,3 @@
-Skip to content
- 
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- @rennanflima Sign out
-1
-0 6 rennanflima/locadora-cin
-forked from mprof2018/locadora-cin
- Code  Pull requests 0  Projects 0  Wiki  Insights  Settings
-locadora-cin/create_dependences_test.py
-e87d61d  a day ago
-@wvs2 wvs2 Ajustando bbd
-      
-71 lines (55 sloc)  2.06 KB
 import os
 import django
 
@@ -86,16 +68,3 @@ filme.save()
 item, created = Item.objects.get_or_create(
     numero_serie='1111111', data_aquisicao='2019-02-01', tipo_midia=midia, filme=filme
 )
-© 2019 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-Press h to open a hovercard with more details.
