@@ -87,6 +87,6 @@ class Migration(migrations.Migration):
         ('core', '0008_auto_20190217_0755'),
     ]
 
-    # operations = [
-    #     migrations.RunPython(save_dependences),
-    # ]
+    operations = [
+        migrations.RunPython(save_dependences),
+    ]
