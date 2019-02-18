@@ -373,7 +373,7 @@ def carregar_item_ajax(request):
     item = get_object_or_404(Item, pk=item_id)
 
     if item.filme.is_lancamento:
-        data['valor'] = "%0.2f" % ((item.tipo_midia.valor * decimal.Decimal(1.5)), )
+        data['valor'] = localize((item.tipo_midia.valor * decimal.Decimal(1.5)), )
     else:
         data['valor'] = localize(decimal.Decimal(item.tipo_midia.valor))
 
